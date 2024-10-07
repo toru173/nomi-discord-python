@@ -1,0 +1,18 @@
+# Ignore Python cache and virtual environment files
+*.pyc
+__pycache__**
+venv/
+
+# Ignore Git repository files
+.git*
+
+# Ignore Docker files themselves
+Dockerfile
+.dockerignore
+start-docker.sh
+
+# Ignore environment files
+.env**
+
+# Ignore Documentation
+*.md
