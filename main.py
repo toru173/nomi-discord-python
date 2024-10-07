@@ -12,7 +12,7 @@ def trim_string(input_string: str, max_length: int = 600) -> str:
     if len(input_string) <= max_length:
         return did_trim, input_string
 
-
+    did_trim = True
     trimmed_string = input_string[:max_length]
     last_space = trimmed_string.rfind(' ')
 
