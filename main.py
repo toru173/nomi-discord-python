@@ -62,13 +62,12 @@ class NomiClient(discord.Client):
     _max_message_length = 600
     _max_message_length = _max_message_length - len(_message_suffix)
 
-    def __init__(self, nomi: Nomi, intents: discord.Intents) -> None:
-        print("Hi!")
-        if type(nomi) is not Nomi:
+    def __init__(self, *args, **kwargs) -> None:
+        if nomi in kwargs and type(nomi) is not Nomi:
             raise TypeError(f"Expected nomi to be a Nomi, got a {type(nomi)}")
         
         self._nomi = nomi
-        super().__init__(intents = intents)     
+        super().__init__(*args, **kwargs)     
 
     async def on_message(self, discord_message):
         # we do not want the Nomi to reply to themselves
@@ -103,7 +102,7 @@ class NomiClient(discord.Client):
 
             try:
                 # Attempt to send message
-                _, reply = nomi.send_message(nomi_message)
+                _, reply = self._nomi.send_message(nomi_message)
                 nomi_reply = reply.text
             except RuntimeError as e:
                 # If there's an error, use that as the reply
@@ -111,7 +110,8 @@ class NomiClient(discord.Client):
 
             # Attempt to substitute user ID in any mentions
             # Example: Replace plain-text @username with the proper mention
-            # Using a regular expression to find words that start with @
+            #          format: <@userid>
+            # Use a regular expression to find words that start with @
             pattern = r"@(\w+)"
             matches = re.findall(pattern, nomi_reply)
 
