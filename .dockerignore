@@ -11,8 +11,5 @@ Dockerfile
 .dockerignore
 start-docker.sh
 
-# Ignore environment files
-.env**
-
 # Ignore Documentation
 *.md
