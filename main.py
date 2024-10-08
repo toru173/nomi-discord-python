@@ -266,8 +266,6 @@ if __name__ == "__main__":
         if value is not None:
             message_modifiers[modifier] = strip_outer_quotation_marks(value)
 
-    stderr.write(str(message_modifiers))
-
     nomi_session = Session(api_key = nomi_api_key)
     nomi = Nomi.from_uuid(session = nomi_session, uuid = nomi_id)        
 
