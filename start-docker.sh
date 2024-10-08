@@ -61,6 +61,7 @@ DEFAULT_MESSAGE_PREFIX="*You receive a message from {author} on Discord* "
 DEFAULT_MESSAGE_SUFFIX="... (the message was cut off because it was too long)"
 CHANNEL_MESSAGE_PREFIX="*You receive a message from {author} in {channel} on {guild} on Discord* "
 DM_MESSAGE_PREFIX="*You receive a DM from {author} on Discord* "
+REACT_KEY_PHRASE="*I react to your message with {emoji}*"
 EOF
     echo "A $CONFIG_FILE configuration file was not found. Please open the $CONFIG_FILE"
     echo "file that has just been created in this folder and populate it with your"
