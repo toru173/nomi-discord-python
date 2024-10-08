@@ -29,45 +29,64 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import annotations
-import os
+from typing import Optional
+from os import environ
+from sys import stderr
 import re
 
 import discord
 from nomi import Session, Nomi
 
-def trim_string(input_string: str, max_length: int = 600) -> str:
-    did_trim = False
-    if len(input_string) <= max_length:
-        return did_trim, input_string
-
-    did_trim = True
-    trimmed_string = input_string[:max_length]
-    last_space = trimmed_string.rfind(' ')
-
-    if last_space != -1:
-        trimmed_string = trimmed_string[:last_space]
-
-    return did_trim, trimmed_string
-
 class NomiClient(discord.Client):
 
-    _message_prefix = "*You receive a message from {author} on Discord* "
-    _message_suffix = "... (the message is longer, but was cut off)"
+    _default_message_prefix = "*You receive a message from {author} on Discord* "
+    _default_message_suffix = "... (the message is longer, but was cut off)"
+    _default_max_message_length = 400
+    _max_max_message_length = 600
 
-    # =========================================================================
-    # =============================== IMPORTANT ===============================
-    # =========================================================================
-    # === Change the number below to '400' if you are a user on a free tier ===
-    # =========================================================================
-    _max_message_length = 600
-    _max_message_length = _max_message_length - len(_message_suffix)
-
-    def __init__(self, *args, **kwargs) -> None:
-        if nomi in kwargs and type(nomi) is not Nomi:
+    def __init__(self, *, nomi: Nomi, max_message_length: Optional[int] = None, message_prefix: Optional[str] = None, message_suffix: Optional[str] = None, intents: discord.Intents, **options) -> None:
+        if type(nomi) is not Nomi:
             raise TypeError(f"Expected nomi to be a Nomi, got a {type(nomi)}")
         
+        if message_prefix is not None:
+            if type(message_prefix) is not str:
+                raise TypeError(f"Expected message_prefix to be a str, got a {type(message_prefix)}")
+            self.message_prefix = message_prefix            
+        else:
+            self.message_prefix = self._default_message_prefix
+
+        if message_suffix is not None:
+            if type(message_suffix) is not str:
+                raise TypeError(f"Expected message_suffix to be a str, got a {type(message_suffix)}")
+            self.message_suffix = message_suffix            
+        else:
+            self.message_suffix = self._default_message_suffix              
+
+        if max_message_length is None:
+            max_message_length = self._default_max_message_length
+
+        if type(max_message_length) is not int:
+            raise TypeError(f"Expected max_message_length to be a int, got a {type(max_message_length)}")
+
+        if max_message_length > self._max_max_message_length:
+            raise ValueError(f"max_message_length should be equal to or less than {self._max_max_message_length}")
+        self.max_message_length = max_message_length      
+        
         self._nomi = nomi
-        super().__init__(*args, **kwargs)     
+
+        super().__init__(intents, **options)
+
+    def _trim_message(self, message: str) -> str:
+        if len(message) <= self.max_message_length:
+            return message
+
+        trimmed_message = message[:self.max_message_length + len(self.message_suffix)]
+        last_space = trimmed_message.rfind(' ')
+
+        if last_space != -1:
+            trimmed_message = trimmed_message[:last_space]
+
+        return trimmed_message + self.message_suffix
 
     async def on_message(self, discord_message):
         # we do not want the Nomi to reply to themselves
@@ -76,17 +95,17 @@ class NomiClient(discord.Client):
 
         # Check if the Nomi is mentioned in the message
         if self.user in discord_message.mentions:
-
+            # The Nomi was mentioned. Now check to see if any other users were
+            # mentioned, and convert their mention_id to either their displayname
+            # or username
             for user in discord_message.mentions:
-                # Get the nickname if available, otherwise use the username
-                try:
-                    name = user.nick if user.nick else user.name
-                except AttributeError:
-                    name = user.name
-                mention_text = f"<@{user.id}>"
+                # Get the displayname if available, otherwise use the username.
+                # If the displayname isn't set this should just be their username.
+                name = user.display_name
+                mention_id = f"<@{user.id}>"
 
-                # Replace the mention with the nickname
-                discord_message_content = discord_message.content.replace(mention_text, name)
+                # Replace the mention with the displayname
+                discord_message_content = discord_message.content.replace(mention_id, name)
 
             # Build the message to send to the Nomi
             nomi_message = self._message_prefix.format(author = discord_message.author,
@@ -94,18 +113,15 @@ class NomiClient(discord.Client):
                                                        guild = discord_message.guild)
             
             nomi_message = nomi_message + discord_message_content
-
-            did_trim, nomi_message = trim_string(nomi_message, max_length = self._max_message_length)
-
-            if did_trim:
-                nomi_message = nomi_message + self._message_suffix
+            nomi_message = self._trim_message(nomi_message)
 
             try:
                 # Attempt to send message
                 _, reply = self._nomi.send_message(nomi_message)
                 nomi_reply = reply.text
             except RuntimeError as e:
-                # If there's an error, use that as the reply
+                # If there's an error, use that as the reply so we can let
+                # the user know what went wrong
                 nomi_reply = f"❌ ERROR ❌\n{str(e)}"
 
             # Attempt to substitute user ID in any mentions
@@ -139,22 +155,47 @@ class NomiClient(discord.Client):
 
             await discord_message.channel.send(nomi_reply)  
 
+def read_variable_from_file(variable_name: str, filename: str) -> Optional[str]:
+    try:
+        with open(filename, 'r') as file:
+            for line in file:
+                # Strip leading/trailing whitespace and newline characters
+                line = line.strip()
+                # Check if the line starts with the variable name followed by '='
+                if line.startswith(f"{variable_name}="):
+                    # Return the part after "VARIABLE_NAME="
+                    return line[len(f"{variable_name}="):]
+        # If the variable is not found, return None
+        return None
+    except (FileNotFoundError, IOError):
+        # Return None if the file cannot be found or read
+        return None
+
 if __name__ == "__main__":
-    # Read environment variables
-    nomi_api_key = os.environ.get('NOMI_API_KEY')
-    nomi_id = os.environ.get('NOMI_ID')
-    discord_bot_token = os.environ.get('DISCORD_BOT_TOKEN')
+    # Read variables from config file
+    CONFIG_FILE = "nomi.conf"
+
+    CONFIG_VARIABLES = ["DISCORD_API_TOKEN",
+                        "NOMI_API_KEY",
+                        "NOMI_ID",
+                        "MAX_MESSAGE_LENGTH",
+                        "MESSAGE_PREFIX",
+                        "MESSAGE_SUFFIX",
+    ]
+
+    for variable in CONFIG_VARIABLES:
+        globals()[variable.lower()] = read_variable_from_file(variable)
+
+    if discord_api_token is None:
+        stderr.write("DISCORD_API_TOKEN was not found in the configuration file, or the file was not found")
+        exit(1)
 
     if nomi_api_key is None:
-        print("NOMI_API_KEY not found in the .env file")
+        stderr.write("NOMI_API_KEY was not found in the configuration file, or the file was not found")
         exit(1)
 
     if nomi_id is None:
-        print("NOMI_ID not found in the .env file")
-        exit(1)
-
-    if discord_bot_token is None:
-        print("DISCORD_BOT_TOKEN not found in the .env file")
+        stderr.write("NOMI_ID was not found in the configuration file, or the file was not found")
         exit(1)
 
     nomi_session = Session(api_key = nomi_api_key)
@@ -164,5 +205,10 @@ if __name__ == "__main__":
     intents.messages = True
     intents.members = True
 
-    client = NomiClient(nomi = nomi, intents = intents)
-    client.run(discord_bot_token)
+    client = NomiClient(nomi = nomi,
+                        max_message_length = max_message_length,
+                        message_prefix = message_prefix,
+                        message_suffix = message_suffix,
+                        intents = intents)
+    
+    client.run(discord_api_token)

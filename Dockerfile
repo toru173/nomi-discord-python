@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the requirements file if it exists
+# Copy the requirements file into the working directory
 COPY requirements.txt .
 
 # Install dependencies if requirements.txt exists
@@ -49,5 +49,5 @@ ENV PYTHON_SCRIPT=main.py
 # Make the script executable
 RUN chmod +x $PYTHON_SCRIPT
 
-# Set the entrypoint to use the environment variable
+# Set the entrypoint to the python script
 ENTRYPOINT ["sh", "-c", "./$PYTHON_SCRIPT"]

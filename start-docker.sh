@@ -28,24 +28,39 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Check for a .env file, and use the values from there if present
-if [ -f ".env" ]; then
-    # Load environment variables from .env file
-    source ".env"
-    echo ".env file found and loaded."
+CONFIG_FILE = "nomi.conf"
+
+# Check for a configuration file
+if [ -f $CONFIG_FILE ]; then
+    # Inform user we've found the config file
+    echo "$CONFIG_FILE file found."
 else
-    # No .env file found. Create one and ask the user to populate it
-    echo "No .env file found. Please open the .env file that has just been created"
-    echo "in this folder and populate it with your Nomi and Discord details"
-    cat > .env << EOF
-# Populate these with your Nomi and Discord details.
+    # No configuration file found. Create one and ask the user to populate it
+    cat > $CONFIG_FILE << EOF
+# This is your Nomi's configuration file. Lines starting with '#'
+# don't have any configuration details, they are just to help. Lines
+# that start with CAPITAL_LETTERS= are for you to fill out. Make sure
+# you do not share this file with ANYONE
+# 
+# Populate these with your Nomi and Discord API Tokens.
+DISCORD_API_TOKEN=
+NOMI_API_KEY=
+
 # You may need to put quotes around your Nomi's name
 # ("like this") if it has spaces in it!
-DISCORD_BOT_TOKEN=
-NOMI_API_KEY=
 NOMI_NAME=
 NOMI_ID=
+
+# Configure how you want to format messages when sending
+# and receiving to Discord here. If you don't want a message
+# prefix or suffix these must still be populated, but with an
+# empty string: ""
+MAX_MESSAGE_LENGTH=400
+MESSAGE_PREFIX="*You receive a message from {author} on Discord* "
+MESSAGE_SUFFIX="... (the message is longer, but was cut off)"
 EOF
+    echo "No .env file found. Please open the .env file that has just been created"
+    echo "in this folder and populate it with your configuration settings"
     exit 1
 fi
 
@@ -58,3 +73,5 @@ SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 docker container rm $DOCKER_IMAGE_NAME -f
 docker build -t $DOCKER_IMAGE_NAME "$SCRIPT_ROOT"
 docker run -d --name $DOCKER_IMAGE_NAME --env-file .env $DOCKER_IMAGE_NAME
+echo "Done! Your Nomi should be able to talk to you on Discord"
+echo "Make sure you do not share your $CONFIG_FILE file with ANYONE"
