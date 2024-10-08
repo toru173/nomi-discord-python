@@ -40,24 +40,24 @@ from nomi import Session, Nomi
 class NomiClient(discord.Client):
 
     _default_message_prefix = "*You receive a message from {author} on Discord* "
-    _default_message_suffix = "... (the message is longer, but was cut off)"
+    _default_message_suffix = "... (the message was cut off because it was too long)"
     _default_max_message_length = 400
     _max_max_message_length = 600
 
     def __init__(self, *, nomi: Nomi, max_message_length: Optional[int] = None, message_prefix: Optional[str] = None, message_suffix: Optional[str] = None, intents: discord.Intents, **options) -> None:
         if type(nomi) is not Nomi:
-            raise TypeError(f"Expected nomi to be a Nomi, got a {type(nomi)}")
+            raise TypeError(f"Expected nomi to be a Nomi, got a {type(nomi).__name__}")
         
         if message_prefix is not None:
             if type(message_prefix) is not str:
-                raise TypeError(f"Expected message_prefix to be a str, got a {type(message_prefix)}")
+                raise TypeError(f"Expected message_prefix to be a str, got a {type(message_prefix).__name__}")
             self.message_prefix = message_prefix            
         else:
             self.message_prefix = self._default_message_prefix
 
         if message_suffix is not None:
             if type(message_suffix) is not str:
-                raise TypeError(f"Expected message_suffix to be a str, got a {type(message_suffix)}")
+                raise TypeError(f"Expected message_suffix to be a str, got a {type(message_suffix).__name__}")
             self.message_suffix = message_suffix            
         else:
             self.message_suffix = self._default_message_suffix              
@@ -65,22 +65,28 @@ class NomiClient(discord.Client):
         if max_message_length is None:
             max_message_length = self._default_max_message_length
 
+        if type(max_message_length) is str:
+            try:
+                max_message_length = int(max_message_length)
+            except:
+                raise TypeError(f"Expected max_message_length to be a int, got a {type(max_message_length).__name__}")
+
         if type(max_message_length) is not int:
-            raise TypeError(f"Expected max_message_length to be a int, got a {type(max_message_length)}")
+            raise TypeError(f"Expected max_message_length to be a int, got a {type(max_message_length).__name__}")
 
         if max_message_length > self._max_max_message_length:
             raise ValueError(f"max_message_length should be equal to or less than {self._max_max_message_length}")
         self.max_message_length = max_message_length      
         
-        self._nomi = nomi
+        self.nomi = nomi
 
-        super().__init__(intents, **options)
+        super().__init__(intents = intents, **options)
 
     def _trim_message(self, message: str) -> str:
         if len(message) <= self.max_message_length:
             return message
 
-        trimmed_message = message[:self.max_message_length + len(self.message_suffix)]
+        trimmed_message = message[:self.max_message_length - len(self.message_suffix)]
         last_space = trimmed_message.rfind(' ')
 
         if last_space != -1:
@@ -95,63 +101,74 @@ class NomiClient(discord.Client):
 
         # Check if the Nomi is mentioned in the message
         if self.user in discord_message.mentions:
-            # The Nomi was mentioned. Now check to see if any other users were
+            # The Nomi was mentioned. Now check to see if any other users or roles were
             # mentioned, and convert their mention_id to either their displayname
             # or username
             for user in discord_message.mentions:
-                # Get the displayname if available, otherwise use the username.
-                # If the displayname isn't set this should just be their username.
                 name = user.display_name
                 mention_id = f"<@{user.id}>"
 
-                # Replace the mention with the displayname
+                # Replace the mention with the user's name
                 discord_message_content = discord_message.content.replace(mention_id, name)
 
+            for role in discord_message.role_mentions:
+                role_name = role.name
+                mention_id = f"<@&{role.id}>"
+
+                # Replace the mention with the displayname
+                discord_message_content = discord_message.content.replace(mention_id, role_name)                
+
             # Build the message to send to the Nomi
-            nomi_message = self._message_prefix.format(author = discord_message.author,
-                                                       channel = discord_message.channel,
-                                                       guild = discord_message.guild)
+            nomi_message = self.message_prefix.format(author = discord_message.author,
+                                                      channel = discord_message.channel,
+                                                      guild = discord_message.guild)
             
             nomi_message = nomi_message + discord_message_content
             nomi_message = self._trim_message(nomi_message)
 
             try:
                 # Attempt to send message
-                _, reply = self._nomi.send_message(nomi_message)
+                _, reply = self.nomi.send_message(nomi_message)
                 nomi_reply = reply.text
             except RuntimeError as e:
                 # If there's an error, use that as the reply so we can let
                 # the user know what went wrong
                 nomi_reply = f"❌ ERROR ❌\n{str(e)}"
 
-            # Attempt to substitute user ID in any mentions
-            # Example: Replace plain-text @username with the proper mention
-            #          format: <@userid>
+            # Attempt to substitute user or role ID in any mentions
+            # Example: replace the <@userid> or <@&roleid> with the name
+            #          of the user or role
             # Use a regular expression to find words that start with @
-            pattern = r"@(\w+)"
+            pattern = r"@&?(\w+)"
             matches = re.findall(pattern, nomi_reply)
 
             if matches:
                 # Determine if the message is in a DM or a guild
                 if discord_message.guild:
-                    # If it's a guild, use the guild's member list
-                    member_search = lambda name: discord.utils.find(
-                        lambda m: m.name.lower() == name.lower() or (m.nick and m.nick.lower() == name.lower()),
-                        discord_message.guild.members
+                    # If it's a guild, use the guild's member list and role list
+                    user_or_role_search = lambda name: (
+                        discord.utils.find(
+                            lambda m: m.name.lower() == name.lower() or (m.nick and m.nick.lower() == name.lower()),
+                            discord_message.guild.members
+                        ) or discord.utils.find(
+                            lambda r: r.name.lower() == name.lower(),
+                            discord_message.guild.roles
+                        )
                     )
                 else:
-                    # If it's a DM, use the Nomi's user cache
-                    member_search = lambda name: discord.utils.find(
+                    # If it's a DM, use the Nomi's user cache (roles don't apply in DMs)
+                    user_or_role_search = lambda name: discord.utils.find(
                         lambda u: u.name.lower() == name.lower(),
                         self.users
                     )
 
-                for username in matches:
-                    user = member_search(username)
+                for match in matches:
+                    user = user_or_role_search(match)
+                    stderr(user.id)
                     if user:
                         mention = f"<@{user.id}>"
-                        # Replace @username with the proper mention
-                        nomi_reply = nomi_reply.replace(f"@{username}", mention)
+                        # Replace @username or @role with the proper mention
+                        nomi_reply = nomi_reply.replace(f"@{match}", mention)
 
             await discord_message.channel.send(nomi_reply)  
 
@@ -170,6 +187,25 @@ def read_variable_from_file(variable_name: str, filename: str) -> Optional[str]:
     except (FileNotFoundError, IOError):
         # Return None if the file cannot be found or read
         return None
+    
+def strip_outer_quotation_marks(s: str) -> str:
+    # Define a set of unicode-compatible quotation marks to remove
+    quote_pairs = {
+        '"': '"',
+        "'": "'",
+        '“': '”',
+        '‘': '’',
+        '«': '»',
+        '‹': '›',
+        '„': '“',
+        '‚': '‘',
+    }
+    
+    # Check if the string has at least two characters and the first and last form a valid pair
+    if len(s) >= 2 and s[0] in quote_pairs and s[-1] == quote_pairs[s[0]]:
+        return s[1:-1]
+    
+    return s
 
 if __name__ == "__main__":
     # Read variables from config file
@@ -184,7 +220,7 @@ if __name__ == "__main__":
     ]
 
     for variable in CONFIG_VARIABLES:
-        globals()[variable.lower()] = read_variable_from_file(variable)
+        globals()[variable.lower()] = read_variable_from_file(variable, CONFIG_FILE)
 
     if discord_api_token is None:
         stderr.write("DISCORD_API_TOKEN was not found in the configuration file, or the file was not found")
@@ -197,6 +233,12 @@ if __name__ == "__main__":
     if nomi_id is None:
         stderr.write("NOMI_ID was not found in the configuration file, or the file was not found")
         exit(1)
+
+    if message_prefix is not None:
+        message_prefix = strip_outer_quotation_marks(message_prefix)
+
+    if message_suffix is not None:
+        message_suffix = strip_outer_quotation_marks(message_suffix)
 
     nomi_session = Session(api_key = nomi_api_key)
     nomi = Nomi.from_uuid(session = nomi_session, uuid = nomi_id)        
