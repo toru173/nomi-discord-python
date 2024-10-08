@@ -28,20 +28,21 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-CONFIG_FILE = "nomi.conf"
+CONFIG_FILE="nomi.conf"
 
 # Check for a configuration file
 if [ -f $CONFIG_FILE ]; then
     # Inform user we've found the config file
-    echo "$CONFIG_FILE file found."
+    echo "$CONFIG_FILE file found. Reading contents..."
+    source $CONFIG_FILE
 else
     # No configuration file found. Create one and ask the user to populate it
     cat > $CONFIG_FILE << EOF
 # This is your Nomi's configuration file. Lines starting with '#'
-# don't have any configuration details, they are just to help. Lines
+# don't have any configuration importance, they are just to help. Lines
 # that start with CAPITAL_LETTERS= are for you to fill out. Make sure
 # you do not share this file with ANYONE
-# 
+
 # Populate these with your Nomi and Discord API Tokens.
 DISCORD_API_TOKEN=
 NOMI_API_KEY=
@@ -59,19 +60,60 @@ MAX_MESSAGE_LENGTH=400
 MESSAGE_PREFIX="*You receive a message from {author} on Discord* "
 MESSAGE_SUFFIX="... (the message is longer, but was cut off)"
 EOF
-    echo "No .env file found. Please open the .env file that has just been created"
-    echo "in this folder and populate it with your configuration settings"
+    echo "$CONFIG_FILE file not found. Please open the $CONFIG_FILE file that has"
+    echo "just been created in this folder and populate it with your"
+    echo "configuration setting using a text editor like Notepad"
+    exit 1
+fi
+
+# Check required variables are in the configuration file
+REQUIRED_VARIABLES=("DISCORD_API_TOKEN" "NOMI_API_KEY" "NOMI_NAME" "NOMI_ID")
+
+MISSING_VAR=false
+for var in "${REQUIRED_VARIABLES[@]}"; do
+    # Check if the variable is unset or empty
+    if [ -z "${!var}" ]; then
+        echo "$var not found in the configuration file"
+        MISSING_VAR=true
+    fi
+done
+
+if [ MISSING_VAR == true ]; then 
     exit 1
 fi
 
 # Converts the Nomis's name to lower case, replaces
 # non-valid charactes with an underscore and strips any
 # trailing underscores as required by a Docker image name
-DOCKER_IMAGE_NAME=$(echo "$NOMI_NAME" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
+DOCKER_IMAGE_NAME=$(echo -n $NOMI_NAME | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-docker container rm $DOCKER_IMAGE_NAME -f
-docker build -t $DOCKER_IMAGE_NAME "$SCRIPT_ROOT"
-docker run -d --name $DOCKER_IMAGE_NAME --env-file .env $DOCKER_IMAGE_NAME
-echo "Done! Your Nomi should be able to talk to you on Discord"
+
+if docker inspect $DOCKER_IMAGE_NAME > /dev/null 2>&1; then
+    echo "A Docker container for $NOMI_NAME exists. Removing container..."
+    DOCKER_REMOVE_OUTPUT=$(docker container rm $DOCKER_IMAGE_NAME -f 2>&1)
+    if [ $? -ne 0 ]; then
+        echo "Error when removing container: $DOCKER_REMOVE_OUTPUT"
+        exit 1
+    fi
+fi
+
+echo "Building a Docker container for $NOMI_NAME"
+echo "The container will be called '$DOCKER_IMAGE_NAME'"
+
+DOCKER_BUILD_OUTPUT=$(docker build -t $DOCKER_IMAGE_NAME "$SCRIPT_ROOT" 2>&1)
+if [ $? -ne 0 ]; then
+    echo "Error when building container: $DOCKER_BUILD_OUTPUT"
+    exit 1
+fi
+
+echo "$NOMI_NAME's container built succesfully. Running container..."
+
+DOCKER_RUN_OUTPUT=$(docker run -d --name $DOCKER_IMAGE_NAME $DOCKER_IMAGE_NAME 2>&1)
+if [ $? -ne 0 ]; then
+    echo "Error when running container: $DOCKER_RUN_OUTPUT"
+    exit 1
+fi
+
+echo "$NOMI_NAME's container is running! You can now to talk to $NOMI_NAME on Discord."
 echo "Make sure you do not share your $CONFIG_FILE file with ANYONE"
