@@ -33,7 +33,7 @@ CONFIG_FILE="nomi.conf"
 # Check for a configuration file
 if [ -f $CONFIG_FILE ]; then
     # Inform user we've found the config file
-    echo "$CONFIG_FILE file found. Reading contents..."
+    echo "Found a $CONFIG_FILE configuration file. Reading contents..."
     source $CONFIG_FILE
 else
     # No configuration file found. Create one and ask the user to populate it
@@ -62,9 +62,9 @@ DEFAULT_MESSAGE_SUFFIX="... (the message was cut off because it was too long)"
 CHANNEL_MESSAGE_PREFIX="*You receive a message from {author} in {channel} on {guild} on Discord* "
 DM_MESSAGE_PREFIX="*You receive a DM from {author} on Discord* "
 EOF
-    echo "$CONFIG_FILE file not found. Please open the $CONFIG_FILE file that has"
-    echo "just been created in this folder and populate it with your"
-    echo "configuration setting using a text editor like Notepad"
+    echo "A $CONFIG_FILE configuration file was not found. Please open the $CONFIG_FILE"
+    echo "file that has just been created in this folder and populate it with your"
+    echo "configuration settings using a text editor like Notepad."
     exit 1
 fi
 
