@@ -37,30 +37,28 @@ import re
 import discord
 from nomi import Session, Nomi
 
+# NomiClient Class. This is the main handler
 class NomiClient(discord.Client):
 
     _default_message_prefix = "*You receive a message from {author} on Discord* "
     _default_message_suffix = "... (the message was cut off because it was too long)"
+    _default_channel_message_prefix = "*You receive a message from {author} in {channel} on {guild} on Discord* "
+    _default_dm_message_prefix = "*You receive a DM from {author} on Discord* "
     _default_max_message_length = 400
     _max_max_message_length = 600
 
-    def __init__(self, *, nomi: Nomi, max_message_length: Optional[int] = None, message_prefix: Optional[str] = None, message_suffix: Optional[str] = None, intents: discord.Intents, **options) -> None:
+    def __init__(self, *, nomi: Nomi, max_message_length: Optional[int] = None, message_modifiers: dict[str, str], intents: discord.Intents, **options) -> None:
         if type(nomi) is not Nomi:
             raise TypeError(f"Expected nomi to be a Nomi, got a {type(nomi).__name__}")
         
-        if message_prefix is not None:
-            if type(message_prefix) is not str:
-                raise TypeError(f"Expected message_prefix to be a str, got a {type(message_prefix).__name__}")
-            self.message_prefix = message_prefix            
-        else:
-            self.message_prefix = self._default_message_prefix
-
-        if message_suffix is not None:
-            if type(message_suffix) is not str:
-                raise TypeError(f"Expected message_suffix to be a str, got a {type(message_suffix).__name__}")
-            self.message_suffix = message_suffix            
-        else:
-            self.message_suffix = self._default_message_suffix              
+        for modifier, value in message_modifiers.items():
+            if value is not None:
+                if not isinstance(value, str):
+                    raise TypeError(f"Expected message modifier '{modifier}' to be a str, got a {type(value).__name__}")
+                # Dynamically set the attribute based on the key
+                setattr(self, modifier, value)
+            else:
+                setattr(self, modifier, self._default_channel_message_prefix)
 
         if max_message_length is None:
             max_message_length = self._default_max_message_length
@@ -82,6 +80,7 @@ class NomiClient(discord.Client):
 
         super().__init__(intents = intents, **options)
 
+
     def _trim_message(self, message: str) -> str:
         if len(message) <= self.max_message_length:
             return message
@@ -94,34 +93,51 @@ class NomiClient(discord.Client):
 
         return trimmed_message + self.message_suffix
 
+
     async def on_message(self, discord_message):
-        # we do not want the Nomi to reply to themselves
+        # We do not want the Nomi to reply to themselves
         if discord_message.author.id == self.user.id:
             return
 
-        # Check if the Nomi is mentioned in the message
-        if self.user in discord_message.mentions:
-            # The Nomi was mentioned. Now check to see if any other users or roles were
-            # mentioned, and convert their mention_id to either their displayname
-            # or username
+        # Check if the Nomi is mentioned in the message, or if we're in DMs
+        if self.user in discord_message.mentions or discord_message.guild is None:
+            # The Nomi was mentioned (or we're DMing). Now check to see if any other
+            # users or roles were mentioned, and convert their mention_id to their
+            # username or display name
+
+            discord_message_content = discord_message.content
+
             for user in discord_message.mentions:
                 name = user.display_name
                 mention_id = f"<@{user.id}>"
 
                 # Replace the mention with the user's name
-                discord_message_content = discord_message.content.replace(mention_id, name)
+                discord_message_content = discord_message_content.replace(mention_id, name)
 
             for role in discord_message.role_mentions:
                 role_name = role.name
                 mention_id = f"<@&{role.id}>"
 
-                # Replace the mention with the displayname
-                discord_message_content = discord_message.content.replace(mention_id, role_name)                
+                # Replace the mention with the role's name
+                discord_message_content = discord_message_content.replace(mention_id, role_name)                
 
             # Build the message to send to the Nomi
-            nomi_message = self.message_prefix.format(author = discord_message.author,
-                                                      channel = discord_message.channel,
-                                                      guild = discord_message.guild)
+            author = discord_message.author
+            message_prefix = self._default_message_prefix
+
+            # In DMs channel and guild are None
+            if isinstance(discord_message.channel, discord.DMChannel):
+                channel = None
+                guild = None
+                message_prefix = self.dm_message_prefix
+            else:
+                channel = discord_message.channel
+                guild = discord_message.guild
+                message_prefix = self.channel_message_prefix
+
+            nomi_message = message_prefix.format(author = author,
+                                                 channel = channel,
+                                                 guild = guild)
             
             nomi_message = nomi_message + discord_message_content
             nomi_message = self._trim_message(nomi_message)
@@ -164,7 +180,6 @@ class NomiClient(discord.Client):
 
                 for match in matches:
                     user = user_or_role_search(match)
-                    stderr(user.id)
                     if user:
                         mention = f"<@{user.id}>"
                         # Replace @username or @role with the proper mention
@@ -172,6 +187,8 @@ class NomiClient(discord.Client):
 
             await discord_message.channel.send(nomi_reply)  
 
+
+# Utility Functions
 def read_variable_from_file(variable_name: str, filename: str) -> Optional[str]:
     try:
         with open(filename, 'r') as file:
@@ -187,7 +204,8 @@ def read_variable_from_file(variable_name: str, filename: str) -> Optional[str]:
     except (FileNotFoundError, IOError):
         # Return None if the file cannot be found or read
         return None
-    
+
+  
 def strip_outer_quotation_marks(s: str) -> str:
     # Define a set of unicode-compatible quotation marks to remove
     quote_pairs = {
@@ -207,6 +225,7 @@ def strip_outer_quotation_marks(s: str) -> str:
     
     return s
 
+
 if __name__ == "__main__":
     # Read variables from config file
     CONFIG_FILE = "nomi.conf"
@@ -215,8 +234,10 @@ if __name__ == "__main__":
                         "NOMI_API_KEY",
                         "NOMI_ID",
                         "MAX_MESSAGE_LENGTH",
-                        "MESSAGE_PREFIX",
-                        "MESSAGE_SUFFIX",
+                        "DEFAULT_MESSAGE_PREFIX",
+                        "DEFAULT_MESSAGE_SUFFIX",
+                        "CHANNEL_MESSAGE_PREFIX",
+                        "DM_MESSAGE_PREFIX",
     ]
 
     for variable in CONFIG_VARIABLES:
@@ -234,11 +255,18 @@ if __name__ == "__main__":
         stderr.write("NOMI_ID was not found in the configuration file, or the file was not found")
         exit(1)
 
-    if message_prefix is not None:
-        message_prefix = strip_outer_quotation_marks(message_prefix)
+    message_modifiers = {
+        "default_message_prefix" : default_message_prefix,
+        "default_message_suffix" : default_message_suffix,
+        "channel_message_prefix" : channel_message_prefix,
+        "dm_message_prefix" : dm_message_prefix, 
+    }
 
-    if message_suffix is not None:
-        message_suffix = strip_outer_quotation_marks(message_suffix)
+    for modifier, value in message_modifiers.items():
+        if value is not None:
+            message_modifiers[modifier] = strip_outer_quotation_marks(value)
+
+    stderr.write(str(message_modifiers))
 
     nomi_session = Session(api_key = nomi_api_key)
     nomi = Nomi.from_uuid(session = nomi_session, uuid = nomi_id)        
@@ -249,8 +277,7 @@ if __name__ == "__main__":
 
     client = NomiClient(nomi = nomi,
                         max_message_length = max_message_length,
-                        message_prefix = message_prefix,
-                        message_suffix = message_suffix,
+                        message_modifiers = message_modifiers,
                         intents = intents)
     
     client.run(discord_api_token)

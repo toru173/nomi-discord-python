@@ -57,8 +57,10 @@ NOMI_ID=
 # prefix or suffix these must still be populated, but with an
 # empty string: ""
 MAX_MESSAGE_LENGTH=400
-MESSAGE_PREFIX="*You receive a message from {author} on Discord* "
-MESSAGE_SUFFIX="... (the message is longer, but was cut off)"
+DEFAULT_MESSAGE_PREFIX="*You receive a message from {author} on Discord* "
+DEFAULT_MESSAGE_SUFFIX="... (the message was cut off because it was too long)"
+CHANNEL_MESSAGE_PREFIX="*You receive a message from {author} in {channel} on {guild} on Discord* "
+DM_MESSAGE_PREFIX="*You receive a DM from {author} on Discord* "
 EOF
     echo "$CONFIG_FILE file not found. Please open the $CONFIG_FILE file that has"
     echo "just been created in this folder and populate it with your"
