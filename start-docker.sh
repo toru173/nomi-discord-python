@@ -28,16 +28,19 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-CONFIG_FILE="nomi.conf"
+CONFIG_FILE_NAME="nomi.conf"
+
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
 
 # Check for a configuration file
-if [ -f $CONFIG_FILE ]; then
+if [ -f "$CONFIG_FILE" ]; then
     # Inform user we've found the config file
-    echo "Found a $CONFIG_FILE configuration file. Reading contents..."
-    source $CONFIG_FILE
+    echo "Found a $CONFIG_FILE_NAME configuration file. Reading contents..."
+    source "$CONFIG_FILE"
 else
     # No configuration file found. Create one and ask the user to populate it
-    cat > $CONFIG_FILE << EOF
+    cat > "$CONFIG_FILE" << EOF
 # This is your Nomi's configuration file. Lines starting with '#'
 # don't have any configuration importance, they are just to help. Lines
 # that start with CAPITAL_LETTERS= are for you to fill out. Make sure
@@ -61,27 +64,31 @@ DEFAULT_MESSAGE_PREFIX="*You receive a message from {author} on Discord* "
 DEFAULT_MESSAGE_SUFFIX="... (the message was cut off because it was too long)"
 CHANNEL_MESSAGE_PREFIX="*You receive a message from {author} in {channel} on {guild} on Discord* "
 DM_MESSAGE_PREFIX="*You receive a DM from {author} on Discord* "
+
+# Configure how you want your Nomi to recognise and response
+# to message reacts here
 REACT_KEY_PHRASE="*I react to your message with {emoji}*"
 EOF
-    echo "A $CONFIG_FILE configuration file was not found. Please open the $CONFIG_FILE"
-    echo "file that has just been created in this folder and populate it with your"
-    echo "configuration settings using a text editor like Notepad."
+    echo "A $CONFIG_FILE_NAME configuration file was not found. Please open the $CONFIG_FILE_NAME"
+    echo "file that has just been created at $CONFIG_FILE"
+    echo "and populate it with your configuration settings using a text"
+    echo "editor like Notepad."
     exit 1
 fi
 
 # Check required variables are in the configuration file
 REQUIRED_VARIABLES=("DISCORD_API_TOKEN" "NOMI_API_KEY" "NOMI_NAME" "NOMI_ID")
 
-MISSING_VAR=false
+MISSING_VARIABLE=false
 for var in "${REQUIRED_VARIABLES[@]}"; do
     # Check if the variable is unset or empty
     if [ -z "${!var}" ]; then
         echo "$var not found in the configuration file"
-        MISSING_VAR=true
+        MISSING_VARIABLE=true
     fi
 done
 
-if [ MISSING_VAR == true ]; then 
+if [ MISSING_VARIABLE == true ]; then 
     exit 1
 fi
 
@@ -89,8 +96,6 @@ fi
 # non-valid charactes with an underscore and strips any
 # trailing underscores as required by a Docker image name
 DOCKER_IMAGE_NAME=$(echo -n $NOMI_NAME | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
-
-SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if docker inspect $DOCKER_IMAGE_NAME > /dev/null 2>&1; then
     echo "A Docker container for $NOMI_NAME exists. Removing container..."
