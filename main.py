@@ -97,15 +97,15 @@ if __name__ == "__main__":
         globals()[variable.lower()] = read_variable_from_file(variable, CONFIG_FILE)
 
     if discord_api_token is None:
-        logging.ERROR("DISCORD_API_TOKEN was not found in the configuration file, or the file was not found")
+        logging.error("DISCORD_API_TOKEN was not found in the configuration file, or the file was not found")
         exit(1)
 
     if nomi_api_key is None:
-        logging.ERROR("NOMI_API_KEY was not found in the configuration file, or the file was not found")
+        logging.error("NOMI_API_KEY was not found in the configuration file, or the file was not found")
         exit(1)
 
     if nomi_id is None:
-        logging.ERROR("NOMI_ID was not found in the configuration file, or the file was not found")
+        logging.error("NOMI_ID was not found in the configuration file, or the file was not found")
         exit(1)
 
     message_modifiers = {
@@ -130,8 +130,7 @@ if __name__ == "__main__":
     nomi = NomiBot(nomi = nomi,
                    max_message_length = max_message_length,
                    message_modifiers = message_modifiers,
-                   intents = intents,
-                   root_logger = True
+                   intents = intents
                 )
     
     nomi.run(token = discord_api_token, root_logger = True)

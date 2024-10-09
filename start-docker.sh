@@ -66,8 +66,10 @@ CHANNEL_MESSAGE_PREFIX="*You receive a message from {author} in {channel} on {gu
 DM_MESSAGE_PREFIX="*You receive a DM from {author} on Discord* "
 
 # Configure how you want your Nomi to recognise and response
-# to message reacts here
-REACT_KEY_PHRASE="*I react to your message with {emoji}*"
+# to message reacts here. Editing this is not recommended
+# as the app does not directly match this phrase when looking
+# for messages from your Nomi that contain a react.
+REACT_TRIGGER_PHRASE=""
 EOF
     echo "A $CONFIG_FILE_NAME configuration file was not found. Please open the $CONFIG_FILE_NAME"
     echo "file that has just been created at $CONFIG_FILE"

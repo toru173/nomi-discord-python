@@ -31,10 +31,10 @@
 from __future__ import annotations
 from typing import Optional
 
-import re
 import logging
 
 import discord
+import regex
 from discord.ext import commands
 from nomi import Nomi
 
@@ -46,30 +46,16 @@ class NomiBot(commands.Bot):
     _default_message_suffix = "... (the message was cut off because it was too long)"
     _default_channel_message_prefix = "*You receive a message from {author} in {channel} on {guild} on Discord* "
     _default_dm_message_prefix = "*You receive a DM from {author} on Discord* "
-    _default_react_trigger_phrase = "I react to your message with {emoji}"
+    _default_react_trigger_phrase = r"I\s*react.*?with\s*\p{Emoji}"
 
     _default_max_message_length = 400
     _max_max_message_length = 600
 
-    _emoji_pattern = (
-        "["
-        "\U0001F600-\U0001F64F"  # Emoticons
-        "\U0001F300-\U0001F5FF"  # Symbols & Pictographs
-        "\U0001F680-\U0001F6FF"  # Transport & Map Symbols
-        "\U0001F700-\U0001F77F"  # Alchemical Symbols
-        "\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
-        "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
-        "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
-        "\U0001FA00-\U0001FA6F"  # Chess Symbols
-        "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
-        "\U00002702-\U000027B0"  # Dingbats
-        "\U000024C2-\U0001F251" 
-        "]+"
-    )    
-
     def __init__(self, *, nomi: Nomi, max_message_length: Optional[int] = None, message_modifiers: dict[str, str], intents: discord.Intents, **options) -> None:
         if type(nomi) is not Nomi:
             raise TypeError(f"Expected nomi to be a Nomi, got a {type(nomi).__name__}")
+        
+        self.nomi = nomi
         
         for modifier, value in message_modifiers.items():
             if value is not None:
@@ -83,17 +69,7 @@ class NomiBot(commands.Bot):
                 else:
                     setattr(self, modifier, self._default_react_trigger_phrase)
 
-        # Escape the trigger phrase to treat special characters literally
-        self.react_trigger_phrase = re.escape(self.react_trigger_phrase)
-        
-        # Replace escaped asterisks (\*) with \*? to make them optional
-        self.react_trigger_phrase = self.react_trigger_phrase.replace(r"\*", r"\*?")
-        
-        # Replace escaped spaces (\ ) with \s* to make them optional
-        self.react_trigger_phrase = self.react_trigger_phrase.replace(r"\ ", r"\s*")                    
-
-        react_trigger_pattern_string = self.react_trigger_phrase.replace(r"\{emoji\}", f"({self._emoji_pattern})")
-        self.react_pattern = re.compile(react_trigger_pattern_string)
+        self.react_trigger_pattern = regex.compile(rf"{self.react_trigger_phrase}.*?(?=\*|$)", regex.IGNORECASE)
 
         if max_message_length is None:
             max_message_length = self._default_max_message_length
@@ -111,12 +87,7 @@ class NomiBot(commands.Bot):
             raise ValueError(f"max_message_length should be equal to or less than {self._max_max_message_length}")
         self.max_message_length = max_message_length      
         
-        self.nomi = nomi
-
-        super().__init__(command_prefix = "/",
-                         intents = intents,
-                         **options
-                        )
+        super().__init__(command_prefix = "/", intents = intents, **options)
         
 
     def _trim_message(self, message: str) -> str:
@@ -149,8 +120,12 @@ class NomiBot(commands.Bot):
             discord_message_content = discord_message.content
 
             for user in discord_message.mentions:
-                name = user.display_name if user.display_name else user.name
-                mention_id = f"<@{user.id}>"
+                name = user.display_name
+                # Mentions are formatted differently if a user has set a nickname
+                if user.nick:
+                    mention_id = f"<@!{user.id}>"
+                else:
+                    mention_id = f"<@{user.id}>"                
 
                 # Replace the mention with the user's name
                 discord_message_content = discord_message_content.replace(mention_id, f"@{name}")
@@ -205,19 +180,20 @@ class NomiBot(commands.Bot):
             # to Discord
             async with discord_message.channel.typing():                    
                 # Attempt to substitute user or role ID in any mentions
-                # Example: replace the <@userid> or <@&roleid> with the name
-                #          of the user or role
+                # Example: replace the <@userid>, <!@userid> or <@&roleid> with the name
+                #          of the user, the user's nickname or name of the role
                 # Use a regular expression to find words that start with @
-                pattern = r"@&?(\w+)"
-                matches = re.findall(pattern, nomi_reply)
+                matches = regex.findall(r"@&?(\w+)", nomi_reply)
 
                 if matches:
                     # Determine if the message is in a DM or a guild
                     if discord_message.guild:
                         # If it's a guild, use the guild's member list and role list
+                        # TODO: Can this be made more efficient with just user.display_name?
                         user_or_role_search = lambda name: (
                             discord.utils.find(
-                                lambda m: m.name.lower() == name.lower() or (m.nick and m.nick.lower() == name.lower()),
+                                lambda m: m.name.lower() == name.lower() or \
+                                      (m.nick and m.nick.lower() == name.lower()),
                                 discord_message.guild.members
                             ) or discord.utils.find(
                                 lambda r: r.name.lower() == name.lower(),
@@ -242,24 +218,31 @@ class NomiBot(commands.Bot):
                 # key phrase, attempt to get that from the Nomi's message
                 # and react to our message accordingly
                 # Search for the pattern in the text
-                match = self.react_pattern.search(nomi_reply)
+                matches = regex.findall(self.react_trigger_pattern, nomi_reply)
 
                 # Extract the matched phrase and emoji if found
-                if match:
-                    trigger_phrase = match.group(0)  # The entire matched text with the emoji
-                    emoji = match.group(1)  # The specific emoji captured
-
-                    if trigger_phrase:
-                        nomi_reply = nomi_reply.replace(trigger_phrase, '')
-
-                    if emoji:
-                        await discord_message.add_reaction(emoji)
+                for match in matches:
+                    # Look for emojis
+                    emojis = regex.findall(r"\p{Emoji}", match)
+                    for emoji in emojis:
+                        try:
+                            # Attempt to send to Discord
+                            await discord_message.add_reaction(emoji)
+                        except discord.errors.HTTPException as e:
+                            # Check for a specific error code: 10014 (Unknown Emoji)
+                            if e.status == 400 and e.code == 10014:
+                                logging.error(f"Failed to add reaction: {emoji} is an unknown emoji")
+                                # TODO: Figure out a better way to handle a failed react
+                                pass
+                            else:
+                                # Re-raise if it's a different HTTPException
+                                raise
+                    # Remove the Nomi's react from the text of their reply
+                    nomi_reply = regex.sub(match, '', nomi_reply)
                 
-                # Strip out **, remove leading whitespace
-                # TODO: Fix the regex
+                # Clean up the reply message
                 nomi_reply = nomi_reply.replace("**", '')
-
-                # TODO: fix "discord.errors.HTTPException: 400 Bad Request (error code: 10014): Unknown Emoji"
+                nomi_reply.strip()
                 
                 # If there's more text, send that as a reply. Don't reply
                 # if the Nomi just send at reaction
