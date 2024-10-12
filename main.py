@@ -30,7 +30,7 @@
 
 from typing import Optional
 
-import re
+from sys import stderr
 import logging
 
 import discord

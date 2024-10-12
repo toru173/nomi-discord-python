@@ -42,11 +42,11 @@ from nomi import Nomi
 # the majority of the custom message-handling logic
 class NomiBot(commands.Bot):
 
-    _default_message_prefix = "*You receive a message from {author} on Discord* "
+    _default_message_prefix = "*You receive a message from @{author} on Discord* "
     _default_message_suffix = "... (the message was cut off because it was too long)"
     _default_channel_message_prefix = "*You receive a message from {author} in {channel} on {guild} on Discord* "
     _default_dm_message_prefix = "*You receive a DM from {author} on Discord* "
-    _default_react_trigger_phrase = r"I\s*react.*?with\s*\p{Emoji}"
+    _default_react_trigger_phrase = "I\s*react.*?with\s*\p{Emoji}"
 
     _default_max_message_length = 400
     _max_max_message_length = 600
@@ -56,7 +56,6 @@ class NomiBot(commands.Bot):
             raise TypeError(f"Expected nomi to be a Nomi, got a {type(nomi).__name__}")
         
         self.nomi = nomi
-        
         for modifier, value in message_modifiers.items():
             if value is not None:
                 if not isinstance(value, str):
@@ -69,7 +68,8 @@ class NomiBot(commands.Bot):
                 else:
                     setattr(self, modifier, self._default_react_trigger_phrase)
 
-        self.react_trigger_pattern = regex.compile(rf"{self.react_trigger_phrase}.*?(?=\*|$)", regex.IGNORECASE)
+        self.react_trigger_phrase = regex.escape(self.react_trigger_phrase)
+        self.react_trigger_pattern = regex.compile(rf"{self.react_trigger_phrase}.*?(\*|$)", regex.IGNORECASE)
 
         if max_message_length is None:
             max_message_length = self._default_max_message_length
@@ -104,10 +104,11 @@ class NomiBot(commands.Bot):
     
 
     async def on_ready(self):
-        logging.info(f"Logged in as {self.user} (ID: {self.user.id})")
+        logging.info(f"{self.user.display_name} is now online. Happy chatting!")
 
 
     async def on_message(self, discord_message):
+
         # We do not want the Nomi to reply to themselves
         if discord_message.author.id == self.user.id:
             return
@@ -213,6 +214,8 @@ class NomiBot(commands.Bot):
                             mention = f"<@{user.id}>"
                             # Replace @username or @role with the proper mention
                             nomi_reply = nomi_reply.replace(f"@{match}", mention)
+
+                logging.error(nomi_reply)
                 
                 # If the nomi has reacted to the message using the react
                 # key phrase, attempt to get that from the Nomi's message
@@ -222,6 +225,7 @@ class NomiBot(commands.Bot):
 
                 # Extract the matched phrase and emoji if found
                 for match in matches:
+
                     # Look for emojis
                     emojis = regex.findall(r"\p{Emoji}", match)
                     for emoji in emojis:

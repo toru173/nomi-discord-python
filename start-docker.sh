@@ -57,10 +57,10 @@ NOMI_ID=
 
 # Configure how you want to format messages when sending
 # and receiving to Discord here. If you don't want a message
-# prefix or suffix these must still be populated, but with an
-# empty string: ""
+# prefix or suffix just leave these here but with nothing
+# after the equals sign.
 MAX_MESSAGE_LENGTH=400
-DEFAULT_MESSAGE_PREFIX="*You receive a message from {author} on Discord* "
+DEFAULT_MESSAGE_PREFIX="*You receive a message from @{author} on Discord* "
 DEFAULT_MESSAGE_SUFFIX="... (the message was cut off because it was too long)"
 CHANNEL_MESSAGE_PREFIX="*You receive a message from {author} in {channel} on {guild} on Discord* "
 DM_MESSAGE_PREFIX="*You receive a DM from {author} on Discord* "
@@ -69,7 +69,7 @@ DM_MESSAGE_PREFIX="*You receive a DM from {author} on Discord* "
 # to message reacts here. Editing this is not recommended
 # as the app does not directly match this phrase when looking
 # for messages from your Nomi that contain a react.
-REACT_TRIGGER_PHRASE=""
+REACT_TRIGGER_PHRASE="I\s*react.*?with\s*\p{Emoji}"
 EOF
     echo "A $CONFIG_FILE_NAME configuration file was not found. Please open the $CONFIG_FILE_NAME"
     echo "file that has just been created at $CONFIG_FILE"
