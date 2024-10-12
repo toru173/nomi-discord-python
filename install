@@ -1,9 +1,9 @@
 :; cat > /dev/null << END_WIN
+@echo off
 :: Please read the LICENSE at the bottom of this file
 ::
 :: This is the Windows part of the installation script.
 
-@ECHO OFF
 SET INSTALL_TARGET=nomi-discord-python
 SET HOME_DIR=%USERPROFILE%
 
