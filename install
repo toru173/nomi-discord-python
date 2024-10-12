@@ -1,14 +1,11 @@
 :; cat > /dev/null << END_WIN
-:: This is the Windows version of the setup script. What is
-:: What is happening here is that the first line is treated
-:: as a single line in Windows, but as two lines on linux
-:: or macOS. That means we can put in another command that
-:: isn't seen by Windows which in our case we do by capturing
-:: all the contents of the script up until END_WIN and dumping
-:: it to /dev/null. This means we can have two versions of the
-:: installer script in the one file!
+:: Please read the LICENSE at the bottom of this file
+::
+:: This is the Windows part of the installation script.
 
+@ECHO OFF
 SET INSTALL_TARGET=nomi-discord-python
+SET HOME_DIR=%USERPROFILE%
 
 :: Perform some basic sanity checks...
 IF %OS%!="Windows_NT" (
@@ -16,27 +13,112 @@ IF %OS%!="Windows_NT" (
     exit /B
 )
 
-:: Get the user's home directory. By default, we'll install into
-:: a folder called "INSTALL_TARGET" in their home folder
-
 :: First, check for required dependencies. We need Docker for
 :: this project to run, so check we have that installed. If
 :: not, prompt the user to download it then re-run this script.
+:: Check if Docker is installed
+docker --version >NUL 2>&1
+IF ERRORLEVEL 1 (
+    echo Docker is required but not installed.
+    echo Please install Docker from the following URL:
+    echo https://www.docker.com/products/docker-desktop/
+    
+    SET /P OPEN_BROWSER="Would you like to open the Docker download page now? (Y/N): "
+    IF /I "%OPEN_BROWSER%"=="Y" (
+        start https://www.docker.com/products/docker-desktop/
+    )
+    exit /B
+)
 
-:: Now we know know we have Docker we check with the user if
-:: installing in our default location (%USERPROFILE%/INSTALL_TARGET)
+:: Check if tar is installed. It SHOULD be because it shipped
+:: with Windows before cURL, and this script is most likely
+:: running using cURL.
+tar --version >NUL 2>&1
+IF ERRORLEVEL 1 (
+    echo tar is required but not installed.
+    echo tar can be installed by installing Git for Windows, which provides tar and other Unix tools.
+    echo Please install Git from the following URL:
+    echo https://git-scm.com/download/win
+
+    SET /P OPEN_BROWSER="Would you like to open the Git for Windows download page now? (Y/N): "
+    IF /I "%OPEN_BROWSER%"=="Y" (
+        start https://git-scm.com/download/win
+    )
+    exit /B
+)
+
+:: Now we know know we have Docker and tar we check with the user if
+:: installing in our default location (%USERPROFILE%\%INSTALL_TARGET%)
 :: is ok. If not, ask for an alternative.
+SET /P INSTALL_DIR="Enter installation directory (Press Enter for default: %USERPROFILE%\%INSTALL_TARGET%): "
+IF "%INSTALL_DIR%"=="" SET INSTALL_DIR=%USERPROFILE%\%INSTALL_TARGET%
+
+:: Create the folder if it doesn't exist.
+IF NOT EXIST "%INSTALL_DIR%" (
+    MKDIR "%INSTALL_DIR%"
+)
+
+:: Generate a random file name using the %RANDOM% environment variable
+SET TEST_FILE="%INSTALL_DIR%\test_%RANDOM%-%RANDOM%.txt"
 
 :: Check we have write access to the location the user has provided.
-:: Create the folder if it doesn't exist.
+:: We'll try to create a test file to check write access
+ECHO Testing write access > %TEST_FILE% 2>NUL
+IF ERRORLEVEL 1 (
+    ECHO It looks like we can't write to the folder: %INSTALL_DIR%.
+    ECHO Please make sure you have permission to write to this directory and try again.
+    exit /B
+)
+
+:: Delete the test file after the check
+DEL %TEST_FILE%
 
 :: Here we download the latest release from GitHub to INSTALL_TARGET
-:: and unzip it.
+ECHO Downloading the latest version from GitHub
+curl -L -o "%INSTALL_DIR%\latest.zip" https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip
 
-:: Once it's unzipped we're good to go! Display a success message
+IF NOT EXIST "%INSTALL_DIR%\latest.zip" (
+    ECHO Something went wrong during the download. Please try again.
+    exit /B
+)
+
+
+:: Warn the user that existing files will be overwritten. No going back now!
+ECHO WARNING: Extracting the archive will overwrite existing files in the directory: %INSTALL_DIR%.
+SET /P CONTINUE="Are you sure you want to proceed with the installation? (Y/N): "
+IF /I NOT "%CONTINUE%"=="Y" (
+    ECHO Extraction canceled. No changes were made.
+    exit /B
+)
+
+:: Proceed with unzipping the file using tar and overwrite existing files
+tar -xvf "%INSTALL_DIR%\latest.zip" -C "%INSTALL_DIR%" --overwrite >NUL
+IF ERRORLEVEL 1 (
+    ECHO Failed to unzip the file. Please try again.
+    exit /B
+)
+
+:: Check if a setup file exists and rename it to setup.bat to make
+:: running it easier in the future
+IF EXIST "%INSTALL_DIR%\setup" (
+    REN "%INSTALL_DIR%\setup" setup.bat
+)
+
+:: Once everything unzipped we're good to go! Display a success message
 :: to the user and ask if they want to set up any Nomis now. If the
 :: user wants to set up a Nomi run the setup file in this directory
 :: for them
+IF EXIST "%INSTALL_DIR%\setup.bat" (
+    ECHO The installation completed succesfully.
+    SET /P RUN_SETUP="Do you want to run the setup now? (Y/N): "
+    
+    IF /I "%RUN_SETUP%"=="Y" (
+        ECHO Running setup...
+        CALL "%INSTALL_DIR%\setup.bat"
+    ) ELSE (
+        ECHO Setup skipped. You can run it later by executing "%INSTALL_DIR%\setup.bat".
+    )
+)
 
 :: All done! Let's exit from the Windows part of the script
 exit /B
@@ -62,7 +144,7 @@ fi
 # not, prompt the user to download it then re-run this script.
 
 # Now we know know we have Docker we check with the user if
-# installing in our default location (%USERPROFILE%/INSTALL_TARGET)
+# installing in our default location (~/$INSTALL_TARGET)
 # is ok. If not, ask for an alternative.
 
 # Check we have write access to the location the user has provided.
@@ -79,3 +161,33 @@ fi
 
 # All done! Let's exit from the macOS/Linux part of the script
 exit 0
+
+LICENSE
+
+Copyright (c) 2024-present toru173 and contributors
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted (subject to the limitations in the disclaimer 
+below) provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, 
+  this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice, 
+  this list of conditions and the following disclaimer in the documentation 
+  and/or other materials provided with the distribution.
+* Neither the name of the copyright holder nor the names of the contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY 
+THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT 
+NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER 
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
