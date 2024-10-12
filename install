@@ -7,8 +7,8 @@
 SET INSTALL_TARGET=nomi-discord-python
 SET HOME_DIR=%USERPROFILE%
 
-:: Perform some basic sanity checks...
-IF %OS%!="Windows_NT" (
+:: Perform a basic sanity check...
+IF NOT "%OS%" == "Windows_NT" (
     echo "Windows 10 or later is required"
     exit /B
 )
