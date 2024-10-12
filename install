@@ -1,14 +1,14 @@
 :; cat > /dev/null << END_WIN
 :: Please read the LICENSE at the bottom of this file
 SET INSTALL_FILE="install_%RANDOM%-%RANDOM%.bat"
-curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %INSTALL_FILE%
+curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install_main -o %INSTALL_FILE%
 CALL %INSTALL_FILE%
 DEL %INSTALL_FILE%
 exit /B
 END_WIN
 
 INSTALL_FILE="install_$RANDOM-$RANDOM.sh"
-curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o $INSTALL_FILE
+curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install_main -o $INSTALL_FILE
 chmod +x $INSTALL_FILE
 bash $INSTALL_FILE
 rm $INSTALL_FILE
