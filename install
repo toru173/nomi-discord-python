@@ -2,9 +2,9 @@
 :: Please read the LICENSE at the bottom of this file
 SET INSTALL_FILE="install_%RANDOM%-%RANDOM%.bat"
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install_main -o %INSTALL_FILE%
-START /b /wait %INSTALL_FILE%
+CALL %INSTALL_FILE%
 DEL %INSTALL_FILE%
-exit /B
+exit /B 0
 END_WIN
 
 INSTALL_FILE="install_$RANDOM-$RANDOM.sh"
