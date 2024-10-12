@@ -136,6 +136,8 @@ then
    exit 1
 fi
 
+echo "Running in Bash!"
+
 # Get the user's home directory. By default, we'll install into
 # a folder called "INSTALL_TARGET" in their home folder
 
