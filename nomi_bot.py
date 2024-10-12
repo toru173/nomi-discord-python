@@ -121,7 +121,7 @@ class NomiBot(commands.Bot):
             discord_message_content = discord_message.content
 
             for user in discord_message.mentions:
-                name = user.display_name
+                name = user.nick if user.nick else user.display_name
                 # Mentions are formatted differently if a user has set a nickname
                 if user.nick:
                     mention_id = f"<@!{user.id}>"
@@ -193,8 +193,7 @@ class NomiBot(commands.Bot):
                         # TODO: Can this be made more efficient with just user.display_name?
                         user_or_role_search = lambda name: (
                             discord.utils.find(
-                                lambda m: m.name.lower() == name.lower() or \
-                                      (m.nick and m.nick.lower() == name.lower()),
+                                lambda m: m.display_name.lower() == name.lower() or (m.nick and m.nick.lower() == name.lower()),
                                 discord_message.guild.members
                             ) or discord.utils.find(
                                 lambda r: r.name.lower() == name.lower(),
@@ -204,7 +203,7 @@ class NomiBot(commands.Bot):
                     else:
                         # If it's a DM, use the Nomi's user cache (roles don't apply in DMs)
                         user_or_role_search = lambda name: discord.utils.find(
-                            lambda u: u.name.lower() == name.lower(),
+                            lambda u: u.display_name.lower() == name.lower(),
                             self.users
                         )
 
