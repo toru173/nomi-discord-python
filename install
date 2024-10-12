@@ -1,0 +1,81 @@
+:; cat > /dev/null << END_WIN
+:: This is the Windows version of the setup script. What is
+:: What is happening here is that the first line is treated
+:: as a single line in Windows, but as two lines on linux
+:: or macOS. That means we can put in another command that
+:: isn't seen by Windows which in our case we do by capturing
+:: all the contents of the script up until END_WIN and dumping
+:: it to /dev/null. This means we can have two versions of the
+:: installer script in the one file!
+
+SET INSTALL_TARGET=nomi-discord-python
+
+:: Perform some basic sanity checks...
+IF %OS%!="Windows_NT" (
+    echo "Windows 10 or later is required"
+    exit /B
+)
+
+:: Get the user's home directory. By default, we'll install into
+:: a folder called "INSTALL_TARGET" in their home folder
+
+:: First, check for required dependencies. We need Docker for
+:: this project to run, so check we have that installed. If
+:: not, prompt the user to download it then re-run this script.
+
+:: Now we know know we have Docker we check with the user if
+:: installing in our default location (%USERPROFILE%/INSTALL_TARGET)
+:: is ok. If not, ask for an alternative.
+
+:: Check we have write access to the location the user has provided.
+:: Create the folder if it doesn't exist.
+
+:: Here we download the latest release from GitHub to INSTALL_TARGET
+:: and unzip it.
+
+:: Once it's unzipped we're good to go! Display a success message
+:: to the user and ask if they want to set up any Nomis now. If the
+:: user wants to set up a Nomi run the setup file in this directory
+:: for them
+
+:: All done! Let's exit from the Windows part of the script
+exit /B
+END_WIN
+
+# This is the macOS/Linux part of the script. We have to do
+# The same steps here, but in a way that works for Bash
+
+INSTALL_TARGET=nomi-discord-python
+
+# Perform some basic sanity checks...
+if [ -z "${BASH_VERSION:-}" ]
+then
+   >&2 echo "Bash is required to interpret this script." 
+   exit 1
+fi
+
+# Get the user's home directory. By default, we'll install into
+# a folder called "INSTALL_TARGET" in their home folder
+
+# First, check for required dependencies. We need Docker for
+# this project to run, so check we have that installed. If
+# not, prompt the user to download it then re-run this script.
+
+# Now we know know we have Docker we check with the user if
+# installing in our default location (%USERPROFILE%/INSTALL_TARGET)
+# is ok. If not, ask for an alternative.
+
+# Check we have write access to the location the user has provided.
+# Create the folder if it doesn't exist.
+
+# Change directory to INSTALL_TARGET. Here we download the latest
+# release from GitHub then unzip it
+
+# Once it's unzipped we're good to go! Display a success message
+# to the user and ask if they want to set up any Nomis now. If the
+# user wants to set up a Nomi run the setup file in this directory
+# for them
+
+
+# All done! Let's exit from the macOS/Linux part of the script
+exit 0

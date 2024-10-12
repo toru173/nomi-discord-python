@@ -1,7 +1,0 @@
-:; cat > /dev/null << END_WIN
-echo "Running on Windows"
-exit /B
-END_WIN
-
-echo "Running on macOS"
-exit
