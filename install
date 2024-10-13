@@ -11,7 +11,7 @@
 :: when executing from a pipe. Thanks cmd.exe!
 SET "TEMP_INSTALL_SCRIPT=%TEMP%\install_%RANDOM%-%RANDOM%.cmd"
 TIMEOUT /T 0 >NUL 2>NUL
-IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START %TEMP_INSTALL_SCRIPT% && EXIT /B)
+IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START CMD /C %TEMP_INSTALL_SCRIPT% && EXIT /B)
 
 SET INSTALL_FOLDER=nomi-discord-python
 SET HOME_DIR=%USERPROFILE%
