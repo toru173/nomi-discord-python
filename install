@@ -1,17 +1,21 @@
 :; cat > /dev/null << END_WIN
-:: Please read the LICENSE at the bottom of this file
 @ECHO OFF
-:: This is the Windows part of the installation script.
+SET "TEMP_INSTALL_SCRIPT=%TEMP%\install_%RANDOM%-%RANDOM%.cmd"
+TIMEOUT /T 0 >NUL 2>NUL
+IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /B /I CMD /C /D %TEMP_INSTALL_SCRIPT% && EXIT /B)
 ::
-:: Check to see if we've been piped to CMD. This is expected
-:: when first running. If so, download the script to disk
-:: and run it from there instead to avoid issues.
+:: The above is to if the scripte was piped to cmd.exe. This
+:: is expected when first running. If so, download the script
+:: to disk and run it from there instead to avoid issues.
 :: We need to set a temporary install file path before
 :: the pipe-check because expansion behaves differently
 :: when executing from a pipe. Thanks cmd.exe!
-SET "TEMP_INSTALL_SCRIPT=%TEMP%\install_%RANDOM%-%RANDOM%.cmd"
-TIMEOUT /T 0 >NUL 2>NUL
-IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START CMD /C %TEMP_INSTALL_SCRIPT% && EXIT /B)
+::
+:: ============================================================================
+:: === The LICENSE for this script can be found at the bottom of this file ====
+:: ============================================================================
+::
+:: This is the Windows part of the installation script.
 
 SET INSTALL_FOLDER=nomi-discord-python
 SET HOME_DIR=%USERPROFILE%
