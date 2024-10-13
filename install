@@ -5,7 +5,7 @@
 :: temporary file to clean up once we're finished.
 SET "TEMP_INSTALL_SCRIPT=%TEMP%\install_%RANDOM%-%RANDOM%.cmd"
 TIMEOUT /T 0 >NUL 2>NUL
-IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /B /I CMD /D /Q /C %TEMP_INSTALL_SCRIPT% && EXIT /B)
+IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /I CMD /D /Q /C %TEMP_INSTALL_SCRIPT% && EXIT /B)
 ::
 :: The above is to if the script was piped to cmd.exe. This
 :: is expected when first running. If so, download the script
