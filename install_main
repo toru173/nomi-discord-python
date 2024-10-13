@@ -9,7 +9,7 @@ SET HOME_DIR=%USERPROFILE%
 
 :: Perform a basic sanity check
 IF NOT "%OS%" == "Windows_NT" (
-    echo "Windows 10 or later is required"
+    echo "Windows NT is required"
     exit /B
 )
 
@@ -26,6 +26,8 @@ IF ERRORLEVEL 1 (
     SET /P OPEN_BROWSER="Would you like to open the Docker download page now? (Y/N): "
     IF /I "%OPEN_BROWSER%"=="Y" (
         start https://www.docker.com/products/docker-desktop/
+    ) else (
+        echo Please install Docker and re-run the installer
     )
     exit /B
 )
@@ -43,6 +45,8 @@ IF ERRORLEVEL 1 (
     SET /P OPEN_BROWSER="Would you like to open the Git for Windows download page now? (Y/N): "
     IF /I "%OPEN_BROWSER%"=="Y" (
         start https://git-scm.com/download/win
+    ) else (
+        echo Please install tar and re-run the installer
     )
     exit /B
 )
