@@ -3,13 +3,17 @@
 @ECHO OFF
 :: This is the Windows part of the installation script.
 ::
-:: Check to see if we've been piped to CMD as is expected
+:: Check to see if we've been piped to CMD. This is expected
 :: when first running. If so, download the script to disk
-:: and run it from there instead to avoid issues with cmd
+:: and run it from there instead to avoid issues.
+:: We need to set a temporary install file path before
+:: the pipe-check because expansion behaves differently
+:: when executing from a pipe. Thanks cmd.exe!
+SET "TEMP_INSTALL_SCRIPT=%TEMP%\install_%RANDOM%-%RANDOM%.cmd"
 TIMEOUT /T 0 >NUL 2>NUL
-IF ERRORLEVEL 1 (SET INSTALL_FILE="!TEMP!\install_!RANDOM!-!RANDOM!.cmd" && curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o !INSTALL_FILE! && START !INSTALL_FILE! && EXIT /B)
+IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START %TEMP_INSTALL_SCRIPT% && EXIT /B)
 
-SET INSTALL_TARGET=nomi-discord-python
+SET INSTALL_FOLDER=nomi-discord-python
 SET HOME_DIR=%USERPROFILE%
 
 :: Perform a basic sanity check
@@ -57,10 +61,10 @@ IF ERRORLEVEL 1 (
 )
 
 :: Now we know know we have Docker and tar we check with the user if
-:: installing in our default location (%USERPROFILE%\%INSTALL_TARGET%)
+:: installing in our default location (%USERPROFILE%\%INSTALL_FOLDER%)
 :: is ok. If not, ask for an alternative.
-SET /P INSTALL_DIR="Enter installation directory (Press Enter for default: %USERPROFILE%\%INSTALL_TARGET%): "
-IF "%INSTALL_DIR%"=="" SET INSTALL_DIR=%USERPROFILE%\%INSTALL_TARGET%
+SET /P INSTALL_DIR="Enter installation directory (Press Enter for default: %USERPROFILE%\%INSTALL_FOLDER%): "
+IF "%INSTALL_DIR%"=="" SET "INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 
 :: Create the folder if it doesn't exist.
 IF NOT EXIST "%INSTALL_DIR%" (
@@ -68,7 +72,7 @@ IF NOT EXIST "%INSTALL_DIR%" (
 )
 
 :: Generate a random file name using the %RANDOM% environment variable
-SET TEST_FILE="%INSTALL_DIR%\test_%RANDOM%-%RANDOM%.txt"
+SET "TEST_FILE=%INSTALL_DIR%\test_%RANDOM%-%RANDOM%.txt"
 
 :: Check we have write access to the location the user has provided.
 :: We'll try to create a test file to check write access
@@ -82,7 +86,7 @@ IF ERRORLEVEL 1 (
 :: Delete the test file after the check
 DEL %TEST_FILE%
 
-:: Here we download the latest release from GitHub to INSTALL_TARGET
+:: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub
 curl -L -o "%INSTALL_DIR%\latest.zip" https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip
 
@@ -110,7 +114,7 @@ IF ERRORLEVEL 1 (
 :: Check if the Nomi creation script exists (it should). Rename it to
 :: create_nomi.cmd to make running it from the command line easier later
 IF EXIST "%INSTALL_DIR%\create_nomi" (
-    REN "%INSTALL_DIR%\create_nomi" setup.cmd
+    REN "%INSTALL_DIR%\create_nomi" create_nomi.cmd
 )
 
 :: Once everything unzipped we're good to go! Display a success message
@@ -124,7 +128,7 @@ IF EXIST "%INSTALL_DIR%\create_nomi.cmd" (
         ECHO Creating a new Nomi
         START "%INSTALL_DIR%\create_nomi.cmd"
     ) ELSE (
-        ECHO Setup skipped. You can run it later by executing "%INSTALL_DIR%\setup.cmd".
+        ECHO Creating a new Nomi was skipped. You can run it later by executing "%INSTALL_DIR%\create_nomi.cmd".
     )
 )
 
@@ -148,7 +152,7 @@ END_WIN
 # This is the macOS/Linux part of the script. We have to do
 # The same steps here, but in a way that works for Bash. We
 
-INSTALL_TARGET=nomi-discord-python
+INSTALL_FOLDER=nomi-discord-python
 
 # Perform some basic sanity checks...
 if [ -z "${BASH_VERSION:-}" ]
@@ -160,20 +164,20 @@ fi
 echo "Running in Bash!"
 
 # Get the user's home directory. By default, we'll install into
-# a folder called "INSTALL_TARGET" in their home folder
+# a folder called "INSTALL_FOLDER" in their home folder
 
 # First, check for required dependencies. We need Docker for
 # this project to run, so check we have that installed. If
 # not, prompt the user to download it then re-run this script.
 
 # Now we know know we have Docker we check with the user if
-# installing in our default location (~/$INSTALL_TARGET)
+# installing in our default location (~/$INSTALL_FOLDER)
 # is ok. If not, ask for an alternative.
 
 # Check we have write access to the location the user has provided.
 # Create the folder if it doesn't exist.
 
-# Change directory to INSTALL_TARGET. Here we download the latest
+# Change directory to INSTALL_FOLDER. Here we download the latest
 # release from GitHub then unzip it
 
 # Once it's unzipped we're good to go! Display a success message
