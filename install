@@ -5,11 +5,8 @@
 :: temporary file to clean up once we're finished.
 SET "TEMP_INSTALL_SCRIPT=%TEMP%\install_%RANDOM%-%RANDOM%.cmd"
 TIMEOUT /T 0 >NUL 2>NUL
-IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START "Install nomi-discord-python" /B /I CMD /D /Q /C %TEMP_INSTALL_SCRIPT% && EXIT /B)
+IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START "Install nomi-discord-python" /I CMD /D /Q /C %TEMP_INSTALL_SCRIPT% && EXIT /B)
 ::
-:: The above is to if the script was piped to cmd.exe. This
-:: is expected when first running. If so, download the script
-:: to disk and run it from there instead to avoid issues.
 :: We need to set a temporary install file path before
 :: the pipe-check because expansion behaves differently
 :: when executing from a pipe. Thanks cmd.exe!
@@ -145,7 +142,6 @@ IF EXIST "%INSTALL_DIR%\create_nomi.cmd" (
 :: was as part of the install process, and if so it won't be
 :: named 'install.'
 IF NOT "%~nx0" == "install" (
-    ECHO Script was run from "%~f0" 
     DEL "%~f0"
 )
 :: Check if the install script exists (it should). Rename it to
