@@ -1,5 +1,8 @@
 :; cat > /dev/null << END_WIN
 @ECHO OFF
+:: If this script is being run by using curl it will need to save
+:: itself to a temporary file. We do that here, and delete the
+:: temporary file to clean up once we're finished.
 SET "TEMP_INSTALL_SCRIPT=%TEMP%\install_%RANDOM%-%RANDOM%.cmd"
 TIMEOUT /T 0 >NUL 2>NUL
 IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /B /I CMD /C /D %TEMP_INSTALL_SCRIPT% && EXIT /B)
