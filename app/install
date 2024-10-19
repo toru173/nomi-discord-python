@@ -2,7 +2,7 @@
 :: @ECHO OFF
 :: If this script is being run using curl it will need to save
 :: itself to a temporary file. We do that here:
-SET "TEMP_INSTALL_SCRIPT=%TEMP%\%RANDOM%-%RANDOM%.bat"
+SET "TEMP_INSTALL_SCRIPT=%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.bat"
 TIMEOUT /T 0 >NUL 2>NUL
 IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /WAIT /I CMD /K %TEMP_INSTALL_SCRIPT% && DEL %TEMP_INSTALL_SCRIPT% & EXIT)
 ::
@@ -105,18 +105,20 @@ ECHO
 ECHO Any configuration files or startup scripts should be safe; however, if
 ECHO you are unsure, cancel now and save your files to a safe place before proceeding
 SET /P CONTINUE="Are you sure you want to proceed with the installation? (Y/N): "
-IF /I NOT "%CONTINUE%" == Y (
+IF /I NOT "%CONTINUE%" == "Y" (
     ECHO Extraction canceled. No changes were made.
     GOTO cleanup
 )
 
 :: Proceed with unzipping the file using tar and overwrite existing files
 ECHO Extracting installation files...
-tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%"
+tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%" --include='./app/*, LICENSE'
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
 )
+
+IF EXIST "%INSTALL_DIR%\install.zip" DEL "%INSTALL_DIR%\install.zip"
 
 :: Check if the Nomi creation script exists (it should). Rename it to
 :: create_nomi.bat to make running it from the command line easier later
@@ -132,7 +134,7 @@ GOTO cleanup
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     ECHO The installation completed succesfully.
     SET /P RUN_SETUP="Do you want to create a Nomi now? (Y/N): "
-    IF /I "%RUN_SETUP%" == Y (
+    IF /I "%RUN_SETUP%" == "Y" (
         ECHO Creating a new Nomi
         START "%INSTALL_DIR%\create_nomi.bat"
     ) ELSE (
