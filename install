@@ -116,7 +116,7 @@ IF /I NOT "%CONTINUE%" == "Y" (
 :: After that, get the install script, the license and everything inside
 :: the 'app' subdirectory
 ECHO Extracting installation files...
-tar -xvf "%INSTALL_DIR%\install.zip" --include='*\install, *\LICENSE, *\app' --strip-components=1 -C "%INSTALL_DIR%" 
+tar -xvf "%INSTALL_DIR%\install.zip" --include="*\install" --include="*\LICENSE" --include="*\app" --strip-components=1 -C "%INSTALL_DIR%" 
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
