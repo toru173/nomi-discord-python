@@ -74,19 +74,19 @@ IF NOT EXIST "%INSTALL_DIR%" (
 )
 
 :: Generate a random file name using the %RANDOM% environment variable
-SET "TEST_FILE=%INSTALL_DIR%\test_writable_%RANDOM%-%RANDOM%.txt"
+SET "WRITE_TEST=%INSTALL_DIR%\test"
 
 :: Check we have write access to the location the user has provided.
-:: We'll try to create a test file to check write access
-ECHO Testing write access > %TEST_FILE%
+:: We'll try to create a test directory to check write access
+MKDIR "%WRITE_TEST%"
 IF ERRORLEVEL 1 (
     ECHO It looks like we can't write to the folder: %INSTALL_DIR%.
     ECHO Please make sure you have permission to write to this directory and try again.
     GOTO cleanup
 )
 
-:: Delete the test file after the check
-DEL %TEST_FILE%
+:: Delete the test directory after the check
+RMDIR "%WRITE_TEST%"
 
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub
