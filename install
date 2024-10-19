@@ -100,7 +100,13 @@ IF NOT EXIST "%INSTALL_DIR%\latest.zip" (
 
 
 :: Warn the user that existing files will be overwritten. No going back now!
-ECHO WARNING: Extracting the archive will overwrite existing files in the directory: %INSTALL_DIR%.
+ECHO WARNING: This step will overwrite existing installation files in the directory:
+ECHO %INSTALL_DIR%.
+ECHO This will not erase any configuration files you have created provided the
+ECHO file names do not match the names of files in the update.
+ECHO
+ECHO Any configuration files or startup scripts should be safe; however,
+ECHO if you are unsure, cancel now and save your files to a safe place.
 SET /P CONTINUE="Are you sure you want to proceed with the installation? (Y/N): "
 IF /I NOT "%CONTINUE%"=="Y" (
     ECHO Extraction canceled. No changes were made.
@@ -108,7 +114,8 @@ IF /I NOT "%CONTINUE%"=="Y" (
 )
 
 :: Proceed with unzipping the file using tar and overwrite existing files
-tar -xvf "%INSTALL_DIR%\latest.zip" -C "%INSTALL_DIR%" --overwrite >NUL
+ECHO Extracting installation files...
+tar -xvf "%INSTALL_DIR%\latest.zip" -C "%INSTALL_DIR%"
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
