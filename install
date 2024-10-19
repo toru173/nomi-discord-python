@@ -1,10 +1,10 @@
 : << END_WIN
 :: @ECHO OFF
 :: If this script is being run using curl it will need to save
-:: itself to a temporary file.
+:: itself to a temporary file. We do that here:
 SET "TEMP_INSTALL_SCRIPT=%TEMP%\%RANDOM%-%RANDOM%.bat"
 TIMEOUT /T 0 >NUL 2>NUL
-IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /WAIT /I CMD /K %TEMP_INSTALL_SCRIPT% && DEL %TEMP_INSTALL_SCRIPT% & EXIT > NUL)
+IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /WAIT /I CMD /K %TEMP_INSTALL_SCRIPT% && DEL %TEMP_INSTALL_SCRIPT% & EXIT)
 ::
 :: We need to set a temporary install file path before
 :: the pipe-check because expansion behaves differently
@@ -35,11 +35,11 @@ IF ERRORLEVEL 1 (
     ECHO Please install Docker from the following URL:
     ECHO https://www.docker.com/products/docker-desktop/
     
-    SET /P OPEN_BROWSER="Would you like to open the Docker download page now? (Y/N): "
+    SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? (Y/N): "
     IF /I "%OPEN_BROWSER%"=="Y" (
         START https://www.docker.com/products/docker-desktop/
     ) ELSE (
-        ECHO Please install Docker and re-run the installer
+        ECHO Please install Docker and re-run the installer.
     )
     @REM GOTO cleanup
 )
@@ -54,11 +54,11 @@ IF ERRORLEVEL 1 (
     ECHO Please install Git from the following URL:
     ECHO https://git-scm.com/download/win
 
-    SET /P OPEN_BROWSER="Would you like to open the Git for Windows download page now? (Y/N): "
+    SET /P "OPEN_BROWSER=Would you like to open the Git for Windows download page now? (Y/N): "
     IF /I "%OPEN_BROWSER%"=="Y" (
         START https://git-scm.com/download/win
     ) ELSE (
-        ECHO Please install tar and re-run the installer
+        ECHO Please install tar and re-run the installer.
     )
     GOTO cleanup
 )
@@ -66,7 +66,7 @@ IF ERRORLEVEL 1 (
 :: Now we know know we have Docker and tar we check with the user if
 :: installing in our default location (%USERPROFILE%\%INSTALL_FOLDER%)
 :: is ok. If not, ask for an alternative.
-SET /P INSTALL_DIR="Enter installation directory (Press Enter for default: %USERPROFILE%\%INSTALL_FOLDER%): "
+SET /P "INSTALL_DIR=Enter installation directory (Press Enter for default: %USERPROFILE%\%INSTALL_FOLDER%): "
 IF "%INSTALL_DIR%"=="" SET "INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 
 :: Create the folder if it doesn't exist.
@@ -91,8 +91,8 @@ DEL %TEST_FILE%
 
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub
-curl -sL -o "%INSTALL_DIR%\latest.zip" https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip
-IF NOT EXIST "%INSTALL_DIR%\latest.zip" (
+curl -sL -o "%INSTALL_DIR%\install.zip" https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip
+IF NOT EXIST "%INSTALL_DIR%\install.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO cleanup
 )
@@ -114,7 +114,7 @@ IF /I NOT "%CONTINUE%"=="Y" (
 
 :: Proceed with unzipping the file using tar and overwrite existing files
 ECHO Extracting installation files...
-tar -xvf "%INSTALL_DIR%\latest.zip" -C "%INSTALL_DIR%"
+tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%"
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
