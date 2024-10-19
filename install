@@ -21,7 +21,7 @@ SET HOME_DIR=%USERPROFILE%
 
 :: Perform a basic sanity check
 IF NOT "%OS%" == "Windows_NT" (
-    ECHO "Windows NT is required"
+    ECHO Windows NT is required
     GOTO cleanup
 )
 
@@ -41,7 +41,7 @@ IF ERRORLEVEL 1 (
     ) ELSE (
         ECHO Please install Docker and re-run the installer
     )
-    :: GOTO cleanup
+    @REM GOTO cleanup
 )
 
 :: Check if tar is installed. It SHOULD be because it shipped
