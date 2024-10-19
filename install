@@ -116,7 +116,7 @@ IF /I NOT "%CONTINUE%" == "Y" (
 :: After that, get the install script, the license and everything inside
 :: the 'app' subdirectory
 ECHO Extracting installation files...
-tar -xvf "%INSTALL_DIR%\install.zip" --include="*\install" --include="*\LICENSE" --include="*\app" --strip-components=1 -C "%INSTALL_DIR%" 
+tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\app" 
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
@@ -124,19 +124,25 @@ IF ERRORLEVEL 1 (
 
 IF EXIST "%INSTALL_DIR%\install.zip" DEL "%INSTALL_DIR%\install.zip"
 
-:: Check if the Nomi creation script exists (it should). Rename it to
-:: create_nomi.bat to make running it from the command line easier later
-IF EXIST "%INSTALL_DIR%\create_nomi" (
-    REN "%INSTALL_DIR%\create_nomi" create_nomi.bat
+:: Check if the install script exists (it should). Rename it to
+:: install.bat to make running it from the command line easier later
+IF EXIST "%INSTALL_DIR%\install" (
+    REN "%INSTALL_DIR%\install" "%INSTALL_DIR%\install.bat"
 )
+
+:: Check if the Nomi creation script exists (it should). Copy and rename it to
+:: create_nomi.bat to make running it from the command line easier later
+IF EXIST "%INSTALL_DIR%\app\create_nomi" (
+    XCOPY "%INSTALL_DIR%\app\create_nomi" "%INSTALL_DIR%\create_nomi.bat"
+)
+
+ECHO The installation completed succesfully.
 
 :: Once everything unzipped we're good to go! Display a success message
 :: to the user and ask if they want to set up any Nomis now. If the
 :: user wants to set up a Nomi run the setup file in this directory
 :: for them
-GOTO cleanup
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
-    ECHO The installation completed succesfully.
     SET /P RUN_SETUP="Do you want to create a Nomi now? (Y/N): "
     IF /I "%RUN_SETUP%" == "Y" (
         ECHO Creating a new Nomi
@@ -148,6 +154,8 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
 
 :: All done! Let's exit from the Windows part of the script
 :cleanup
+:: In case we received an error between downloading and extracting
+:: the install files, delete them here
 IF EXIST "%INSTALL_DIR%\install.zip" DEL "%INSTALL_DIR%\install.zip"
 ENDLOCAL
 ECHO Please close this window to return to the previous command screen
