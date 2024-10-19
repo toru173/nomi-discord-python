@@ -33,7 +33,7 @@
 # We can combine the two because a line starting with ':;' is treated as a single
 # line by cmd.exe, but as two lines by bash. That means we can put in a second
 # command specific to bash, such as a command that captures all of the
-# contents of the script up to a boundary keyword and redirecting it to
+# contents of the script up to a delimiter keyword and redirecting it to
 # /dev/null. This means we can have two versions of a script in the same file.
 #
 # An example script would be:
@@ -59,7 +59,7 @@
 import argparse
 import os
 
-def adjust_line_endings(polyglot_file, boundary):
+def adjust_line_endings(polyglot_file, delimiter):
     try:
         # Check if file exists
         if not os.path.exists(polyglot_file):
@@ -80,15 +80,19 @@ def adjust_line_endings(polyglot_file, boundary):
             for line in lines:
                 # We are expecting our polyglot script to start with the
                 # batch section for cmd.exe, then the bash section after
-                # the boundary marker
-                if line.startswith(boundary):
-                    # Once the boundary is found, switch to LF
-                    file.write(line.replace('\r\n', '\n').replace('\r', '\n'))
-                    # Write out the remaining lines in the file with LF only
-                    file.writelines([l.replace('\r\n', '\n').replace('\r', '\n') for l in lines[lines.index(line) + 1: ]])
-                    break
+                # the delimiter
+                if delimiter in line:
+                    # Check for the initial delimiter defining the heredoc.
+                    # The heredoc is sensitive to line endings. Use CRLF as the
+                    # CR ('\r') will be interpreted as part of the heredoc delimiter
+                    file.write(line.replace('\n', '\r\n').replace('\r\r\n', '\r\n'))
+                    if line.startswith(delimiter):
+                        # Once the end of the heredoc is found, switch to LF
+                        # Write out the remaining lines in the file with LF only
+                        file.writelines([l.replace('\r\n', '\n').replace('\r', '\n') for l in lines[lines.index(line) + 1: ]])
+                        break
                 else:
-                    # Ensure CRLF before the boundary
+                    # Ensure CRLF before the delimiter
                     file.write(line.replace('\n', '\r\n').replace('\r\r\n', '\r\n'))
 
         print(f"Line endings adjusted succesfully in '{polyglot_file}'")
@@ -105,11 +109,11 @@ def main():
     parser = argparse.ArgumentParser(description="Ensure CRLF before 'END_WIN' and LF after in a polyglot (batch/bash) script",
                                      usage="%(prog)s input_file")
     parser.add_argument('polyglot_file', help="Path to the polyglot script that requires adjusted line endings")
-    parser.add_argument('boundary', help="Boundary indicator that seperates the batch portion of a script from the bash portion (eg END_WIN)")
+    parser.add_argument('delimiter', help="delimiter that seperates the batch portion of a script from the bash portion (eg END_WIN)")
     
     args = parser.parse_args()
 
-    adjust_line_endings(args.polyglot_file, args.boundary)
+    adjust_line_endings(args.polyglot_file, args.delimiter)
 
 if __name__ == "__main__":
     main()
