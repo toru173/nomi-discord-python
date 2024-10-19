@@ -110,7 +110,10 @@ IF /I NOT "%CONTINUE%" == "Y" (
     GOTO cleanup
 )
 
-:: Proceed with unzipping the file using tar and overwrite existing files
+:: Proceed with unzipping the file using tar and overwrite existing files.
+:: GitHub wraps the whole repository in a folder so we have to traverse
+:: into that before before we can filter by the things we want to download.
+:: After that, get the install script, the license and everything inside /app
 ECHO Extracting installation files...
 tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%" --include='*/install, */app/*, */LICENSE'
 IF ERRORLEVEL 1 (
