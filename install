@@ -74,7 +74,7 @@ IF NOT EXIST "%INSTALL_DIR%" (
 )
 
 :: Generate a random file name using the %RANDOM% environment variable
-SET "WRITE_TEST=%INSTALL_DIR%\test"
+SET "WRITE_TEST=%INSTALL_DIR%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%"
 
 :: Check we have write access to the location the user has provided.
 :: We'll try to create a test directory to check write access
@@ -102,8 +102,8 @@ ECHO %INSTALL_DIR%
 ECHO This will not erase any configuration files you have created so long
 ECHO as the file names do not match the names of files in the update.
 ECHO
-ECHO Any configuration files or startup scripts should be safe; however,
-ECHO if you are unsure, cancel now and save your files to a safe place.
+ECHO Any configuration files or startup scripts should be safe; however, if
+ECHO you are unsure, cancel now and save your files to a safe place before proceeding
 SET /P CONTINUE="Are you sure you want to proceed with the installation? (Y/N): "
 IF /I NOT "%CONTINUE%" == Y (
     ECHO Extraction canceled. No changes were made.
