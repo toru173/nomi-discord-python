@@ -36,7 +36,7 @@ IF ERRORLEVEL 1 (
     ECHO https://www.docker.com/products/docker-desktop/
     
     SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? (Y/N): "
-    IF /I "%OPEN_BROWSER%"=="Y" (
+    IF /I "%OPEN_BROWSER%" == "Y" (
         START https://www.docker.com/products/docker-desktop/
     ) ELSE (
         ECHO Please install Docker and re-run the installer.
@@ -55,7 +55,7 @@ IF ERRORLEVEL 1 (
     ECHO https://git-scm.com/download/win
 
     SET /P "OPEN_BROWSER=Would you like to open the Git for Windows download page now? (Y/N): "
-    IF /I "%OPEN_BROWSER%"=="Y" (
+    IF /I "%OPEN_BROWSER%" == "Y" (
         START https://git-scm.com/download/win
     ) ELSE (
         ECHO Please install tar and re-run the installer.
@@ -67,7 +67,7 @@ IF ERRORLEVEL 1 (
 :: installing in our default location (%USERPROFILE%\%INSTALL_FOLDER%)
 :: is ok. If not, ask for an alternative.
 SET /P "INSTALL_DIR=Enter installation directory (Press Enter for default: %USERPROFILE%\%INSTALL_FOLDER%): "
-IF "%INSTALL_DIR%"=="" SET "INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
+IF "%INSTALL_DIR%" == "" SET "INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 
 :: Create the folder if it doesn't exist.
 IF NOT EXIST "%INSTALL_DIR%" (
@@ -107,7 +107,7 @@ ECHO
 ECHO Any configuration files or startup scripts should be safe; however,
 ECHO if you are unsure, cancel now and save your files to a safe place.
 SET /P CONTINUE="Are you sure you want to proceed with the installation? (Y/N): "
-IF /I NOT "%CONTINUE%"=="Y" (
+IF /I NOT "%CONTINUE%" == Y (
     ECHO Extraction canceled. No changes were made.
     GOTO cleanup
 )
@@ -134,7 +134,7 @@ GOTO cleanup
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     ECHO The installation completed succesfully.
     SET /P RUN_SETUP="Do you want to create a Nomi now? (Y/N): "
-    IF /I "%RUN_SETUP%"=="Y" (
+    IF /I "%RUN_SETUP%" == Y (
         ECHO Creating a new Nomi
         START "%INSTALL_DIR%\create_nomi.bat"
     ) ELSE (
@@ -144,6 +144,7 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
 
 :: All done! Let's exit from the Windows part of the script
 :cleanup
+IF EXIST "%INSTALL_DIR%\install.zip" DEL "%INSTALL_DIR%\install.zip"
 ECHO Please close this window to return to the previous command screen
 EXIT /B
 END_WIN
