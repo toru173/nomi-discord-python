@@ -16,6 +16,7 @@ IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord
 ::
 :: This is the Windows part of the installation script.
 
+SETLOCAL ENABLEDELAYEDEXPANSION
 SET INSTALL_FOLDER=nomi-discord-python
 SET HOME_DIR=%USERPROFILE%
 
@@ -34,9 +35,8 @@ IF ERRORLEVEL 1 (
     ECHO Docker is required but not installed.
     ECHO Please install Docker from the following URL:
     ECHO https://www.docker.com/products/docker-desktop/
-    
     SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? (Y/N): "
-    IF /I "%OPEN_BROWSER%" == "Y" (
+    IF /I "!OPEN_BROWSER!" == "Y" (
         START https://www.docker.com/products/docker-desktop/
     ) ELSE (
         ECHO Please install Docker and re-run the installer.
@@ -53,9 +53,8 @@ IF ERRORLEVEL 1 (
     ECHO Alternatively tar can be installed by installing Git for Windows, which provides tar and other Unix tools.
     ECHO Please install Git from the following URL:
     ECHO https://git-scm.com/download/win
-
     SET /P "OPEN_BROWSER=Would you like to open the Git for Windows download page now? (Y/N): "
-    IF /I "%OPEN_BROWSER%" == "Y" (
+    IF /I "!OPEN_BROWSER!" == "Y" (
         START https://git-scm.com/download/win
     ) ELSE (
         ECHO Please install tar and re-run the installer.
@@ -75,11 +74,11 @@ IF NOT EXIST "%INSTALL_DIR%" (
 )
 
 :: Generate a random file name using the %RANDOM% environment variable
-SET "TEST_FILE=%INSTALL_DIR%\test_%RANDOM%-%RANDOM%.txt"
+SET "TEST_FILE=%INSTALL_DIR%\test_writable_%RANDOM%-%RANDOM%.txt"
 
 :: Check we have write access to the location the user has provided.
 :: We'll try to create a test file to check write access
-ECHO Testing write access > %TEST_FILE% 2>NUL
+ECHO Testing write access > %TEST_FILE%
 IF ERRORLEVEL 1 (
     ECHO It looks like we can't write to the folder: %INSTALL_DIR%.
     ECHO Please make sure you have permission to write to this directory and try again.
@@ -96,7 +95,6 @@ IF NOT EXIST "%INSTALL_DIR%\install.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO cleanup
 )
-
 
 :: Warn the user that existing files will be overwritten. No going back now!
 ECHO WARNING: This step will overwrite existing installation files in the directory:
@@ -145,6 +143,7 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
 :: All done! Let's exit from the Windows part of the script
 :cleanup
 IF EXIST "%INSTALL_DIR%\install.zip" DEL "%INSTALL_DIR%\install.zip"
+ENDLOCAL
 ECHO Please close this window to return to the previous command screen
 EXIT /B
 END_WIN
