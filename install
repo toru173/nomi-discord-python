@@ -4,7 +4,7 @@
 :: itself to a temporary file.
 SET "TEMP_INSTALL_SCRIPT=%TEMP%\%RANDOM%-%RANDOM%.bat"
 TIMEOUT /T 0 >NUL 2>NUL
-IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /WAIT /I CMD /K %TEMP_INSTALL_SCRIPT% && DEL %TEMP_INSTALL_SCRIPT% && EXIT)
+IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /WAIT /I CMD /K %TEMP_INSTALL_SCRIPT% && DEL %TEMP_INSTALL_SCRIPT% & EXIT > NUL)
 ::
 :: We need to set a temporary install file path before
 :: the pipe-check because expansion behaves differently
@@ -92,7 +92,6 @@ DEL %TEST_FILE%
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub
 curl -sL -o "%INSTALL_DIR%\latest.zip" https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip
-
 IF NOT EXIST "%INSTALL_DIR%\latest.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO cleanup
@@ -101,9 +100,9 @@ IF NOT EXIST "%INSTALL_DIR%\latest.zip" (
 
 :: Warn the user that existing files will be overwritten. No going back now!
 ECHO WARNING: This step will overwrite existing installation files in the directory:
-ECHO %INSTALL_DIR%.
-ECHO This will not erase any configuration files you have created provided the
-ECHO file names do not match the names of files in the update.
+ECHO %INSTALL_DIR%
+ECHO This will not erase any configuration files you have created so long
+ECHO as the file names do not match the names of files in the update.
 ECHO
 ECHO Any configuration files or startup scripts should be safe; however,
 ECHO if you are unsure, cancel now and save your files to a safe place.
