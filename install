@@ -127,7 +127,7 @@ IF EXIST "%INSTALL_DIR%\install.zip" DEL "%INSTALL_DIR%\install.zip"
 :: Check if the install script exists (it should). Rename it to
 :: install.bat to make running it from the command line easier later
 IF EXIST "%INSTALL_DIR%\install" (
-    REN "%INSTALL_DIR%\install" "%INSTALL_DIR%\install.bat"
+    REN "%INSTALL_DIR%\install" "install.bat"
 )
 
 :: Check if the Nomi creation script exists (it should). Copy and rename it to
@@ -148,7 +148,7 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
         ECHO Creating a new Nomi
         START "%INSTALL_DIR%\create_nomi.bat"
     ) ELSE (
-        ECHO Creating a new Nomi was skipped. You can run it later by executing "%INSTALL_DIR%\create_nomi.bat".
+        ECHO Creating a new Nomi was skipped. You can run it later by running "%INSTALL_DIR%\create_nomi.bat".
     )
 )
 
