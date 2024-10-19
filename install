@@ -89,8 +89,8 @@ IF ERRORLEVEL 1 (
 RMDIR "%WRITE_TEST%"
 
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
-ECHO Downloading the latest version from GitHub
-curl -sL -o "%INSTALL_DIR%\install.zip" https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip
+ECHO Downloading the latest version from GitHub...
+curl -sL https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip > "%INSTALL_DIR%\install.zip"
 IF NOT EXIST "%INSTALL_DIR%\install.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO cleanup
@@ -101,7 +101,7 @@ ECHO WARNING: This step will overwrite existing installation files in the direct
 ECHO %INSTALL_DIR%
 ECHO This will not erase any configuration files you have created so long
 ECHO as the file names do not match the names of files in the update.
-ECHO
+ECHO:
 ECHO Any configuration files or startup scripts should be safe; however, if
 ECHO you are unsure, cancel now and save your files to a safe place before proceeding
 SET /P CONTINUE="Are you sure you want to proceed with the installation? (Y/N): "
@@ -112,7 +112,7 @@ IF /I NOT "%CONTINUE%" == "Y" (
 
 :: Proceed with unzipping the file using tar and overwrite existing files
 ECHO Extracting installation files...
-tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%" --include='./app/*, LICENSE'
+tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%" --include='*/install, */app/*, */LICENSE'
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
