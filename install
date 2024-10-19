@@ -41,7 +41,7 @@ IF ERRORLEVEL 1 (
     ) ELSE (
         ECHO Please install Docker and re-run the installer
     )
-    EXIT /B
+    :: EXIT /B
 )
 
 :: Check if tar is installed. It SHOULD be because it shipped
@@ -91,7 +91,7 @@ DEL %TEST_FILE%
 
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub
-curl -L -o "%INSTALL_DIR%\latest.zip" https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip
+curl -sL -o "%INSTALL_DIR%\latest.zip" https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip
 
 IF NOT EXIST "%INSTALL_DIR%\latest.zip" (
     ECHO Something went wrong during the download. Please try again.
@@ -110,7 +110,7 @@ IF /I NOT "%CONTINUE%"=="Y" (
 :: Proceed with unzipping the file using tar and overwrite existing files
 tar -xvf "%INSTALL_DIR%\latest.zip" -C "%INSTALL_DIR%" --overwrite >NUL
 IF ERRORLEVEL 1 (
-    ECHO Failed to unzip the file. Please try again.
+    ECHO Failed to extract the installation files. Please try again.
     EXIT /B
 )
 
@@ -124,6 +124,7 @@ IF EXIST "%INSTALL_DIR%\create_nomi" (
 :: to the user and ask if they want to set up any Nomis now. If the
 :: user wants to set up a Nomi run the setup file in this directory
 :: for them
+EXIT /B
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     ECHO The installation completed succesfully.
     SET /P RUN_SETUP="Do you want to create a Nomi now? (Y/N): "
