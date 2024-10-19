@@ -1,10 +1,10 @@
 : << END_WIN
-@ECHO OFF
+:: @ECHO OFF
 :: If this script is being run using curl it will need to save
 :: itself to a temporary file.
-@SET "TEMP_INSTALL_SCRIPT=%TEMP%\%RANDOM%-%RANDOM%.bat"
-@TIMEOUT /T 0 >NUL 2>NUL
-@IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /WAIT /I CMD /Q /K %TEMP_INSTALL_SCRIPT% >NUL 2>&1 & DEL %TEMP_INSTALL_SCRIPT% && EXIT /B)
+SET "TEMP_INSTALL_SCRIPT=%TEMP%\%RANDOM%-%RANDOM%.bat"
+TIMEOUT /T 0 >NUL 2>NUL
+IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% && START /WAIT /I CMD /K %TEMP_INSTALL_SCRIPT% >NUL 2>&1 & DEL %TEMP_INSTALL_SCRIPT% && EXIT)
 ::
 :: We need to set a temporary install file path before
 :: the pipe-check because expansion behaves differently
@@ -22,7 +22,7 @@ SET HOME_DIR=%USERPROFILE%
 :: Perform a basic sanity check
 IF NOT "%OS%" == "Windows_NT" (
     ECHO "Windows NT is required"
-    EXIT /B
+    GOTO cleanup
 )
 
 :: First, check for required dependencies. We need Docker for
@@ -41,7 +41,7 @@ IF ERRORLEVEL 1 (
     ) ELSE (
         ECHO Please install Docker and re-run the installer
     )
-    :: EXIT /B
+    :: GOTO cleanup
 )
 
 :: Check if tar is installed. It SHOULD be because it shipped
@@ -49,8 +49,8 @@ IF ERRORLEVEL 1 (
 :: running using cURL.
 tar --version >NUL 2>&1
 IF ERRORLEVEL 1 (
-    ECHO tar is required but not installed.
-    ECHO tar can be installed by installing Git for Windows, which provides tar and other Unix tools.
+    ECHO tar is required but not installed. It was integrated into Windows 10 in 2018. Do you need to update?
+    ECHO Alternatively tar can be installed by installing Git for Windows, which provides tar and other Unix tools.
     ECHO Please install Git from the following URL:
     ECHO https://git-scm.com/download/win
 
@@ -60,7 +60,7 @@ IF ERRORLEVEL 1 (
     ) ELSE (
         ECHO Please install tar and re-run the installer
     )
-    EXIT /B
+    GOTO cleanup
 )
 
 :: Now we know know we have Docker and tar we check with the user if
@@ -83,7 +83,7 @@ ECHO Testing write access > %TEST_FILE% 2>NUL
 IF ERRORLEVEL 1 (
     ECHO It looks like we can't write to the folder: %INSTALL_DIR%.
     ECHO Please make sure you have permission to write to this directory and try again.
-    EXIT /B
+    GOTO cleanup
 )
 
 :: Delete the test file after the check
@@ -95,7 +95,7 @@ curl -sL -o "%INSTALL_DIR%\latest.zip" https://github.com/toru173/nomi-discord-p
 
 IF NOT EXIST "%INSTALL_DIR%\latest.zip" (
     ECHO Something went wrong during the download. Please try again.
-    EXIT /B
+    GOTO cleanup
 )
 
 
@@ -104,14 +104,14 @@ ECHO WARNING: Extracting the archive will overwrite existing files in the direct
 SET /P CONTINUE="Are you sure you want to proceed with the installation? (Y/N): "
 IF /I NOT "%CONTINUE%"=="Y" (
     ECHO Extraction canceled. No changes were made.
-    EXIT /B
+    GOTO cleanup
 )
 
 :: Proceed with unzipping the file using tar and overwrite existing files
 tar -xvf "%INSTALL_DIR%\latest.zip" -C "%INSTALL_DIR%" --overwrite >NUL
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
-    EXIT /B
+    GOTO cleanup
 )
 
 :: Check if the Nomi creation script exists (it should). Rename it to
@@ -124,7 +124,7 @@ IF EXIST "%INSTALL_DIR%\create_nomi" (
 :: to the user and ask if they want to set up any Nomis now. If the
 :: user wants to set up a Nomi run the setup file in this directory
 :: for them
-EXIT /B
+GOTO cleanup
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     ECHO The installation completed succesfully.
     SET /P RUN_SETUP="Do you want to create a Nomi now? (Y/N): "
@@ -137,6 +137,8 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
 )
 
 :: All done! Let's exit from the Windows part of the script
+:cleanup
+ECHO Please close this window to return to the previous command screen
 EXIT /B
 END_WIN
 
