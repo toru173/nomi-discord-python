@@ -134,10 +134,23 @@ fi
 # Trap to function when we exit
 trap "cleanup" EXIT INT
 
-# Define cleanup function
+# Cleanup function
 function cleanup() {
     exit_code=$?
     exit $exit_code
+}
+
+# Prompt for and confirm user input
+prompt_confirm() {
+    read -r -p "$1 [y/N] " RESPONSE </dev/tty
+    case "$RESPONSE" in
+        [yY][eE][sS]|[yY]) 
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
 }
 
 echo "==========================================================================="

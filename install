@@ -275,7 +275,7 @@ fi
 # Trap to function when we exit
 trap "cleanup" EXIT INT
 
-# Define cleanup function
+# Cleanup function
 function cleanup() {
     exit_code=$?
     if [ -n "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/install.zip" ]; then
@@ -284,7 +284,7 @@ function cleanup() {
     exit $exit_code
 }
 
-# Function to prompt for and confirm user input
+# Prompt for and confirm user input
 prompt_confirm() {
     read -r -p "$1 [y/N] " RESPONSE </dev/tty
     case "$RESPONSE" in
