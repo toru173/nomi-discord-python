@@ -39,45 +39,71 @@ ECHO that your system has a few things installed already, then install the lates
 ECHO version of nomi-python-discord.
 ECHO:
 
+SET DOCKER_INSTALLED=0
+SET TAR_INSTALLED=0
 :: First, check for required dependencies. We need Docker for
 :: this project to run, so check we have that installed. If
 :: not, prompt the user to download it then re-run this script.
 :: Check if Docker is installed
 docker --version >NUL 2>&1
 IF ERRORLEVEL 1 (
-    ECHO Docker is required but not installed.
-    ECHO Please install Docker from the following URL:
-    ECHO https://www.docker.com/products/docker-desktop/
-    SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? (Y/N): "
-    IF /I "!OPEN_BROWSER!" == "Y" (
-        START https://www.docker.com/products/docker-desktop/
-    ) ELSE (
-        ECHO Please install Docker and re-run the installer.
-    )
-    GOTO cleanup
+    SET DOCKER_INSTALLED=0
+) ELSE (
+    SET DOCKER_INSTALLED=1
 )
-
-ECHO [x] Docker is installed
 
 :: Check if tar is installed. It SHOULD be because it shipped
 :: with Windows before cURL, and this script is most likely
 :: running using cURL.
 tar --version >NUL 2>&1
 IF ERRORLEVEL 1 (
-    ECHO tar is required but not installed. It was integrated into Windows 10 in 2018. Do you need to update?
-    ECHO Alternatively tar can be installed by installing Git for Windows, which provides tar and other Unix tools.
-    ECHO Please install Git from the following URL:
-    ECHO https://git-scm.com/download/win
-    SET /P "OPEN_BROWSER=Would you like to open the Git for Windows download page now? (Y/N): "
-    IF /I "!OPEN_BROWSER!" == "Y" (
-        START https://git-scm.com/download/win
-    ) ELSE (
-        ECHO Please install tar and re-run the installer.
+    SET TAR_INSTALLED=0
+) ELSE (
+    SET TAR_INSTALLED=1
+)
+
+:: Display installation statuses
+IF "%DOCKER_INSTALLED%"=="1" (
+    ECHO [x] Docker is installed
+) ELSE (
+    ECHO [ ] Docker is not installed
+)
+
+IF "%TAR_INSTALLED%"=="1" (
+    ECHO [x] tar is installed
+) ELSE (
+    ECHO [ ] tar is not installed
+)
+
+:: If both are installed, continue
+IF "%DOCKER_INSTALLED%"=="1" IF "%TAR_INSTALLED%"=="1" (
+    ECHO All necessary software is installed.
+    GOTO continue
+) ELSE (
+
+    :: We're missing some necessary software. Let's fix it.
+    ECHO Please install the missing software and re-run the installer.
+
+    SET /P "INSTALL_HELP=Would you like help installing the missing software? (Y/N): "
+    IF /I "%INSTALL_HELP%"=="Y" (
+        IF "%DOCKER_INSTALLED%"=="0" (
+            ECHO Docker is required but not installed.
+            SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? (Y/N): "
+            IF /I "!OPEN_BROWSER!" == "Y" (
+                START https://www.docker.com/products/docker-desktop/
+            )
+        )
+        IF "%TAR_INSTALLED%"=="0" (
+            ECHO tar is required but not installed. It was integrated into Windows 10 in 2018. Do you need to update?
+            ECHO Alternatively tar can be installed by installing Git for Windows, which provides tar and other Unix tools.
+            SET /P "OPEN_BROWSER=Would you like to open the Git for Windows download page now? (Y/N): "
+            IF /I "!OPEN_BROWSER!" == "Y" (
+                START https://git-scm.com/download/win
+            )
+        )
     )
     GOTO cleanup
 )
-
-ECHO [x] tar is installed
 
 :: Now we know know we have Docker and tar we check with the user if
 :: installing in our default location (%USERPROFILE%\%INSTALL_FOLDER%)
