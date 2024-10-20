@@ -207,9 +207,18 @@ manage_existing_nomi() {
     
     if prompt_confirm "Are these values correct?"; then
         # Save the config
-        sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
-        sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
-        sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+        if [ "$(uname -s)" == "Darwin" ]; then
+            sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+            sed -i "" "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+            sed -i "" "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+        elif [ "$(uname -s)" == "Linux" ]; then
+            sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+            sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+            sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+        else
+            echo "Error: Unsupported operating system '$(uname -s)'."
+            return 1
+        fi
 
         # Ask if the user wants to start the Nomi
         if prompt_confirm "Do you want to start this Nomi now?"; then
@@ -254,11 +263,21 @@ create_new_nomi() {
     NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "")
     NOMI_ID=$(prompt_variable "NOMI_ID" "")
 
-    # Populate .conf file
-    sed -i "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
-    sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
-    sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
-    sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+    # Populate nomi.conf file
+    if [ "$(uname -s)" == "Darwin" ]; then
+        sed -i "" "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
+        sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+        sed -i "" "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+        sed -i "" "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+    elif [ "$(uname -s)" == "Linux" ]; then
+        sed -i "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
+        sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+        sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+        sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+    else
+        echo "Error: Unsupported operating system '$(uname -s)'."
+        return 1
+    fi
 
     # Display and confirm
     echo "Configuration for $NOMI_NAME:"
