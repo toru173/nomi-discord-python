@@ -80,7 +80,6 @@ IF "%TAR_INSTALLED%"=="1" (
 :: If both are installed, continue
 IF "%DOCKER_INSTALLED%"=="1" IF "%TAR_INSTALLED%"=="1" (
     ECHO All required software is installed.
-    GOTO continue
 ) ELSE (
 
     :: We're missing some necessary software. Let's fix it.
@@ -199,6 +198,11 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     )
 )
 
+SET /P "OPEN_FOLDER=Would you like to open the installation folder in a file browser? (Y/N): "
+IF /I "%OPEN_FOLDER%" == "Y" (
+    EXPLORER %INSTALL_DIR%
+)
+
 :: All done! Let's exit from the Windows part of the script
 :cleanup
 :: In case we received an error between downloading and extracting
@@ -297,14 +301,14 @@ else
     echo "Please install the missing software and re-run the installer."
 
     # Prompt user for help installing the missing software
-    read -p "Would you like help installing the missing software? (Y/N): " INSTALL_HELP
+    read -p "Would you like help installing the missing software? (Y/N): " INSTALL_HELP </dev/tty
     INSTALL_HELP=${INSTALL_HELP,,}
 
     if [[ "$INSTALL_HELP" == "y" ]]; then
         # If Docker is not installed, prompt to open the Docker download page
         if [ "$DOCKER_INSTALLED" -eq 0 ]; then
             echo "Docker is required but not installed."
-            read -p "Would you like to open the Docker download page now? (Y/N): " OPEN_BROWSER
+            read -p "Would you like to open the Docker download page now? (Y/N): " OPEN_BROWSER </dev/tty
             OPEN_BROWSER=${OPEN_BROWSER,,}
             if [[ "$OPEN_BROWSER" == "y" ]]; then
                 # Attempt to open the browser with xdg-open (Linux) or open (macOS)
@@ -353,7 +357,7 @@ fi
 # Now we know we have Docker and tar we check with the user if
 # installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
 # If not, ask for an alternative.
-DEFAULT_INSTALL_DIR="$HOME/${INSTALL_FOLDER:-install_folder}"
+DEFAULT_INSTALL_DIR="$HOME/$INSTALL_FOLDER"
 read -p "Where would you like to install nomi-discord-python? Current choice: $DEFAULT_INSTALL_DIR " INSTALL_DIR
 INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
 
@@ -398,7 +402,7 @@ echo "Any configuration files or startup scripts should be safe; however, if"
 echo "you are unsure, cancel now and save your files to a safe place before proceeding."
 
 # Prompt the user for confirmation to proceed
-read -p "Are you sure you want to proceed with the installation? (Y/N): " CONTINUE
+read -p "Are you sure you want to proceed with the installation? (Y/N): " CONTINUE </dev/tty
 CONTINUE=${CONTINUE,,}
 
 if [[ "$CONTINUE" != "y" ]]; then
@@ -474,7 +478,7 @@ echo "The installation completed successfully."
 # for them
 if [ -f "$INSTALL_DIR/create_nomi.sh" ]; then
     # Prompt the user to set up a Nomi
-    read -p "Do you want to create a Nomi now? (Y/N): " RUN_SETUP
+    read -p "Do you want to create a Nomi now? (Y/N): " RUN_SETUP </dev/tty
     RUN_SETUP=${RUN_SETUP,,}
 
     if [[ "$RUN_SETUP" == "y" ]]; then
@@ -489,7 +493,7 @@ else
     exit 1
 fi
 
-read -p "Would you like to open the installation folder in a file browser? (Y/N): " OPEN_FOLDER
+read -p "Would you like to open the installation folder in a file browser? (Y/N): " OPEN_FOLDER </dev/tty
 OPEN_FOLDER=${OPEN_FOLDER,,}
 if [[ "$OPEN_FOLDER" == "y" ]]; then
     if command -v xdg-open >/dev/null 2>&1; then
