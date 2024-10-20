@@ -203,6 +203,7 @@ manage_existing_nomi() {
 
         # Display and confirm values
         echo "Configuration for $NOMI_NAME:"
+        echo "NOMI_NAME: $NOMI_NAME"
         echo "DISCORD_API_TOKEN: $DISCORD_API_TOKEN"
         echo "NOMI_API_KEY: $NOMI_API_KEY"
         echo "NOMI_ID: $NOMI_ID"
@@ -227,10 +228,13 @@ manage_existing_nomi() {
         fi
     done
 
+    NOMI_FILENAME=$(echo -n $NOMI_NAME | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
+    START_SCRIPT="$SCRIPT_ROOT/$NOMI_FILENAME.*"
+
     if prompt_confirm "Do you want to start this Nomi now?"; then
-        "$CONF_FILE"
+        "$START_SCRIPT"
     else
-        echo "You can start $NOMI_NAME by executing $CONF_FILE"
+        echo "You can start $NOMI_NAME by executing $(basename $START_SCRIPT)"
     fi
 }
 
