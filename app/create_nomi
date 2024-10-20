@@ -194,19 +194,20 @@ manage_existing_nomi() {
     local NOMI_NAME=$1
     local CONF_FILE=$2
 
-    # Prompt for values, showing current ones
-    DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "$(grep -m1 '^DISCORD_API_TOKEN=' "$CONF_FILE" | cut -d '=' -f2)")
-    NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "$(grep -m1 '^NOMI_API_KEY=' "$CONF_FILE" | cut -d '=' -f2)")
-    NOMI_ID=$(prompt_variable "NOMI_ID" "$(grep -m1 '^NOMI_ID=' "$CONF_FILE" | cut -d '=' -f2)")
-
-    # Display and confirm values
-    echo "Configuration for $NOMI_NAME:"
-    echo "DISCORD_API_TOKEN: $DISCORD_API_TOKEN"
-    echo "NOMI_API_KEY: $NOMI_API_KEY"
-    echo "NOMI_ID: $NOMI_ID"
-    
     while true; do
-        if prompt_confirm "Are these values correct?"; then
+        # Prompt for values, showing current ones
+        NOMI_NAME=$(prompt_variable "NOMI_NAME" "$(grep -m1 '^NOMI_NAME=' "$CONF_FILE" | cut -d '=' -f2)")
+        DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "$(grep -m1 '^DISCORD_API_TOKEN=' "$CONF_FILE" | cut -d '=' -f2)")
+        NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "$(grep -m1 '^NOMI_API_KEY=' "$CONF_FILE" | cut -d '=' -f2)")
+        NOMI_ID=$(prompt_variable "NOMI_ID" "$(grep -m1 '^NOMI_ID=' "$CONF_FILE" | cut -d '=' -f2)")
+
+        # Display and confirm values
+        echo "Configuration for $NOMI_NAME:"
+        echo "DISCORD_API_TOKEN: $DISCORD_API_TOKEN"
+        echo "NOMI_API_KEY: $NOMI_API_KEY"
+        echo "NOMI_ID: $NOMI_ID"
+
+            if prompt_confirm "Are these values correct?"; then
             # Save the config
             if [ "$(uname -s)" == "Darwin" ]; then
                 sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
