@@ -131,7 +131,7 @@ IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
 :: Display the chosen directory and ask for confirmation
 ECHO:
 ECHO Your choice: %INSTALL_DIR%
-SET /P "CONTINUE=Is this correct? (Y/N): "
+SET /P "CONTINUE=Are you sure? (Y/N): "
 
 IF /I NOT "%CONTINUE%" == "Y" (
     GOTO prompt_install_dir
@@ -162,7 +162,7 @@ RMDIR "%WRITE_TEST%"
 
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub...
-curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%INSTALL_DIR%\install.zip" --remove-on-error
+curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%INSTALL_DIR%\install.zip" --progress-bar --remove-on-error
 IF NOT EXIST "%INSTALL_DIR%\install.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO cleanup
@@ -406,7 +406,7 @@ while true; do
     # Display the chosen directory and ask for confirmation
     echo
     echo "Your choice: $INSTALL_DIR"
-    read -p "Is this correct? (Y/N): " CONTINUE </dev/tty
+    read -p "Are you sure? (Y/N): " CONTINUE </dev/tty
     CONTINUE=$(echo "$CONTINUE" | tr '[:upper:]' '[:lower:]')
     if [[ "$CONTINUE" == "y" ]]; then
         break
@@ -437,7 +437,7 @@ rmdir "$WRITE_TEST"
 
 # Download the latest release from GitHub to INSTALL_FOLDER
 echo "Downloading the latest version from GitHub..."
-curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "$INSTALL_DIR/install.zip" --remove-on-error
+curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "$INSTALL_DIR/install.zip" --progress-bar --remove-on-error
 
 # Check if the download was successful
 if [ ! -f "$INSTALL_DIR/install.zip" ]; then
@@ -513,7 +513,7 @@ function get_script() {
         echo "Error: Unsupported operating system '$(uname -s)'."
         return 1
     fi
-
+    echo "Copying $source to $destination_file"
     echo "#!/usr/bin/env bash" > "$destination_file"
     cat "$source" >> "$destination_file"
 
@@ -558,9 +558,6 @@ if [ -f "$INSTALL_DIR/create_nomi.sh" ]; then
         echo "Creating a new Nomi was skipped."
         echo "You can run it later by executing 'create_nomi.sh' in the installation directory."
     fi
-else
-    echo "Error: create_nomi script not found in $INSTALL_DIR."
-    exit 1
 fi
 
 read -p "Would you like to open the installation folder in a file browser? (Y/N): " OPEN_FOLDER </dev/tty
