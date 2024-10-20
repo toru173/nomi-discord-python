@@ -157,8 +157,8 @@ prompt_confirm() {
 prompt_variable() {
     local var_name=$1
     local current_value=$2
-    read -r -p "Enter $var_name [$current_value]: " value
-    echo "${value:-$current_value}"
+    read -r -p "Enter $var_name [$current_value]: " VALUE </dev/tty
+    echo "${VALUE:-$current_value}"
 }
 
 # Get a script and make it executable based on the OS name
@@ -226,7 +226,7 @@ manage_existing_nomi() {
 create_new_nomi() {
     echo "Creating new Nomi!"
     while true; do
-        read -r -p "Enter a new Nomi name: " NOMI_NAME
+        read -r -p "Enter a new Nomi name: " NOMI_NAME </dev/tty
 
         # Check for existing Nomi with the same name
         if [ -f "$NOMI_NAME.conf" ]; then
@@ -299,9 +299,9 @@ SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Find all .conf files and extract NOMI_NAME
 conf_files=()
 nomi_names=()
-while IFS= read -r -d '' file; do
-    conf_files+=("$file")
-    nomi_name=$(grep -m1 '^NOMI_NAME=' "$file" | cut -d '=' -f2)
+while IFS= read -r -d '' FILE; do
+    conf_files+=("$FILE")
+    nomi_name=$(grep -m1 '^NOMI_NAME=' "$FILE" | cut -d '=' -f2)
     nomi_names+=("$NOMI_NAME")
 done < <(find . -maxdepth 1 -name '*.conf' -print0)
 
@@ -315,13 +315,13 @@ else
         echo "$((i+1)). ${nomi_names[$i]}"
     done
 
-    read -r -p "Choose a Nomi by number or type 'new' to create a new Nomi: " choice
+    read -r -p "Choose a Nomi by number or type 'new' to create a new Nomi: " CHOICE </dev/tty
 
-    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -le "${#nomi_names[@]}" ]; then
-        selected_nomi="${nomi_names[$((choice-1))]}"
-        selected_conf="${conf_files[$((choice-1))]}"
+    if [[ "$CHOICE" =~ ^[0-9]+$ ]] && [ "$CHOICE" -le "${#nomi_names[@]}" ]; then
+        selected_nomi="${nomi_names[$((CHOICE-1))]}"
+        selected_conf="${conf_files[$((CHOICE-1))]}"
         manage_existing_nomi "$selected_nomi" "$selected_conf"
-    elif [ "$choice" == "new" ]; then
+    elif [ "$CHOICE" == "new" ]; then
         create_new_nomi
     else
         echo "Invalid selection."
