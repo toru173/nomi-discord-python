@@ -266,11 +266,21 @@ create_new_nomi() {
     get_script "$SCRIPT_ROOT/start_$NOMI_FILENAME" "$SCRIPT_ROOT"
     rm "$SCRIPT_ROOT/start_$NOMI_FILENAME"
 
+    # Populate start_nomi file
+    if [ "$(uname -s)" == "Darwin" ]; then
+        sed -i "" "s/^CONFIG_FILE_NAME=.*/CONFIG_FILE_NAME=$NOMI_FILENAME.conf/" "$SCRIPT_ROOT/start_$NOMI_FILENAME.command"
+    elif [ "$(uname -s)" == "Linux" ]; then
+        sed -i "s/^CONFIG_FILE_NAME=.*/CONFIG_FILE_NAME=$NOMI_FILENAME.conf/" "$SCRIPT_ROOT/start_$NOMI_FILENAME.sh"
+    else
+        echo "Error: Unsupported operating system '$(uname -s)'."
+        return 1
+    fi    
+
     # Populate nomi.conf file
     if [ "$(uname -s)" == "Darwin" ]; then
-        sed -i "" "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
+        sed -i "" "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$SCRIPT_ROOT/$NOMI_FILENAME.conf"
     elif [ "$(uname -s)" == "Linux" ]; then
-        sed -i "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
+        sed -i "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$SCRIPT_ROOT/$NOMI_FILENAME.conf"
     else
         echo "Error: Unsupported operating system '$(uname -s)'."
         return 1

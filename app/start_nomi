@@ -163,8 +163,7 @@ echo
 echo "If you ever want to quit the script, simply press CTRL+C together"
 echo
 
-NOMI_NAME="example_nomi"
-CONFIG_FILE_NAME="$NOMI_NAME.conf"
+CONFIG_FILE_NAME=
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
@@ -178,8 +177,8 @@ fi
 # Check for a configuration file
 if [ -f "$CONFIG_FILE" ]; then
     # Inform user we've found the config file
-    echo "Found $NOMI_NAME's configuration file. Reading contents..."
     source "$CONFIG_FILE"
+    echo "Found $NOMI_NAME's configuration file. Reading contents..."
 else
     # No configuration file found. Ask the user to run create_nomi to set one up
     echo "A configuration file for $NOMI_NAME was not found. Please re-run"
