@@ -60,6 +60,9 @@ IF "%MISSING_VARIABLE%"=="TRUE" (
     GOTO cleanup
 )
 
+ECHO Cannot yet build a Docker image name correctly
+EXIT /B
+
 :: Converts the Nomi's name to lowercase, replaces non-valid characters with
 :: an underscore, and strips trailing underscores
 FOR /F "tokens=* delims=" %%A IN ('echo %NOMI_NAME% ^| powershell -Command "$input.tolower()"') DO SET NOMI_NAME_LC=%%A
