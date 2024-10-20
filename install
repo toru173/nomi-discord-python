@@ -129,7 +129,7 @@ ECHO Your choice: %INSTALL_DIR%
 ECHO:
 SET /P "CONTINUE=Is this correct? (Y/N): "
 
-IF NOT /I "%CONTINUE%" == "Y" (
+IF /I NOT "%CONTINUE%" == "Y" (
     GOTO prompt_install_dir
 )
 
