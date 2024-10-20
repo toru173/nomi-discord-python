@@ -38,7 +38,8 @@ ECHO Welcome to the easy installer for nomi-discord-python. We're going to check
 ECHO that your system has a few things installed already, then install the latest
 ECHO version of nomi-python-discord.
 ECHO:
-
+ECHO If you ever want to quit the script, simply press CTRL+C together
+ECHO:
 
 :: First, check for required dependencies. We need Docker for
 :: this project to run, so check we have that installed. If
@@ -287,6 +288,8 @@ echo
 echo "Welcome to the easy installer for nomi-discord-python. We're going to check"
 echo "that your system has a few things installed already, then install the latest"
 echo "version of nomi-python-discord."
+echo
+echo "If you ever want to quit the script, simply press CTRL+C together"
 echo
 
 # First, check for required dependencies. We need Docker for
