@@ -213,6 +213,7 @@ IF EXIST "%INSTALL_DIR%\app\create_nomi" (
 )
 
 ECHO The installation completed succesfully.
+ECHO:
 
 :: Once everything unzipped we're good to go! Display a success message
 :: to the user and ask if they want to set up any Nomis now. If the
@@ -543,6 +544,7 @@ else
 fi
 
 echo "The installation completed successfully."
+echo
 
 # Once everything unzipped we're good to go! Display a success message
 # to the user and ask if they want to set up any Nomis now. If the
@@ -565,7 +567,7 @@ if [ -f "$CREATE_NOMI_SCRIPT" ]; then
         echo "Creating a new Nomi..."
         "$CREATE_NOMI_SCRIPT"
     else
-        echo "Creating a new Nomi was skipped. You can run it later
+        echo "Creating a new Nomi was skipped. You can run it later"
         echo "by executing 'create_nomi.sh' in the installation directory."
     fi
 fi
