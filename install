@@ -30,6 +30,15 @@ IF NOT "%OS%" == "Windows_NT" (
     GOTO cleanup
 )
 
+ECHO ===============================================================================
+ECHO ============================== Easy Installer =================================
+ECHO ===============================================================================
+ECHO:
+ECHO Welcome to the easy installer for nomi-discord-python. We're going to check
+ECHO that your system has a few things installed already, then install the latest
+ECHO version of nomi-python-discord.
+ECHO:
+
 :: First, check for required dependencies. We need Docker for
 :: this project to run, so check we have that installed. If
 :: not, prompt the user to download it then re-run this script.
@@ -167,9 +176,13 @@ PAUSE
 EXIT
 END_WIN
 
-
 # This is the macOS/Linux part of the script. We have to do
-# The same steps here, but in a way that works for Bash. We
+# The same steps here, but in a way that works for Bash.
+
+# By default, we'll install into a folder called
+# "INSTALL_FOLDER" in their home folder
+readonly INSTALL_FOLDER=nomi-discord-python
+
 # Perform some basic sanity checks, then continue execution
 if [ -z "${BASH_VERSION:-}" ]; then
     # Attempt to find Bash
@@ -201,9 +214,14 @@ function cleanup() {
     fi
 }
 
-# By default, we'll install into a folder called
-# "INSTALL_FOLDER" in their home folder
-readonly INSTALL_FOLDER=nomi-discord-python
+echo "==============================================================================="
+echo "============================== Easy Installer ================================="
+echo "==============================================================================="
+echo
+echo "Welcome to the easy installer for nomi-discord-python. We're going to check"
+echo "that your system has a few things installed already, then install the latest"
+echo "version of nomi-python-discord."
+echo
 
 # First, check for required dependencies. We need Docker for
 # this project to run, so check we have that installed. If
@@ -399,6 +417,18 @@ if [ -f "$INSTALL_DIR/create_nomi.sh" ]; then
 else
     echo "Error: create_nomi script not found in $INSTALL_DIR."
     exit 1
+fi
+
+read -p "Would you like to open the installation folder in a file browser? (Y/N): " OPEN_FOLDER
+OPEN_FOLDER=${OPEN_FOLDER,,}
+if [[ "$OPEN_FOLDER" == "y" ]]; then
+    if command -v xdg-open >/dev/null 2>&1; then
+        # Linux (xdg-open is available)
+        xdg-open "$INSTALL_DIR"
+    elif command -v open >/dev/null 2>&1; then
+        # macOS (open is available)
+        open "$INSTALL_DIR"
+    fi
 fi
 
 # All done! Let's exit from the macOS/Linux part of the script
