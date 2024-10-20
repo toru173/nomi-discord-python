@@ -159,7 +159,7 @@ RMDIR "%WRITE_TEST%"
 
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub...
-curl -sL https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%INSTALL_DIR%\install.zip" --remove-on-error
+curl https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%INSTALL_DIR%\install.zip" --remove-on-error
 IF NOT EXIST "%INSTALL_DIR%\install.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO cleanup
@@ -173,6 +173,7 @@ ECHO:
 ECHO Any configuration files or startup scripts should be safe; however, if
 ECHO you are unsure, cancel now and save your files to a safe place before
 ECHO proceeding.
+ECHO:
 
 :: Prompt the user before proceeding
 SET /P CONTINUE="Are you sure you want to proceed with the installation? (Y/N): "
@@ -428,7 +429,7 @@ rmdir "$WRITE_TEST"
 
 # Download the latest release from GitHub to INSTALL_FOLDER
 echo "Downloading the latest version from GitHub..."
-curl -sL https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "$INSTALL_DIR/install.zip" --remove-on-error
+curl https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "$INSTALL_DIR/install.zip" --remove-on-error
 
 # Check if the download was successful
 if [ ! -f "$INSTALL_DIR/install.zip" ]; then
@@ -444,6 +445,7 @@ echo
 echo "Any configuration files or startup scripts should be safe; however, if"
 echo "you are unsure, cancel now and save your files to a safe place before"
 echo "proceeding."
+echo
 
 # Prompt the user for confirmation to proceed
 read -p "Are you sure you want to proceed with the installation? (Y/N): " CONTINUE </dev/tty
