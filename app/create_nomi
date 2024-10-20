@@ -245,12 +245,11 @@ create_new_nomi() {
     NOMI_FILENAME=$(echo -n $NOMI_NAME | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
 
     # Copy example files
-    get_script "$SCRIPT_ROOT/app/nomi_conf.example" "$SCRIPT_ROOT"
-    get_script "$SCRIPT_ROOT/app/start_nomi" "$SCRIPT_ROOT"
+    cp "$SCRIPT_ROOT/app/nomi_conf.example" "$SCRIPT_ROOT/$NOMI_FILENAME.conf"
+    cp "$SCRIPT_ROOT/app/start_nomi" "$SCRIPT_ROOT/start_$NOMI_FILENAME"
 
-    # Rename with the Nomi's name
-    mv "nomi_conf.example" "$(basename "nomi_conf.example" .conf).$NOMI_FILENAME.${filename##*.}"
-    mv "start_nomi" "$(basename "start_nomi" .conf).start_$NOMI_FILENAME.${filename##*.}"
+    get_script "$SCRIPT_ROOT/start_$NOMI_FILENAME" "$SCRIPT_ROOT"
+    rm "$SCRIPT_ROOT/start_$NOMI_FILENAME"
 
     # Prompt for values
     DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "")
