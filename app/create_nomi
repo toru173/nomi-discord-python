@@ -289,7 +289,7 @@ fi
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Find all .conf files and extract NOMI_NAME
+# Find all nomi.conf files and extract NOMI_NAME
 CONF_FILES=()
 NOMI_NAMES=()
 while IFS= read -r -d '' FILE; do
