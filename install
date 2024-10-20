@@ -80,6 +80,7 @@ IF "%TAR_INSTALLED%"=="1" (
 :: If both are installed, continue
 IF "%DOCKER_INSTALLED%"=="1" IF "%TAR_INSTALLED%"=="1" (
     ECHO All required software is installed.
+    ECHO:
 ) ELSE (
 
     :: We're missing some necessary software. Let's fix it.
@@ -142,10 +143,9 @@ IF NOT EXIST "%INSTALL_DIR%\install.zip" (
 )
 
 :: Warn the user that existing files will be overwritten. No going back now!
+ECHO:
 ECHO WARNING: This step will overwrite existing installation files in the directory:
 ECHO %INSTALL_DIR%
-ECHO This will not erase any configuration files you have created so long
-ECHO as the file names do not match the names of files in the update.
 ECHO:
 ECHO Any configuration files or startup scripts should be safe; however, if
 ECHO you are unsure, cancel now and save your files to a safe place before proceeding
@@ -296,6 +296,7 @@ fi
 # If both are installed, continue
 if [ "$DOCKER_INSTALLED" -eq 1 ] && [ "$TAR_INSTALLED" -eq 1 ]; then
     echo "All required software is installed."
+    echo
 else
     # We're missing some necessary software. Let's fix it.
     echo "Please install the missing software and re-run the installer."
@@ -358,7 +359,7 @@ fi
 # installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
 # If not, ask for an alternative.
 DEFAULT_INSTALL_DIR="$HOME/$INSTALL_FOLDER"
-read -p "Where would you like to install nomi-discord-python? Current choice: $DEFAULT_INSTALL_DIR " INSTALL_DIR
+read -p "Where would you like to install nomi-discord-python? Current choice: $DEFAULT_INSTALL_DIR " INSTALL_DIR </dev/tty
 INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
 
 # Create the folder if it doesn't exist.
@@ -395,8 +396,6 @@ exit 0
 # Warn the user that existing files will be overwritten. No going back now!
 echo "WARNING: This step will overwrite existing installation files in the directory:"
 echo "$INSTALL_DIR"
-echo "This will not erase any configuration files you have created as long as"
-echo "the file names do not match the names of files in the update."
 echo
 echo "Any configuration files or startup scripts should be safe; however, if"
 echo "you are unsure, cancel now and save your files to a safe place before proceeding."
