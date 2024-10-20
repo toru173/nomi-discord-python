@@ -183,7 +183,6 @@ function get_script() {
         echo "Error: Unsupported operating system '$(uname -s)'."
         return 1
     fi
-    echo "Copying $source_file to $destination_file"
     echo "#!/usr/bin/env bash" > "$destination_file"
     cat "$source_file" >> "$destination_file"
 
@@ -224,7 +223,6 @@ manage_existing_nomi() {
 
 # Create new Nomi configuration file
 create_new_nomi() {
-    echo "Creating new Nomi!"
     while true; do
         read -r -p "Enter a new Nomi name: " NOMI_NAME </dev/tty
 
