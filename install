@@ -297,6 +297,32 @@ prompt_confirm() {
     esac
 }
 
+function get_script() {
+    local source_file="$1"
+    local destination_dir="$2"
+    
+    # Check if the source file exists
+    if [ ! -f "$source_file" ]; then
+        echo "Error: Source file '$source_file' not found!"
+        return 1
+    fi
+
+    local base_filename="$(basename $source_file)"
+
+    # Determine the destination file based on the OS
+    if [ "$(uname -s)" == "Darwin" ]; then
+        destination_file="${destination_dir}/${base_filename}.command"
+    elif [ "$(uname -s)" == "Linux" ]; then
+        destination_file="${destination_dir}/${base_filename}.sh"
+    else
+        echo "Error: Unsupported operating system '$(uname -s)'."
+        return 1
+    fi
+    echo "#!/usr/bin/env bash" > "$destination_file"
+    cat "$source_file" >> "$destination_file"
+    chmod +x "$destination_file"
+}
+
 echo "==========================================================================="
 echo "============================ Easy Installer ==============================="
 echo "==========================================================================="
@@ -496,32 +522,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-function get_script() {
-    local source_file="$1"
-    local destination_dir="$2"
-    
-    # Check if the source file exists
-    if [ ! -f "$source_file" ]; then
-        echo "Error: Source file '$source_file' not found!"
-        return 1
-    fi
-
-    local base_filename="$(basename $source_file)"
-
-    # Determine the destination file based on the OS
-    if [ "$(uname -s)" == "Darwin" ]; then
-        destination_file="${destination_dir}/${base_filename}.command"
-    elif [ "$(uname -s)" == "Linux" ]; then
-        destination_file="${destination_dir}/${base_filename}.sh"
-    else
-        echo "Error: Unsupported operating system '$(uname -s)'."
-        return 1
-    fi
-    echo "#!/usr/bin/env bash" > "$destination_file"
-    cat "$source_file" >> "$destination_file"
-    chmod +x "$destination_file"
-}
-
 # Check if the install script exists (it should). Rename it to
 # install.sh on linux and install.command on macOS to make running
 # it from the command line easier later and add a shebang
@@ -543,34 +543,29 @@ fi
 
 echo "The installation completed successfully."
 
-echo "$INSTALL_DIR/create_nomi.sh"
-
 # Once everything unzipped we're good to go! Display a success message
 # to the user and ask if they want to set up any Nomis now. If the
 # user wants to set up a Nomi run the setup file in this directory
 # for them
-if [ -f "$INSTALL_DIR/create_nomi.sh" ]; then
+if [ "$(uname -s)" == "Darwin" ]; then
+    CREATE_NOMI_SCRIPT="$INSTALL_DIR/create_nomi.command"
+elif [ "$(uname -s)" == "Linux" ]; then
+    CREATE_NOMI_SCRIPT="$INSTALL_DIR/create_nomi.sh"
+else
+    echo "Error: Unsupported operating system '$(uname -s)'."
+    return 1
+fi
+
+echo "$CREATE_NOMI_SCRIPT"
+
+if [ -f "$CREATE_NOMI_SCRIPT" ]; then
     # Prompt the user to set up a Nomi
     if prompt_confirm "Do you want to create a Nomi now?"; then
         echo "Creating a new Nomi..."
-        "$INSTALL_DIR/create_nomi.sh"
+        "$CREATE_NOMI_SCRIPT"
     else
         echo "Creating a new Nomi was skipped. You can run it later
         echo "by executing 'create_nomi.sh' in the installation directory."
-    fi
-fi
-
-echo "$INSTALL_DIR/create_nomi.command"
-
-# macOS version
-if [ -f "$INSTALL_DIR/create_nomi.command" ]; then
-    # Prompt the user to set up a Nomi
-    if prompt_confirm "Do you want to create a Nomi now?"; then
-        echo "Creating a new Nomi..."
-        "$INSTALL_DIR/create_nomi.command"
-    else
-        echo "Creating a new Nomi was skipped. You can run it later
-        echo "by executing 'create_nomi.command' in the installation directory."
     fi
 fi
 
