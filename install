@@ -285,7 +285,7 @@ function cleanup() {
 # Function to prompt for and confirm user input
 prompt_confirm() {
     read -r -p "$1 [y/N] " RESPONSE </dev/tty
-    case "$response" in
+    case "$RESPONSE" in
         [yY][eE][sS]|[yY]) 
             true
             ;;
