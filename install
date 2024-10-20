@@ -220,6 +220,7 @@ ECHO The installation completed succesfully.
 :: for them
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     SET /P "CREATE_NOMI=Do you want to create a Nomi now? [y/N]: "
+    ECHO "%CREATE_NOMI%"
     IF /I "%CREATE_NOMI%" == "Y" (
         ECHO Creating a new Nomi...
         START /I CMD /Q /K "%INSTALL_DIR%\create_nomi.bat"
