@@ -39,11 +39,13 @@ ECHO that your system has a few things installed already, then install the lates
 ECHO version of nomi-python-discord.
 ECHO:
 
-SET DOCKER_INSTALLED=0
-SET TAR_INSTALLED=0
+
 :: First, check for required dependencies. We need Docker for
 :: this project to run, so check we have that installed. If
 :: not, prompt the user to download it then re-run this script.
+SET DOCKER_INSTALLED=0
+SET TAR_INSTALLED=0
+
 :: Check if Docker is installed
 docker --version >NUL 2>&1
 IF ERRORLEVEL 1 (
@@ -77,7 +79,7 @@ IF "%TAR_INSTALLED%"=="1" (
 
 :: If both are installed, continue
 IF "%DOCKER_INSTALLED%"=="1" IF "%TAR_INSTALLED%"=="1" (
-    ECHO All necessary software is installed.
+    ECHO All required software is installed.
     GOTO continue
 ) ELSE (
 
@@ -102,6 +104,7 @@ IF "%DOCKER_INSTALLED%"=="1" IF "%TAR_INSTALLED%"=="1" (
             )
         )
     )
+    ECHO Some required software is missing. Please install the missing software and re-run the installer
     GOTO cleanup
 )
 
@@ -256,65 +259,96 @@ echo
 # First, check for required dependencies. We need Docker for
 # this project to run, so check we have that installed. If
 # not, prompt the user to download it then re-run this script.
+DOCKER_INSTALLED=0
+TAR_INSTALLED=0
+
 # Check if Docker is installed
-if ! command -v docker >/dev/null 2>&1; then
-    echo "Docker is required but not installed."
-    echo "Please install Docker from the following URL:"
-    echo "https://www.docker.com/products/docker-desktop/"
+if command -v docker >/dev/null 2>&1; then
+    DOCKER_INSTALLED=1
+else
+    DOCKER_INSTALLED=0
+fi
 
-    # Prompt user to open the Docker download page
-    read -p "Would you like to open the Docker download page now? (Y/N): " OPEN_BROWSER
-    OPEN_BROWSER=${OPEN_BROWSER,,}
-    if [[ "$OPEN_BROWSER" == "y" ]]; then
-        # Attempt to open the browser with xdg-open (Linux) or open (macOS)
-        if command -v xdg-open >/dev/null 2>&1; then
-            xdg-open "https://www.docker.com/products/docker-desktop/"
-        elif command -v open >/dev/null 2>&1; then
-            open "https://www.docker.com/products/docker-desktop/"
-        else
-            echo "Unable to automatically open a browser. Please manually visit the URL."
+# Check if tar is installed
+if command -v tar >/dev/null 2>&1; then
+    TAR_INSTALLED=1
+else
+    TAR_INSTALLED=0
+fi
+
+# Display installation statuses
+if [ "$DOCKER_INSTALLED" -eq 1 ]; then
+    echo "[x] Docker is installed"
+else
+    echo "[ ] Docker is not installed"
+fi
+
+if [ "$TAR_INSTALLED" -eq 1 ]; then
+    echo "[x] tar is installed"
+else
+    echo "[ ] tar is not installed"
+fi
+
+# If both are installed, continue
+if [ "$DOCKER_INSTALLED" -eq 1 ] && [ "$TAR_INSTALLED" -eq 1 ]; then
+    echo "All required software is installed."
+else
+    # We're missing some necessary software. Let's fix it.
+    echo "Please install the missing software and re-run the installer."
+
+    # Prompt user for help installing the missing software
+    read -p "Would you like help installing the missing software? (Y/N): " INSTALL_HELP
+    INSTALL_HELP=${INSTALL_HELP,,}
+
+    if [[ "$INSTALL_HELP" == "y" ]]; then
+        # If Docker is not installed, prompt to open the Docker download page
+        if [ "$DOCKER_INSTALLED" -eq 0 ]; then
+            echo "Docker is required but not installed."
+            read -p "Would you like to open the Docker download page now? (Y/N): " OPEN_BROWSER
+            OPEN_BROWSER=${OPEN_BROWSER,,}
+            if [[ "$OPEN_BROWSER" == "y" ]]; then
+                # Attempt to open the browser with xdg-open (Linux) or open (macOS)
+                if command -v xdg-open >/dev/null 2>&1; then
+                    xdg-open "https://www.docker.com/products/docker-desktop/"
+                elif command -v open >/dev/null 2>&1; then
+                    open "https://www.docker.com/products/docker-desktop/"
+                else
+                    echo "Please manually open the following URL: https://www.docker.com/products/docker-desktop/"
+                fi
+            fi
         fi
-    echo "Please install Docker and re-run the installer."
-    exit 1
-fi
 
-echo "[x] Docker is installed"
+        # Check if tar is installed. Prompt the user to download it if not
+        # by attempting to guess what package manager they are using (if any)
+        if [ "$TAR_INSTALLED" -eq 0 ]; then
+            echo "tar is required but not installed."
+            echo "You may need to install it using a package manager."
+            echo
 
-# Check if tar is installed. Prompt the user to download it if not
-# by attempting to guess what package manager they are using (if any)
-if ! command -v tar >/dev/null 2>&1; then
-    echo "tar is required but not installed."
-    echo "You may need to install it using a package manager."
-    echo
-
-    # Provide examples of how to install tar depending on the system
-    if command -v apt >/dev/null 2>&1; then
-        echo "For Ubuntu or Debian-based systems, you can install tar by running:"
-        echo "    sudo apt update && sudo apt install tar"
-    elif command -v yum >/dev/null 2>&1; then
-        echo "For Red Hat, CentOS, or Fedora systems, you can install tar by running:"
-        echo "    sudo yum install tar"
-    elif command -v dnf >/dev/null 2>&1; then
-        echo "For newer Fedora systems (or RHEL 8+), you can install tar by running:"
-        echo "    sudo dnf install tar"
-    elif command -v zypper >/dev/null 2>&1; then
-        echo "For SUSE or openSUSE systems, you can install tar by running:"
-        echo "    sudo zypper install tar"
-    elif command -v brew >/dev/null 2>&1; then
-        echo "For macOS users, you can install GNU tar by running:"
-        echo "    brew install gnu-tar"
-    else
-        echo "Your system does not have a recognized package manager."
-        echo "Please refer to your system documentation on how to install tar."
+            # Provide examples of how to install tar depending on the system
+            if command -v apt >/dev/null 2>&1; then
+                echo "For Ubuntu or Debian-based systems, you can install tar by running:"
+                echo "    sudo apt update && sudo apt install tar"
+            elif command -v yum >/dev/null 2>&1; then
+                echo "For Red Hat, CentOS, or Fedora systems, you can install tar by running:"
+                echo "    sudo yum install tar"
+            elif command -v dnf >/dev/null 2>&1; then
+                echo "For newer Fedora systems (or RHEL 8+), you can install tar by running:"
+                echo "    sudo dnf install tar"
+            elif command -v zypper >/dev/null 2>&1; then
+                echo "For SUSE or openSUSE systems, you can install tar by running:"
+                echo "    sudo zypper install tar"
+            elif command -v brew >/dev/null 2>&1; then
+                echo "For macOS users, you can install GNU tar by running:"
+                echo "    brew install gnu-tar"
+            else
+                echo "Your system does not have a recognized package manager."
+                echo "Please refer to your system documentation on how to install tar."
+            fi
+        fi
     fi
-
-    echo
-    echo "Please install tar and re-run the installer."
-
     exit 1
 fi
-
-echo "[x] tar is installed"
 
 # Now we know we have Docker and tar we check with the user if
 # installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
