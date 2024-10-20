@@ -194,9 +194,11 @@ trap "cleanup" EXIT INT
 
 # Define cleanup function
 function cleanup() {
-    exit_code=$?
-    echo "Deleting $INSTALL_DIR/install.zip"
-    exit $exit_code
+    if [ -n "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/install.zip" ]; then
+        echo "Deleting $INSTALL_DIR/install.zip"
+    else
+        echo "Warning: INSTALL_DIR is not set or install.zip does not exist."
+    fi
 }
 
 # By default, we'll install into a folder called
