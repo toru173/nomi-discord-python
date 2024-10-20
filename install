@@ -116,6 +116,7 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
 SET "DEFAULT_INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 SET "INSTALL_DIR=%DEFAULT_INSTALL_DIR%"
 
+ECHO:
 ECHO Where would you like to install nomi-discord-python?
 
 :prompt_install_dir
@@ -380,11 +381,13 @@ else
     exit 1
 fi
 
+echo
+echo "Where would you like to install nomi-discord-python?"
+
 # Now we know we have Docker and tar we check with the user if
 # installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
 # If not, ask for an alternative.
 DEFAULT_INSTALL_DIR="$HOME/$INSTALL_FOLDER"
-echo "Where would you like to install nomi-discord-python?"
 while true; do
     # Prompt the user for the installation directory
     echo "Current choice: $DEFAULT_INSTALL_DIR"
@@ -439,7 +442,7 @@ echo "WARNING: This step will overwrite existing installation files in the direc
 echo "$INSTALL_DIR"
 echo
 echo "Any configuration files or startup scripts should be safe; however, if"
-echo "you are unsure, cancel now and save your files to a safe place before
+echo "you are unsure, cancel now and save your files to a safe place before"
 echo "proceeding."
 
 # Prompt the user for confirmation to proceed
