@@ -13,8 +13,8 @@ ECHO ===========================================================================
 ECHO ============================= Create a Nomi ===============================
 ECHO ===========================================================================
 ECHO:
-ECHO This launcher will create and start a Nomi running in a Docker container. It
-ECHO needs to be run whenever you make changes to your Nomi's configuration file.
+ECHO Use this script to create a new Nomi, or to verify an existing Nomi's
+ECHO configuration.
 ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
@@ -145,7 +145,7 @@ echo "============================= Create a Nomi ==============================
 echo "==========================================================================="
 echo
 echo "Use this script to create a new Nomi, or to verify an existing Nomi's"
-echo "settings."
+echo "configuration."
 echo
 echo "If you ever want to quit the script, simply press CTRL+C together"
 echo
