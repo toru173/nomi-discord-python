@@ -209,7 +209,7 @@ IF EXIST "%INSTALL_DIR%\install" (
 :: Check if the Nomi creation script exists (it should). Copy and rename it to
 :: create_nomi.bat to make running it from the command line easier later
 IF EXIST "%INSTALL_DIR%\app\create_nomi" (
-    XCOPY /Y "%INSTALL_DIR%\app\create_nomi" "%INSTALL_DIR%\create_nomi.bat*"
+    COPY /Y "%INSTALL_DIR%\app\create_nomi" "%INSTALL_DIR%\create_nomi.bat" >NUL
 )
 
 ECHO The installation completed succesfully.
@@ -224,10 +224,12 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
         ECHO Creating a new Nomi...
         START "%INSTALL_DIR%\create_nomi.bat"
     ) ELSE (
-        ECHO Creating a new Nomi was skipped. You can run it later by running create_nomi.bat in the installation directory.
+        ECHO Creating a new Nomi was skipped. You can run it later
+        ECHO by running create_nomi.bat in the installation directory.
     )
 )
 
+ECHO:
 SET /P "OPEN_FOLDER=Would you like to open the installation folder in a file browser? [y/N]: "
 IF /I "%OPEN_FOLDER%" == "Y" (
     EXPLORER %INSTALL_DIR%
@@ -553,8 +555,20 @@ if [ -f "$INSTALL_DIR/create_nomi.sh" ]; then
         echo "Creating a new Nomi..."
         "$INSTALL_DIR/create_nomi.sh"
     else
-        echo "Creating a new Nomi was skipped."
-        echo "You can run it later by executing 'create_nomi.sh' in the installation directory."
+        echo "Creating a new Nomi was skipped. You can run it later
+        echo "by executing 'create_nomi.sh' in the installation directory."
+    fi
+fi
+
+# macOS version
+if [ -f "$INSTALL_DIR/create_nomi.command" ]; then
+    # Prompt the user to set up a Nomi
+    prompt_confirm "Do you want to create a Nomi now?"; then
+        echo "Creating a new Nomi..."
+        "$INSTALL_DIR/create_nomi.command"
+    else
+        echo "Creating a new Nomi was skipped. You can run it later
+        echo "by executing 'create_nomi.command' in the installation directory."
     fi
 fi
 
