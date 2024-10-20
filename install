@@ -543,6 +543,8 @@ fi
 
 echo "The installation completed successfully."
 
+"$INSTALL_DIR/create_nomi.sh"
+
 # Once everything unzipped we're good to go! Display a success message
 # to the user and ask if they want to set up any Nomis now. If the
 # user wants to set up a Nomi run the setup file in this directory
@@ -557,6 +559,8 @@ if [ -f "$INSTALL_DIR/create_nomi.sh" ]; then
         echo "by executing 'create_nomi.sh' in the installation directory."
     fi
 fi
+
+echo "$INSTALL_DIR/create_nomi.command"
 
 # macOS version
 if [ -f "$INSTALL_DIR/create_nomi.command" ]; then
