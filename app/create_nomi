@@ -210,10 +210,12 @@ manage_existing_nomi() {
             if prompt_confirm "Are these values correct?"; then
             # Save the config
             if [ "$(uname -s)" == "Darwin" ]; then
+                sed -i "" "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
                 sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
                 sed -i "" "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
                 sed -i "" "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
             elif [ "$(uname -s)" == "Linux" ]; then
+                sed -i "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
                 sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
                 sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
                 sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
