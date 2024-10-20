@@ -75,7 +75,7 @@ function cleanup() {
 }
 
 # Prompt for and confirm user input
-prompt_confirm() {
+function prompt_confirm() {
     read -r -p "$1 [y/N] " RESPONSE </dev/tty
     case "$RESPONSE" in
         [yY][eE][sS]|[yY]) 
@@ -88,7 +88,7 @@ prompt_confirm() {
 }
 
 # Prompt for variable values
-prompt_variable() {
+function prompt_variable() {
     local var_name=$1
     local current_value=$2
     read -r -p "Enter $var_name [$current_value]: " VALUE </dev/tty
@@ -124,7 +124,7 @@ function get_script() {
 }
 
 # Manage existing Nomi configuration file
-manage_existing_nomi() {
+function manage_existing_nomi() {
     local NOMI_NAME=$1
     local CONF_FILE=$2
 
@@ -168,12 +168,12 @@ manage_existing_nomi() {
     if prompt_confirm "Do you want to start this Nomi now?"; then
         "$START_SCRIPT"
     else
-        echo "You can start $NOMI_NAME by executing $(basename $START_SCRIPT)"
+        echo #"You can start $NOMI_NAME by executing $(basename $START_SCRIPT)"
     fi
 }
 
 # Create new Nomi configuration file
-create_new_nomi() {
+function create_new_nomi() {
     while true; do
         read -r -p "Enter a new Nomi name: " NOMI_NAME </dev/tty
 
@@ -247,6 +247,7 @@ NOMI_NAMES=()
 while IFS= read -r -d '' FILE; do
     CONF_FILES+=("$FILE")
     NOMI_NAME=$(grep -m1 '^NOMI_NAME=' "$FILE" | cut -d '=' -f2)
+    echo "here"
     NOMI_NAME=${NOMI_NAME:-"(Unknown Nomi)"}
     NOMI_NAMES+=("$NOMI_NAME")
 done < <(find . -maxdepth 1 -name '*.conf' -print0)
@@ -315,16 +316,15 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#    # Prompt for values
+#    DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "")
+#    NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "")
+#    NOMI_ID=$(prompt_variable "NOMI_ID" "")
 
-    # Prompt for values
-    DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "")
-    NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "")
-    NOMI_ID=$(prompt_variable "NOMI_ID" "")
+#        sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+#        sed -i "" "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+#        sed -i "" "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
 
-        sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
-        sed -i "" "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
-        sed -i "" "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
-
-        sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
-        sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
-        sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+#        sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+#        sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+#        sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
