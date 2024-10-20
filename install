@@ -89,7 +89,7 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
     ECHO Please install the missing software and re-run the installer.
 
     SET /P "INSTALL_HELP=Would you like help installing the missing software? [y/N]: "
-    IF /I "%INSTALL_HELP%" == "Y" (
+    IF /I "!INSTALL_HELP!" == "Y" (
         IF "%DOCKER_INSTALLED%" == "0" (
             ECHO:
             ECHO Docker is required but not installed.
@@ -133,7 +133,7 @@ ECHO:
 ECHO Your choice: %INSTALL_DIR%
 SET /P "CONTINUE=Are you sure? [y/N]: "
 
-IF /I NOT "%CONTINUE%" == "Y" (
+IF /I NOT "!CONTINUE!" == "Y" (
     GOTO prompt_install_dir
 )
 
@@ -180,7 +180,7 @@ ECHO:
 
 :: Prompt the user before proceeding
 SET /P CONTINUE="Are you sure you want to proceed with the installation? [y/N]: "
-IF /I NOT "%CONTINUE%" == "Y" (
+IF /I NOT "!CONTINUE!" == "Y" (
     ECHO Extraction canceled. No changes were made.
     GOTO cleanup
 )
@@ -221,8 +221,8 @@ ECHO:
 :: for them
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     SET /P "CREATE_NOMI=Do you want to create a Nomi now? [y/N]: "
-    ECHO "%CREATE_NOMI%"
-    IF /I "%CREATE_NOMI%" == "Y" (
+    ECHO "!CREATE_NOMI!"
+    IF /I "!CREATE_NOMI!" == "Y" (
         ECHO Creating a new Nomi...
         START /I CMD /Q /K "%INSTALL_DIR%\create_nomi.bat"
     ) ELSE (
@@ -233,7 +233,7 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
 
 ECHO:
 SET /P "OPEN_FOLDER=Would you like to open the installation folder in a file browser? [y/N]: "
-IF /I "%OPEN_FOLDER%" == "Y" (
+IF /I "!OPEN_FOLDER!" == "Y" (
     EXPLORER %INSTALL_DIR%
 )
 
