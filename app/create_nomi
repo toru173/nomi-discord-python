@@ -163,7 +163,7 @@ manage_existing_nomi() {
     done
 
     NOMI_FILENAME=$(echo -n $NOMI_NAME | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
-    START_SCRIPT="$SCRIPT_ROOT/$NOMI_FILENAME.*"
+    START_SCRIPT="$SCRIPT_ROOT/start_$NOMI_FILENAME.*"
 
     if prompt_confirm "Do you want to start this Nomi now?"; then
         "$START_SCRIPT"
