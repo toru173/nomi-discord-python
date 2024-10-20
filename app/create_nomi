@@ -218,7 +218,7 @@ done < <(find . -maxdepth 1 -name '*.conf' -print0)
 
 # List NOMI names if there are any, or prompt to create new
 if [ "${#conf_files[@]}" -eq 0 ]; then
-    echo "No .conf files found."
+    echo "No Nomi configuration files found."
     prompt_confirm "Do you want to create a new Nomi?" && create_new_nomi
 else
     echo "These Nomi configuration files were found:"
