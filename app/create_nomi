@@ -228,7 +228,9 @@ manage_existing_nomi() {
     done
 
     if prompt_confirm "Do you want to start this Nomi now?"; then
-        ./start_"$NOMI_NAME"
+        "$CONF_FILE"
+    else
+        echo "You can start $NOMI_NAME by executing $CONF_FILE"
     fi
 }
 
