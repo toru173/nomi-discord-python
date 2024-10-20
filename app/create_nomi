@@ -224,7 +224,7 @@ manage_existing_nomi() {
 
 # Create new Nomi configuration file
 create_new_nomi() {
-
+    echo "Creating new Nomi!"
     while true; do
         read -r -p "Enter a new Nomi name: " NOMI_NAME
 
@@ -305,7 +305,7 @@ while IFS= read -r -d '' file; do
     nomi_names+=("$NOMI_NAME")
 done < <(find . -maxdepth 1 -name '*.conf' -print0)
 
-# List NOMI names if there are any, or prompt to create new
+# List Nomi names if there are any, or prompt to create new
 if [ "${#conf_files[@]}" -eq 0 ]; then
     echo "No Nomi configuration files found."
     prompt_confirm "Do you want to create a new Nomi?" && create_new_nomi

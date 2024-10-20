@@ -559,12 +559,10 @@ else
     return 1
 fi
 
-echo "$CREATE_NOMI_SCRIPT"
-
 if [ -f "$CREATE_NOMI_SCRIPT" ]; then
     # Prompt the user to set up a Nomi
     if prompt_confirm "Do you want to create a Nomi now?"; then
-        echo "Creating a new Nomi..."
+        echo
         "$CREATE_NOMI_SCRIPT"
     else
         echo "Creating a new Nomi was skipped. You can run it later"
