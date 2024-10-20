@@ -192,13 +192,13 @@ function get_script() {
 
 # Manage existing Nomi configuration file
 manage_existing_nomi() {
-    local nomi_name=$1
-    local conf_file=$2
+    local NOMI_NAME=$1
+    local CONF_FILE=$2
 
     # Prompt for values, showing current ones
-    DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "$(grep -m1 '^DISCORD_API_TOKEN=' "$conf_file" | cut -d '=' -f2)")
-    NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "$(grep -m1 '^NOMI_API_KEY=' "$conf_file" | cut -d '=' -f2)")
-    NOMI_ID=$(prompt_variable "NOMI_ID" "$(grep -m1 '^NOMI_ID=' "$conf_file" | cut -d '=' -f2)")
+    DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "$(grep -m1 '^DISCORD_API_TOKEN=' "$CONF_FILE" | cut -d '=' -f2)")
+    NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "$(grep -m1 '^NOMI_API_KEY=' "$CONF_FILE" | cut -d '=' -f2)")
+    NOMI_ID=$(prompt_variable "NOMI_ID" "$(grep -m1 '^NOMI_ID=' "$CONF_FILE" | cut -d '=' -f2)")
 
     # Display and confirm values
     echo "Configuration for $NOMI_NAME:"
@@ -208,9 +208,9 @@ manage_existing_nomi() {
     
     if prompt_confirm "Are these values correct?"; then
         # Save the config
-        sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$conf_file"
-        sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$conf_file"
-        sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$conf_file"
+        sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+        sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+        sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
 
         # Ask if the user wants to start the Nomi
         if prompt_confirm "Do you want to start this Nomi now?"; then
@@ -258,10 +258,10 @@ create_new_nomi() {
     NOMI_ID=$(prompt_variable "NOMI_ID" "")
 
     # Populate .conf file
-    sed -i "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$conf_file"
-    sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$conf_file"
-    sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$conf_file"
-    sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$conf_file"
+    sed -i "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
+    sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+    sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+    sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
 
     # Display and confirm
     echo "Configuration for $NOMI_NAME:"
@@ -320,9 +320,9 @@ else
     read -r -p "Choose a Nomi by number or type 'new' to create a new Nomi: " CHOICE </dev/tty
 
     if [[ "$CHOICE" =~ ^[0-9]+$ ]] && [ "$CHOICE" -le "${#NOMI_NAMES[@]}" ]; then
-        selected_nomi="${NOMI_NAMES[$((CHOICE-1))]}"
-        selected_conf="${CONF_FILES[$((CHOICE-1))]}"
-        manage_existing_nomi "$selected_nomi" "$selected_conf"
+        SELECTED_NOMI="${NOMI_NAMES[$((CHOICE-1))]}"
+        SELECTED_CONF="${CONF_FILES[$((CHOICE-1))]}"
+        manage_existing_nomi "$SELECTED_NOMI" "$SELECTED_CONF"
     elif [ "$CHOICE" == "new" ]; then
         create_new_nomi
     else
