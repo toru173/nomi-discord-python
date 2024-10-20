@@ -88,12 +88,12 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
     ECHO:
     ECHO Please install the missing software and re-run the installer.
 
-    SET /P "INSTALL_HELP=Would you like help installing the missing software? (Y/N): "
+    SET /P "INSTALL_HELP=Would you like help installing the missing software? [y/N]: "
     IF /I "%INSTALL_HELP%" == "Y" (
         IF "%DOCKER_INSTALLED%" == "0" (
             ECHO:
             ECHO Docker is required but not installed.
-            SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? (Y/N): "
+            SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? [y/N]: "
             IF /I "!OPEN_BROWSER!" == "Y" (
                 START https://www.docker.com/products/docker-desktop/
             )
@@ -102,7 +102,7 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
             ECHO:
             ECHO tar is required but not installed. It was integrated into Windows 10 in 2018. Do you need to update?
             ECHO Alternatively tar can be installed by installing Git for Windows, which provides tar and other Unix tools.
-            SET /P "OPEN_BROWSER=Would you like to open the Git for Windows download page now? (Y/N): "
+            SET /P "OPEN_BROWSER=Would you like to open the Git for Windows download page now? [y/N]: "
             IF /I "!OPEN_BROWSER!" == "Y" (
                 START https://git-scm.com/download/win
             )
@@ -131,7 +131,7 @@ IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
 :: Display the chosen directory and ask for confirmation
 ECHO:
 ECHO Your choice: %INSTALL_DIR%
-SET /P "CONTINUE=Are you sure? (Y/N): "
+SET /P "CONTINUE=Are you sure? [y/N]: "
 
 IF /I NOT "%CONTINUE%" == "Y" (
     GOTO prompt_install_dir
@@ -179,7 +179,7 @@ ECHO proceeding.
 ECHO:
 
 :: Prompt the user before proceeding
-SET /P CONTINUE="Are you sure you want to proceed with the installation? (Y/N): "
+SET /P CONTINUE="Are you sure you want to proceed with the installation? [y/N]: "
 IF /I NOT "%CONTINUE%" == "Y" (
     ECHO Extraction canceled. No changes were made.
     GOTO cleanup
@@ -219,7 +219,7 @@ ECHO The installation completed succesfully.
 :: user wants to set up a Nomi run the setup file in this directory
 :: for them
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
-    SET /P RUN_SETUP="Do you want to create a Nomi now? (Y/N): "
+    SET /P RUN_SETUP="Do you want to create a Nomi now? [y/N]: "
     IF /I "%RUN_SETUP%" == "Y" (
         ECHO Creating a new Nomi...
         START "%INSTALL_DIR%\create_nomi.bat"
@@ -228,7 +228,7 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     )
 )
 
-SET /P "OPEN_FOLDER=Would you like to open the installation folder in a file browser? (Y/N): "
+SET /P "OPEN_FOLDER=Would you like to open the installation folder in a file browser? [y/N]: "
 IF /I "%OPEN_FOLDER%" == "Y" (
     EXPLORER %INSTALL_DIR%
 )
@@ -279,6 +279,19 @@ function cleanup() {
         rm "$INSTALL_DIR/install.zip"
     fi
     exit $exit_code
+}
+
+# Function to prompt for and confirm user input
+prompt_confirm() {
+    read -r -p "$1 [y/N] " RESPONSE </dev/tty
+    case "$response" in
+        [yY][eE][sS]|[yY]) 
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
 }
 
 echo "==========================================================================="
@@ -335,17 +348,12 @@ else
     echo "Please install the missing software and re-run the installer."
 
     # Prompt user for help installing the missing software
-    read -p "Would you like help installing the missing software? (Y/N): " INSTALL_HELP </dev/tty
-    INSTALL_HELP=$(echo "$INSTALL_HELP" | tr '[:upper:]' '[:lower:]')
-
-    if [[ "$INSTALL_HELP" == "y" ]]; then
+    if prompt_confirm "Would you like help installing the missing software?"; then
         # If Docker is not installed, prompt to open the Docker download page
         if [ "$DOCKER_INSTALLED" -eq 0 ]; then
             echo
             echo "Docker is required but not installed."
-            read -p "Would you like to open the Docker download page now? (Y/N): " OPEN_BROWSER </dev/tty
-            OPEN_BROWSER=$(echo "$OPEN_BROWSER" | tr '[:upper:]' '[:lower:]')
-            if [[ "$OPEN_BROWSER" == "y" ]]; then
+            if prompt_confirm "Would you like to open the Docker download page now?"; then
                 # Attempt to open the browser with xdg-open (Linux) or open (macOS)
                 if command -v xdg-open >/dev/null 2>&1; then
                     xdg-open "https://www.docker.com/products/docker-desktop/"
@@ -406,9 +414,7 @@ while true; do
     # Display the chosen directory and ask for confirmation
     echo
     echo "Your choice: $INSTALL_DIR"
-    read -p "Are you sure? (Y/N): " CONTINUE </dev/tty
-    CONTINUE=$(echo "$CONTINUE" | tr '[:upper:]' '[:lower:]')
-    if [[ "$CONTINUE" == "y" ]]; then
+    if prompt_confirm "Are you sure?"; then
         break
     fi
 done
@@ -456,10 +462,7 @@ echo "proceeding."
 echo
 
 # Prompt the user for confirmation to proceed
-read -p "Are you sure you want to proceed with the installation? (Y/N): " CONTINUE </dev/tty
-CONTINUE=$(echo "$CONTINUE" | tr '[:upper:]' '[:lower:]')
-
-if [[ "$CONTINUE" != "y" ]]; then
+if ! prompt_confirm "Are you sure you want to proceed with the installation?"; then
     echo "Extraction canceled. No changes were made."
     # Cleanup and exit
     exit 0
@@ -545,10 +548,7 @@ echo "The installation completed successfully."
 # for them
 if [ -f "$INSTALL_DIR/create_nomi.sh" ]; then
     # Prompt the user to set up a Nomi
-    read -p "Do you want to create a Nomi now? (Y/N): " RUN_SETUP </dev/tty
-    RUN_SETUP=$(echo "$RUN_SETUP" | tr '[:upper:]' '[:lower:]')
-
-    if [[ "$RUN_SETUP" == "y" ]]; then
+    prompt_confirm "Do you want to create a Nomi now?"; then
         echo "Creating a new Nomi..."
         "$INSTALL_DIR/create_nomi.sh"
     else
@@ -557,9 +557,7 @@ if [ -f "$INSTALL_DIR/create_nomi.sh" ]; then
     fi
 fi
 
-read -p "Would you like to open the installation folder in a file browser? (Y/N): " OPEN_FOLDER </dev/tty
-OPEN_FOLDER=$(echo "$OPEN_FOLDER" | tr '[:upper:]' '[:lower:]')
-if [[ "$OPEN_FOLDER" == "y" ]]; then
+if prompt_confirm "Would you like to open the installation folder in a file browser?"; then
     if command -v xdg-open >/dev/null 2>&1; then
         # Linux (xdg-open is available)
         xdg-open "$INSTALL_DIR"
