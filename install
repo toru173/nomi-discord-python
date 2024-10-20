@@ -18,7 +18,7 @@ IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord
 :: === The LICENSE for this script can be found at the bottom of this file ====
 :: ============================================================================
 ::
-:: This is the Windows part of the installation script.
+:: This is the Windows part of the script.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 SET INSTALL_FOLDER=nomi-discord-python
@@ -239,6 +239,7 @@ IF /I "%OPEN_FOLDER%" == "Y" (
 :: the install files, delete them here
 IF EXIST "%INSTALL_DIR%\install.zip" DEL /F /Q "%INSTALL_DIR%\install.zip"
 ENDLOCAL
+PAUSE
 ECHO You may now close this window
 EXIT /B
 END_WIN

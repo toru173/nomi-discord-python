@@ -1,24 +1,11 @@
 : << END_WIN
 @ECHO OFF
-:: If this script is being run using curl it will need to save
-:: itself to a temporary file. We do that here:
-SET "TEMP_INSTALL_SCRIPT=%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.bat"
-TIMEOUT /T 0 >NUL 2>NUL
-IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% --remove-on-error && START /I /WAIT CMD /Q /K %TEMP_INSTALL_SCRIPT% & DEL /F /Q %TEMP_INSTALL_SCRIPT% & EXIT)
-::
-:: We need to set a temporary install file path before
-:: the pipe-check because expansion behaves differently
-:: when executing from a pipe. We also can't use a
-:: TIMEOUT because it behaves differently when being piped.
-:: We try to run it as a way to check that the script is
-:: running from a pipe, but then use ping with a timeout
-:: when we actually need to wait (https://stackoverflow.com/a/735294)
 ::
 :: ============================================================================
 :: === The LICENSE for this script can be found at the bottom of this file ====
 :: ============================================================================
 ::
-:: This is the Windows part of the installation script.
+:: This is the Windows part of the script.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 
@@ -117,6 +104,7 @@ ECHO You may now close this window.
 :: All done! Let's exit from the Windows part of the script
 :cleanup
 ENDLOCAL
+PAUSE
 ECHO You may now close this window
 EXIT /B
 END_WIN
