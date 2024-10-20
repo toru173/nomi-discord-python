@@ -219,8 +219,8 @@ ECHO The installation completed succesfully.
 :: user wants to set up a Nomi run the setup file in this directory
 :: for them
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
-    SET /P "RUN_SETUP=Do you want to create a Nomi now? [y/N]: "
-    IF /I "%RUN_SETUP%" == "Y" (
+    SET /P "CREATE_NOMI=Do you want to create a Nomi now? [y/N]: "
+    IF /I "%CREATE_NOMI%" == "Y" (
         ECHO Creating a new Nomi...
         START /I CMD /Q /K "%INSTALL_DIR%\create_nomi.bat"
     ) ELSE (
