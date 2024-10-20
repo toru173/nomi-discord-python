@@ -526,7 +526,6 @@ if [ -f "$INSTALL_DIR/install" ]; then
     rm "$INSTALL_DIR/install"
 else
     echo "Error: install script not found in $INSTALL_DIR."
-    exit 1
 fi
 
 # Check if the Nomi creation script exists (it should). Copy it
@@ -536,7 +535,6 @@ if [ -f "$INSTALL_DIR/app/create_nomi" ]; then
     get_script "$INSTALL_DIR/create_nomi" "$INSTALL_DIR/"
 else
     echo "Error: create_nomi script not found in $INSTALL_DIR/app."
-    exit 1
 fi
 
 echo "The installation completed successfully."
