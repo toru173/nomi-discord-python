@@ -240,13 +240,14 @@ if ! command -v docker >/dev/null 2>&1; then
 fi
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo "$SCRIPT_ROOT"
 
 # Find all nomi.conf files and extract NOMI_NAME
 CONF_FILES=()
 NOMI_NAMES=()
-find . -maxdepth 1 -name '*.conf' -exec bash -c '
+
+find "$SCRIPT_ROOT" -maxdepth 1 -name '*' -exec bash -c '
     for FILE; do
+        echo $FILE
         CONF_FILES+=("$FILE")
         NOMI_NAME=$(grep -m1 "^NOMI_NAME=" "$FILE" | cut -d "=" -f2)
         NOMI_NAME=${NOMI_NAME:-"(Unknown Nomi)"}
