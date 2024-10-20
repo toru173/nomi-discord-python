@@ -572,6 +572,7 @@ if [[ "$OPEN_FOLDER" == "y" ]]; then
 fi
 
 echo "You may now close this window"
+echo
 
 # All done! Let's exit from the macOS/Linux part of the script
 exit 0
