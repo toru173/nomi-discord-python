@@ -99,7 +99,6 @@ IF ERRORLEVEL 1 (
 
 ECHO %NOMI_NAME%'s container is running! You can now talk to %NOMI_NAME% on Discord.
 ECHO Make sure you do not share your %CONFIG_FILE% file with ANYONE.
-ECHO You may now close this window.
 
 :: All done! Let's exit from the Windows part of the script
 :cleanup
