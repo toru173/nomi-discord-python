@@ -1,0 +1,30 @@
+# This is your Nomi's configuration file. Lines starting with '#'
+# don't have any configuration importance, they are just to help. Lines
+# that start with CAPITAL_LETTERS= are for you to fill out. Make sure
+# you do not share this file with ANYONE
+
+# Populate these with your Nomi and Discord API Tokens.
+DISCORD_API_TOKEN=
+NOMI_API_KEY=
+
+# You may need to put quotes around your Nomi's name
+# ("like this") if it has spaces in it!
+NOMI_NAME=
+NOMI_ID=
+
+# Configure how you want to format messages when sending
+# and receiving to Discord here. If you don't want a message
+# prefix or suffix just leave these here but with nothing
+# after the equals sign.
+#
+# {author}, {channel} and {guild} are placeholders. The software
+# will try to replace them with the correct values during chat.
+# If you want to use the placeholders make sure you include the {}
+# either side.
+DEFAULT_MESSAGE_PREFIX="*You receive a message from @{author} on Discord* "
+DEFAULT_MESSAGE_SUFFIX="... (the message was cut off because it was too long)"
+CHANNEL_MESSAGE_PREFIX="*You receive a message from {author} in {channel} on {guild} on Discord* "
+DM_MESSAGE_PREFIX="*You receive a DM from {author} on Discord* "
+
+# If you are a paying user change this to 600
+MAX_MESSAGE_LENGTH=400

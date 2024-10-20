@@ -9,7 +9,8 @@ venv/
 # Ignore Docker files themselves
 Dockerfile
 .dockerignore
-start-docker.sh
 
-# Ignore Documentation
-*.md
+# Ignore other application assets
+create_nomi
+start_nomi
+*.example

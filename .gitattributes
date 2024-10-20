@@ -2,3 +2,5 @@
 * text=auto
 
 install -text
+start_nomi -text
+create_nomi -text

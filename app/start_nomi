@@ -1,0 +1,280 @@
+: << END_WIN
+@ECHO OFF
+:: If this script is being run using curl it will need to save
+:: itself to a temporary file. We do that here:
+SET "TEMP_INSTALL_SCRIPT=%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.bat"
+TIMEOUT /T 0 >NUL 2>NUL
+IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %TEMP_INSTALL_SCRIPT% --remove-on-error && START /I /WAIT CMD /Q /K %TEMP_INSTALL_SCRIPT% & DEL /F /Q %TEMP_INSTALL_SCRIPT% & EXIT)
+::
+:: We need to set a temporary install file path before
+:: the pipe-check because expansion behaves differently
+:: when executing from a pipe. We also can't use a
+:: TIMEOUT because it behaves differently when being piped.
+:: We try to run it as a way to check that the script is
+:: running from a pipe, but then use ping with a timeout
+:: when we actually need to wait (https://stackoverflow.com/a/735294)
+::
+:: ============================================================================
+:: === The LICENSE for this script can be found at the bottom of this file ====
+:: ============================================================================
+::
+:: This is the Windows part of the installation script.
+
+SETLOCAL ENABLEDELAYEDEXPANSION
+
+ECHO ===========================================================================
+ECHO ============================= Nomi Launcher ===============================
+ECHO ===========================================================================
+ECHO:
+ECHO This launcher will create and start a Nomi running in a Docker container. It
+ECHO needs to be run whenever you make changes to your Nomi's configuration file.
+ECHO:
+ECHO If you ever want to quit the script, simply press CTRL+C together.
+ECHO:
+
+SET NOMI_NAME=example_nomi
+SET CONFIG_FILE_NAME=%NOMI_NAME%.conf
+
+:: Get the current directory
+SET "SCRIPT_ROOT=%~dp0"
+SET "CONFIG_FILE=%SCRIPT_ROOT%%CONFIG_FILE_NAME%"
+
+:: Check if Docker is installed
+docker --version >NUL 2>&1
+IF ERRORLEVEL 1 (
+    ECHO Could not find Docker. Please re-run the installation script.
+    GOTO cleanup
+)
+
+:: Check for a configuration file
+IF EXIST "%CONFIG_FILE%" (
+    ECHO Found %NOMI_NAME%'s configuration file. Reading contents...
+    CALL "%CONFIG_FILE%"
+) ELSE (
+    ECHO A configuration file for %NOMI_NAME% was not found. Please re-run
+    ECHO the create_nomi script to set up %NOMI_NAME%.
+    GOTO cleanup
+)
+
+:: Check required variables are in the configuration file
+SET MISSING_VARIABLE=FALSE
+FOR %%V IN (DISCORD_API_TOKEN NOMI_API_KEY NOMI_NAME NOMI_ID) DO (
+    IF "%%~V"=="" (
+        ECHO %%V not found in the configuration file.
+        SET MISSING_VARIABLE=TRUE
+    )
+)
+
+IF "%MISSING_VARIABLE%"=="TRUE" (
+    ECHO There was an error reading the configuration file for %NOMI_NAME%.
+    ECHO Please re-run the create_nomi script to set up %NOMI_NAME%, or
+    ECHO open the configuration file in a text editor to inspect the
+    ECHO missing values.
+    GOTO cleanup
+)
+
+:: Converts the Nomi's name to lowercase, replaces non-valid characters with
+:: an underscore, and strips trailing underscores
+FOR /F "tokens=* delims=" %%A IN ('echo %NOMI_NAME% ^| powershell -Command "$input.tolower()"') DO SET NOMI_NAME_LC=%%A
+SET DOCKER_IMAGE_NAME=%NOMI_NAME_LC%
+SET DOCKER_IMAGE_NAME=%DOCKER_IMAGE_NAME:.=_%
+SET DOCKER_IMAGE_NAME=%DOCKER_IMAGE_NAME:-=_%
+
+:: Remove trailing underscores
+FOR /F "tokens=* delims=_" %%A IN ("%DOCKER_IMAGE_NAME%") DO SET DOCKER_IMAGE_NAME=%%A
+
+:: Check if a Docker container already exists and remove it
+docker inspect %DOCKER_IMAGE_NAME% >NUL 2>&1
+IF NOT ERRORLEVEL 1 (
+    ECHO A Docker container for %NOMI_NAME% exists. Removing container...
+    docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
+    IF ERRORLEVEL 1 (
+        ECHO Error when removing container.
+        GOTO cleanup
+    )
+)
+
+:: Build the Docker container
+ECHO Building a Docker container for %NOMI_NAME%
+docker build -t %DOCKER_IMAGE_NAME% "%SCRIPT_ROOT%" >NUL 2>&1
+IF ERRORLEVEL 1 (
+    ECHO Error when building container.
+    GOTO cleanup
+)
+
+:: Run the Docker container
+ECHO %NOMI_NAME%'s container built successfully. Running container...
+docker run -d --name %DOCKER_IMAGE_NAME% %DOCKER_IMAGE_NAME% >NUL 2>&1
+IF ERRORLEVEL 1 (
+    ECHO Error when running container.
+    GOTO cleanup
+)
+
+ECHO %NOMI_NAME%'s container is running! You can now talk to %NOMI_NAME% on Discord.
+ECHO Make sure you do not share your %CONFIG_FILE% file with ANYONE.
+ECHO You may now close this window.
+
+:: All done! Let's exit from the Windows part of the script
+:cleanup
+ENDLOCAL
+ECHO You may now close this window
+EXIT /B
+END_WIN
+
+# This is the macOS/Linux part of the script. We have to do
+# The same steps here, but in a way that works for Bash.
+
+# Perform some basic sanity checks, then continue execution
+if [ -z "${BASH_VERSION:-}" ]; then
+    # Attempt to find Bash
+    if command -v bash >/dev/null 2>&1; then
+        # Re-execute the script with Bash by reading it from stdin if necessary
+        if [ -t 0 ]; then
+            # If the script is not being piped, re-execute the file with bash
+            exec bash "$0" "$@"
+        else
+            # If the script is being piped (non-interactive), re-execute from stdin
+            exec bash <(cat) "$@"
+        fi
+    else
+        # Unable to find Bash. Exit with an error
+        echo "Bash is required to run this script." >&2
+        exit 1
+    fi
+fi
+
+# Trap to function when we exit
+trap "cleanup" EXIT INT
+
+# Define cleanup function
+function cleanup() {
+    exit_code=$?
+    exit $exit_code
+}
+
+echo "==========================================================================="
+echo "============================= Nomi Launcher ==============================="
+echo "==========================================================================="
+echo
+echo "This launcher will create and start a Nomi running in a Docker container. It"
+echo "needs to be run whenever you make changes to your Nomi's configuration file"
+echo
+echo "If you ever want to quit the script, simply press CTRL+C together"
+echo
+
+NOMI_NAME="example_nomi"
+CONFIG_FILE_NAME="$NOMI_NAME.conf"
+
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
+
+# Check if Docker is installed
+if ! command -v docker >/dev/null 2>&1; then
+    echo "Could not find Docker. Please re-run the installation script"
+    exit 1
+fi
+
+# Check for a configuration file
+if [ -f "$CONFIG_FILE" ]; then
+    # Inform user we've found the config file
+    echo "Found $NOMI_NAME's configuration file. Reading contents..."
+    source "$CONFIG_FILE"
+else
+    # No configuration file found. Ask the user to run create_nomi to set one up
+    echo "A configuration file for $NOMI_NAME was not found. Please re-run"
+    echo "the create_nomi script to set up $NOMI_NAME"
+    exit 1
+fi
+
+# Check required variables are in the configuration file
+REQUIRED_VARIABLES=("DISCORD_API_TOKEN" "NOMI_API_KEY" "NOMI_NAME" "NOMI_ID")
+
+MISSING_VARIABLE=false
+for var in "${REQUIRED_VARIABLES[@]}"; do
+    # Check if the variable is unset or empty
+    if [ -z "${!var}" ]; then
+        echo "$var not found in the configuration file"
+        MISSING_VARIABLE=true
+    fi
+done
+
+if [ MISSING_VARIABLE == true ]; then
+    echo "There was an error reading the configuration file for $NOMI_NAME."
+    echo "Please re-run the create_nomi script to set up $NOMI_NAME, or"
+    echo "open the configuration file in a text editor to inspect the"
+    echo "missing values"
+    exit 1
+fi
+
+# Converts the Nomis's name to lower case, replaces
+# non-valid charactes with an underscore and strips any
+# trailing underscores as required by a Docker image name
+DOCKER_IMAGE_NAME=$(echo -n $NOMI_NAME | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
+
+if docker inspect $DOCKER_IMAGE_NAME > /dev/null 2>&1; then
+    echo "A Docker container for $NOMI_NAME exists. Removing container..."
+    DOCKER_REMOVE_OUTPUT=$(docker container rm $DOCKER_IMAGE_NAME -f 2>&1)
+    if [ $? -ne 0 ]; then
+        echo "Error when removing container: $DOCKER_REMOVE_OUTPUT"
+        exit 1
+    fi
+fi
+
+echo "Building a Docker container for $NOMI_NAME"
+echo "The container will be called '$DOCKER_IMAGE_NAME'"
+
+DOCKER_BUILD_OUTPUT=$(docker build -t $DOCKER_IMAGE_NAME "$SCRIPT_ROOT" 2>&1)
+if [ $? -ne 0 ]; then
+    echo "Error when building container: $DOCKER_BUILD_OUTPUT"
+    exit 1
+fi
+
+echo "$NOMI_NAME's container built succesfully. Running container..."
+
+DOCKER_RUN_OUTPUT=$(docker run -d --name $DOCKER_IMAGE_NAME $DOCKER_IMAGE_NAME 2>&1)
+if [ $? -ne 0 ]; then
+    echo "Error when running container: $DOCKER_RUN_OUTPUT"
+    exit 1
+fi
+
+echo "$NOMI_NAME's container is running! You can now to talk to $NOMI_NAME on Discord."
+echo "Make sure you do not share your $CONFIG_FILE file with ANYONE"
+echo "You may now close this window"
+echo
+
+# All done! Let's exit from the macOS/Linux part of the script
+exit 0
+
+===============================================================================
+================================== LICENSE ====================================
+===============================================================================
+
+LICENSE
+
+Copyright (c) 2024-present toru173 and contributors
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted (subject to the limitations in the disclaimer 
+below) provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, 
+  this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice, 
+  this list of conditions and the following disclaimer in the documentation 
+  and/or other materials provided with the distribution.
+* Neither the name of the copyright holder nor the names of the contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY 
+THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT 
+NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER 
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
