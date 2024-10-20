@@ -161,7 +161,7 @@ RMDIR "%WRITE_TEST%"
 
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub...
-curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%INSTALL_DIR%\install.zip" --progress-bar --remove-on-error
+curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%INSTALL_DIR%\install.zip" --remove-on-error
 IF NOT EXIST "%INSTALL_DIR%\install.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO cleanup
@@ -238,8 +238,8 @@ IF /I "%OPEN_FOLDER%" == "Y" (
 :: the install files, delete them here
 IF EXIST "%INSTALL_DIR%\install.zip" DEL /F /Q "%INSTALL_DIR%\install.zip"
 ENDLOCAL
-PAUSE
-EXIT
+ECHO You may now close this window
+EXIT /B
 END_WIN
 
 # This is the macOS/Linux part of the script. We have to do
@@ -434,7 +434,7 @@ rmdir "$WRITE_TEST"
 
 # Download the latest release from GitHub to INSTALL_FOLDER
 echo "Downloading the latest version from GitHub..."
-curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "$INSTALL_DIR/install.zip" --progress-bar --remove-on-error
+curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "$INSTALL_DIR/install.zip" --remove-on-error
 
 # Check if the download was successful
 if [ ! -f "$INSTALL_DIR/install.zip" ]; then
@@ -487,37 +487,53 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+function get_script() {
+    local source="$1"
+    local destination="$2"
+    
+    # Check if the source file exists
+    if [ ! -f "$source" ]; then
+        echo "Error: Source file '$source' not found!"
+        return 1
+    fi
+
+    local base_filename="$(basename "$source")"
+    local destination_dir="$(dirname "$destination")/"
+    local destination_file="${destination_dir}/${base_filename}"
+
+    # Determine the destination file based on the OS
+    if [ "$(uname -s)" == "Darwin" ]; then
+        destination_file="${destination_file}.command"
+    elif [ "$(uname -s)" == "Linux" ]; then
+        destination_file="${destination_file}.sh"
+    else
+        echo "Error: Unsupported operating system '$(uname -s)'."
+        return 1
+    fi
+
+    echo "#!/usr/bin/env bash" > "$destination_file"
+    cat "$source" >> "$destination_file"
+
+    chmod +x "$destination_file"
+}
+
 # Check if the install script exists (it should). Rename it to
-# install.sh to make running it from the command line easier later
-# and add a shebang
+# install.sh on linux and install.command on macOS to make running
+# it from the command line easier later and add a shebang
 if [ -f "$INSTALL_DIR/install" ]; then
-    # Rename the install script to install.sh
-    mv "$INSTALL_DIR/install" "$INSTALL_DIR/install.sh"
-
-    # Add the shebang at the top of the file
-    echo -e "#!/usr/bin/env bash\n$(cat \"$INSTALL_DIR/install.sh\")" > "$INSTALL_DIR/install.sh"
-
-    # Make sure the script is executable
-    chmod +x "$INSTALL_DIR/install.sh"
+    get_script "$INSTALL_DIR/install" "$INSTALL_DIR"
 else
     echo "Error: install script not found in $INSTALL_DIR."
     exit 1
 fi
 
-# Check if the Nomi creation script exists (it should). Copy and rename it to
-# create_nomi.sh to make running it from the command line easier later
-# and add a shebang
+# Check if the Nomi creation script exists (it should). Copy it
+# from the /app directory into our install directory and make it
+# executable too
 if [ -f "$INSTALL_DIR/app/create_nomi" ]; then
-    # Rename the install script to install.sh
-    mv "$INSTALL_DIR/app/create_nomi" "$INSTALL_DIR/create_nomi.sh"
-
-    # Add the shebang at the top of the file
-    echo -e "#!/usr/bin/env bash\n$(cat \"$INSTALL_DIR/create_nomi.sh\")" > "$INSTALL_DIR/create_nomi.sh"
-
-    # Make sure the script is executable
-    chmod +x "$INSTALL_DIR/create_nomi.sh"
+    get_script "$INSTALL_DIR/install" "$INSTALL_DIR"
 else
-    echo "Error: create_nomi script not found in $INSTALL_DIR."
+    echo "Error: create_nomi script not found in $INSTALL_DIR/app."
     exit 1
 fi
 
@@ -555,6 +571,8 @@ if [[ "$OPEN_FOLDER" == "y" ]]; then
         open "$INSTALL_DIR"
     fi
 fi
+
+echo "You may now close this window"
 
 # All done! Let's exit from the macOS/Linux part of the script
 exit 0
