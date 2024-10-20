@@ -57,6 +57,8 @@ IF ERRORLEVEL 1 (
     GOTO cleanup
 )
 
+ECHO [x] Docker is installed
+
 :: Check if tar is installed. It SHOULD be because it shipped
 :: with Windows before cURL, and this script is most likely
 :: running using cURL.
@@ -75,10 +77,12 @@ IF ERRORLEVEL 1 (
     GOTO cleanup
 )
 
+ECHO [x] tar is installed
+
 :: Now we know know we have Docker and tar we check with the user if
 :: installing in our default location (%USERPROFILE%\%INSTALL_FOLDER%)
 :: is ok. If not, ask for an alternative.
-SET /P "INSTALL_DIR=Enter installation directory (Press Enter for default: %USERPROFILE%\%INSTALL_FOLDER%): "
+SET /P "INSTALL_DIR=Where would you like to install nomi-discord-python? Current choice: %USERPROFILE%\%INSTALL_FOLDER%): "
 IF "%INSTALL_DIR%" == "" SET "INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 
 :: Create the folder if it doesn't exist.
@@ -248,6 +252,8 @@ if ! command -v docker >/dev/null 2>&1; then
     exit 1
 fi
 
+echo "[x] Docker is installed"
+
 # Check if tar is installed. Prompt the user to download it if not
 # by attempting to guess what package manager they are using (if any)
 if ! command -v tar >/dev/null 2>&1; then
@@ -282,11 +288,13 @@ if ! command -v tar >/dev/null 2>&1; then
     exit 1
 fi
 
+echo "[x] tar is installed"
+
 # Now we know we have Docker and tar we check with the user if
 # installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
 # If not, ask for an alternative.
 DEFAULT_INSTALL_DIR="$HOME/${INSTALL_FOLDER:-install_folder}"
-read -p "Enter installation directory (Press Enter for default: $DEFAULT_INSTALL_DIR): " INSTALL_DIR
+read -p "Where would you like to install nomi-discord-python? Current choice: $DEFAULT_INSTALL_DIR " INSTALL_DIR
 INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
 
 # Create the folder if it doesn't exist.
@@ -317,6 +325,8 @@ if [ ! -f "$INSTALL_DIR/install.zip" ]; then
     echo "Something went wrong during the download. Please try again."
     exit 1
 fi
+
+exit 0
 
 # Warn the user that existing files will be overwritten. No going back now!
 echo "WARNING: This step will overwrite existing installation files in the directory:"
