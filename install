@@ -209,7 +209,7 @@ IF EXIST "%INSTALL_DIR%\install" (
 :: Check if the Nomi creation script exists (it should). Copy and rename it to
 :: create_nomi.bat to make running it from the command line easier later
 IF EXIST "%INSTALL_DIR%\app\create_nomi" (
-    XCOPY /Y "%INSTALL_DIR%\app\create_nomi" "%INSTALL_DIR%\create_nomi.bat"
+    XCOPY /Y "%INSTALL_DIR%\app\create_nomi" "%INSTALL_DIR%\create_nomi.bat*"
 )
 
 ECHO The installation completed succesfully.
