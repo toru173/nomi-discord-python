@@ -196,7 +196,7 @@ trap "cleanup" EXIT INT
 function cleanup() {
     exit_code=$?
     echo "Deleting $INSTALL_DIR/install.zip"
-    exit exit_code
+    exit $exit_code
 }
 
 # By default, we'll install into a folder called
