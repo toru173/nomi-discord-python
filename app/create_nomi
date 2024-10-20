@@ -33,73 +33,7 @@ IF ERRORLEVEL 1 (
     GOTO cleanup
 )
 
-:: Check for a configuration file
-IF EXIST "%CONFIG_FILE%" (
-    ECHO Found %NOMI_NAME%'s configuration file. Reading contents...
-    CALL "%CONFIG_FILE%"
-) ELSE (
-    ECHO A configuration file for %NOMI_NAME% was not found. Please re-run
-    ECHO the create_nomi script to set up %NOMI_NAME%.
-    GOTO cleanup
-)
-
-:: Check required variables are in the configuration file
-SET MISSING_VARIABLE=FALSE
-FOR %%V IN (DISCORD_API_TOKEN NOMI_API_KEY NOMI_NAME NOMI_ID) DO (
-    IF "%%~V"=="" (
-        ECHO %%V not found in the configuration file.
-        SET MISSING_VARIABLE=TRUE
-    )
-)
-
-IF "%MISSING_VARIABLE%"=="TRUE" (
-    ECHO There was an error reading the configuration file for %NOMI_NAME%.
-    ECHO Please re-run the create_nomi script to set up %NOMI_NAME%, or
-    ECHO open the configuration file in a text editor to inspect the
-    ECHO missing values.
-    GOTO cleanup
-)
-
-:: Converts the Nomi's name to lowercase, replaces non-valid characters with
-:: an underscore, and strips trailing underscores
-FOR /F "tokens=* delims=" %%A IN ('echo %NOMI_NAME% ^| powershell -Command "$input.tolower()"') DO SET NOMI_NAME_LC=%%A
-SET DOCKER_IMAGE_NAME=%NOMI_NAME_LC%
-SET DOCKER_IMAGE_NAME=%DOCKER_IMAGE_NAME:.=_%
-SET DOCKER_IMAGE_NAME=%DOCKER_IMAGE_NAME:-=_%
-
-:: Remove trailing underscores
-FOR /F "tokens=* delims=_" %%A IN ("%DOCKER_IMAGE_NAME%") DO SET DOCKER_IMAGE_NAME=%%A
-
-:: Check if a Docker container already exists and remove it
-docker inspect %DOCKER_IMAGE_NAME% >NUL 2>&1
-IF NOT ERRORLEVEL 1 (
-    ECHO A Docker container for %NOMI_NAME% exists. Removing container...
-    docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
-    IF ERRORLEVEL 1 (
-        ECHO Error when removing container.
-        GOTO cleanup
-    )
-)
-
-:: Build the Docker container
-ECHO Building a Docker container for %NOMI_NAME%
-docker build -t %DOCKER_IMAGE_NAME% "%SCRIPT_ROOT%" >NUL 2>&1
-IF ERRORLEVEL 1 (
-    ECHO Error when building container.
-    GOTO cleanup
-)
-
-:: Run the Docker container
-ECHO %NOMI_NAME%'s container built successfully. Running container...
-docker run -d --name %DOCKER_IMAGE_NAME% %DOCKER_IMAGE_NAME% >NUL 2>&1
-IF ERRORLEVEL 1 (
-    ECHO Error when running container.
-    GOTO cleanup
-)
-
-ECHO %NOMI_NAME%'s container is running! You can now talk to %NOMI_NAME% on Discord.
-ECHO Make sure you do not share your %CONFIG_FILE% file with ANYONE.
-ECHO You may now close this window.
+ECHO This feature is not yet implemented.
 
 :: All done! Let's exit from the Windows part of the script
 :cleanup
