@@ -115,12 +115,12 @@ IF "%DOCKER_INSTALLED%"=="1" IF "%TAR_INSTALLED%"=="1" (
 SET "DEFAULT_INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 SET "INSTALL_DIR=%DEFAULT_INSTALL_DIR%"
 
-:prompt_install_dir
 ECHO Where would you like to install nomi-discord-python?
+
+:prompt_install_dir
 ECHO Current choice: %INSTALL_DIR%
 SET /P "USER_INPUT=> "
 
-:: If user input is not empty, update the INSTALL_DIR
 IF NOT "%USER_INPUT%"=="" SET "INSTALL_DIR=%USER_INPUT%"
 
 :: Display the chosen directory and ask for confirmation
@@ -392,7 +392,9 @@ while true; do
     echo "You chose: $INSTALL_DIR"
     read -p "Is this correct? (Y/N): " CONTINUE </dev/tty
     CONTINUE=${CONTINUE,,}
-    if [[ "$CONTINUE" != "y" ]]; break
+    if [[ "$CONTINUE" != "y" ]]; then
+        break
+    fi
 done
 
 echo
