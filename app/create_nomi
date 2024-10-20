@@ -23,7 +23,7 @@ IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord
 SETLOCAL ENABLEDELAYEDEXPANSION
 
 ECHO ===========================================================================
-ECHO ============================= Nomi Launcher ===============================
+ECHO ============================= Create a Nomi ===============================
 ECHO ===========================================================================
 ECHO:
 ECHO This launcher will create and start a Nomi running in a Docker container. It
@@ -153,26 +153,187 @@ function cleanup() {
 }
 
 echo "==========================================================================="
-echo "============================= Nomi Launcher ==============================="
+echo "============================= Create a Nomi ==============================="
 echo "==========================================================================="
 echo
-echo "This launcher will create and start a Nomi running in a Docker container. It"
-echo "needs to be run whenever you make changes to your Nomi's configuration file"
+echo "Use this script to create a new Nomi, or to verify an existing Nomi's"
+echo "settings."
 echo
 echo "If you ever want to quit the script, simply press CTRL+C together"
 echo
-
-NOMI_NAME="example_nomi"
-CONFIG_FILE_NAME="$NOMI_NAME.conf"
-
-SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
 
 # Check if Docker is installed
 if ! command -v docker >/dev/null 2>&1; then
     echo "Could not find Docker. Please re-run the installation script"
     exit 1
 fi
+
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Function to prompt for and confirm user input
+prompt_confirm() {
+    read -r -p "$1 [y/N] " response
+    case "$response" in
+        [yY][eE][sS]|[yY]) 
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
+# Function to prompt for variable values
+prompt_variable() {
+    local var_name=$1
+    local current_value=$2
+    read -r -p "Enter $var_name [$current_value]: " value
+    echo "${value:-$current_value}"
+}
+
+function get_script() {
+    local source_file="$1"
+    local destination_dir="$2"
+    
+    # Check if the source file exists
+    if [ ! -f "$source_file" ]; then
+        echo "Error: Source file '$source_file' not found!"
+        return 1
+    fi
+
+    local base_filename="$(basename "$source_file")"
+
+    # Determine the destination file based on the OS
+    if [ "$(uname -s)" == "Darwin" ]; then
+        destination_file="${destination_dir}/${base_filename%.sh}.command"
+    elif [ "$(uname -s)" == "Linux" ]; then
+        destination_file="${destination_dir}/${base_filename%.sh}.sh"
+    else
+        echo "Error: Unsupported operating system '$(uname -s)'."
+        return 1
+    fi
+    echo "Copying $source_file to $destination_file"
+    echo "#!/usr/bin/env bash" > "$destination_file"
+    cat "$source_file" >> "$destination_file"
+
+    chmod +x "$destination_file"
+}
+
+# Find all .conf files and extract NOMI_NAME
+conf_files=()
+nomi_names=()
+while IFS= read -r -d '' file; do
+    conf_files+=("$file")
+    nomi_name=$(grep -m1 '^NOMI_NAME=' "$file" | cut -d '=' -f2)
+    nomi_names+=("$nomi_name")
+done < <(find . -maxdepth 1 -name '*.conf' -print0)
+
+# List NOMI names if there are any, or prompt to create new
+if [ "${#conf_files[@]}" -eq 0 ]; then
+    echo "No .conf files found."
+    prompt_confirm "Do you want to create a new Nomi?" && create_new_nomi
+else
+    echo "These Nomi configuration files were found:"
+    for i in "${!nomi_names[@]}"; do
+        echo "$((i+1)). ${nomi_names[$i]}"
+    done
+
+    read -r -p "Choose a Nomi by number or type 'new' to create a new Nomi: " choice
+
+    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -le "${#nomi_names[@]}" ]; then
+        selected_nomi="${nomi_names[$((choice-1))]}"
+        selected_conf="${conf_files[$((choice-1))]}"
+        manage_existing_nomi "$selected_nomi" "$selected_conf"
+    elif [ "$choice" == "new" ]; then
+        create_new_nomi
+    else
+        echo "Invalid selection."
+        exit 1
+    fi
+fi
+
+# Function to manage existing Nomi configuration
+manage_existing_nomi() {
+    local nomi_name=$1
+    local conf_file=$2
+
+    # Prompt for values, showing current ones
+    DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "$(grep -m1 '^DISCORD_API_TOKEN=' "$conf_file" | cut -d '=' -f2)")
+    NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "$(grep -m1 '^NOMI_API_KEY=' "$conf_file" | cut -d '=' -f2)")
+    NOMI_ID=$(prompt_variable "NOMI_ID" "$(grep -m1 '^NOMI_ID=' "$conf_file" | cut -d '=' -f2)")
+
+    # Display and confirm values
+    echo "Configuration for $nomi_name:"
+    echo "DISCORD_API_TOKEN: $DISCORD_API_TOKEN"
+    echo "NOMI_API_KEY: $NOMI_API_KEY"
+    echo "NOMI_ID: $NOMI_ID"
+    
+    if prompt_confirm "Are these values correct?"; then
+        # Save the config
+        sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$conf_file"
+        sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$conf_file"
+        sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$conf_file"
+
+        # Ask if the user wants to start the Nomi
+        if prompt_confirm "Do you want to start this Nomi now?"; then
+            ./start_"$nomi_name"
+        fi
+    else
+        echo "Configuration aborted."
+        exit 1
+    fi
+}
+
+# Function to create a new Nomi
+create_new_nomi() {
+    read -r -p "Enter a new Nomi name: " nomi_name
+
+    # Check for existing Nomi with the same name
+    if [ -f "$nomi_name.conf" ]; then
+        if prompt_confirm "$nomi_name.conf exists. Overwrite?"; then
+            echo "Overwriting..."
+        else
+            read -r -p "Enter a new Nomi name: " nomi_name
+        fi
+    fi
+
+    NOMI_FILENAME=$(echo -n $NOMI_NAME | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
+
+    # Copy example files
+    get_script "$SCRIPT_ROOT/app/nomi_conf.example" "$SCRIPT_ROOT"
+    get_script "$SCRIPT_ROOT/app/start_nomi" "$SCRIPT_ROOT"
+
+    mv "nomi_conf.example" "$(basename "nomi_conf.example" .conf).$NOMI_FILENAME.${filename##*.}"
+    mv "start_nomi" "$(basename "start_nomi" .conf).start_$NOMI_FILENAME.${filename##*.}"
+
+    # Prompt for values
+    DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "")
+    NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "")
+    NOMI_ID=$(prompt_variable "NOMI_ID" "")
+
+    # Populate .conf file
+    sed -i "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$conf_file"
+    sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$conf_file"
+    sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$conf_file"
+    sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$conf_file"
+
+    # Display and confirm
+    echo "Configuration for $nomi_name:"
+    echo "DISCORD_API_TOKEN: $DISCORD_API_TOKEN"
+    echo "NOMI_API_KEY: $NOMI_API_KEY"
+    echo "NOMI_ID: $NOMI_ID"
+    
+    if prompt_confirm "Are these values correct?"; then
+        # Ask if the user wants to start the Nomi
+        if prompt_confirm "Do you want to start this Nomi now?"; then
+            chmod +x "start_$NOMI_FILENAME"
+            ./start_"$NOMI_FILENAME"
+        fi
+    else
+        echo "Creation aborted."
+        exit 1
+    fi
+}
 
 # Check for a configuration file
 if [ -f "$CONFIG_FILE" ]; then

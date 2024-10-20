@@ -500,7 +500,7 @@ function get_script() {
         return 1
     fi
 
-    local base_filename="$(basename "$source_file")"
+    local base_filename="$(basename \"$source_file\")"
 
     # Determine the destination file based on the OS
     if [ "$(uname -s)" == "Darwin" ]; then
