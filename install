@@ -12,7 +12,7 @@ IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord
 :: TIMEOUT because it behaves differently when being piped.
 :: We try to run it as a way to check that the script is
 :: running from a pipe, but then use ping with a timeout
-:: when we actually need to way (https://stackoverflow.com/a/735294)
+:: when we actually need to wait (https://stackoverflow.com/a/735294)
 ::
 :: ============================================================================
 :: === The LICENSE for this script can be found at the bottom of this file ====
@@ -81,7 +81,7 @@ IF NOT EXIST "%INSTALL_DIR%" (
 SET "WRITE_TEST=%INSTALL_DIR%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%"
 
 :: Check we have write access to the location the user has provided.
-:: We'll try to create a test directory to check write access
+:: We'll try to create a test directory to check write access.
 MKDIR "%WRITE_TEST%"
 IF ERRORLEVEL 1 (
     ECHO It looks like we can't write to the folder: %INSTALL_DIR%.
@@ -150,10 +150,10 @@ ECHO The installation completed succesfully.
 IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     SET /P RUN_SETUP="Do you want to create a Nomi now? (Y/N): "
     IF /I "%RUN_SETUP%" == "Y" (
-        ECHO Creating a new Nomi
+        ECHO Creating a new Nomi...
         START "%INSTALL_DIR%\create_nomi.bat"
     ) ELSE (
-        ECHO Creating a new Nomi was skipped. You can run it later by running "create_nomi.bat" in the installation directory.
+        ECHO Creating a new Nomi was skipped. You can run it later by running create_nomi.bat in the installation directory.
     )
 )
 
@@ -164,47 +164,247 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
 IF EXIST "%INSTALL_DIR%\install.zip" DEL /F /Q "%INSTALL_DIR%\install.zip"
 ENDLOCAL
 PAUSE
-EXIT /B
+EXIT
 END_WIN
+
 
 # This is the macOS/Linux part of the script. We have to do
 # The same steps here, but in a way that works for Bash. We
-
-INSTALL_FOLDER=nomi-discord-python
-
-# Perform some basic sanity checks...
-if [ -z "${BASH_VERSION:-}" ]
-then
-   >&2 echo "Bash is required to run this script." 
-   cleanup 1
+# Perform some basic sanity checks, then continue execution
+if [ -z "${BASH_VERSION:-}" ]; then
+    # Attempt to find Bash
+    if command -v bash >/dev/null 2>&1; then
+        # Re-execute the script with Bash by reading it from stdin if necessary
+        if [ -t 0 ]; then
+            # If the script is not being piped, re-execute the file with bash
+            exec bash "$0" "$@"
+        else
+            # If the script is being piped (non-interactive), re-execute from stdin
+            exec bash <(cat) "$@"
+        fi
+    else
+        # Unable to find Bash. Exit with an error
+        echo "Bash is required to run this script." >&2
+        exit 1
+    fi
 fi
 
-echo "Running in Bash!"
+# Trap to function when we exit
+trap "cleanup" EXIT INT
 
-# Get the user's home directory. By default, we'll install into
-# a folder called "INSTALL_FOLDER" in their home folder
+# Define cleanup function
+function cleanup() {
+    exit_code=$?
+    echo "Deleting $INSTALL_DIR/install.zip"
+    exit exit_code
+}
+
+# By default, we'll install into a folder called
+# "INSTALL_FOLDER" in their home folder
+readonly INSTALL_FOLDER=nomi-discord-python
 
 # First, check for required dependencies. We need Docker for
 # this project to run, so check we have that installed. If
 # not, prompt the user to download it then re-run this script.
+# Check if Docker is installed
+if ! command -v docker >/dev/null 2>&1; then
+    echo "Docker is required but not installed."
+    echo "Please install Docker from the following URL:"
+    echo "https://www.docker.com/products/docker-desktop/"
 
-# Now we know know we have Docker we check with the user if
-# installing in our default location (~/$INSTALL_FOLDER)
-# is ok. If not, ask for an alternative.
+    # Prompt user to open the Docker download page
+    read -p "Would you like to open the Docker download page now? (Y/N): " OPEN_BROWSER
+    OPEN_BROWSER=${OPEN_BROWSER,,}
+    if [[ "$OPEN_BROWSER" == "y" ]]; then
+        # Attempt to open the browser with xdg-open (Linux) or open (macOS)
+        if command -v xdg-open >/dev/null 2>&1; then
+            xdg-open "https://www.docker.com/products/docker-desktop/"
+        elif command -v open >/dev/null 2>&1; then
+            open "https://www.docker.com/products/docker-desktop/"
+        else
+            echo "Unable to automatically open a browser. Please manually visit the URL."
+        fi
+    echo "Please install Docker and re-run the installer."
+    exit 1
+fi
+
+# Check if tar is installed. Prompt the user to download it if not
+# by attempting to guess what package manager they are using (if any)
+if ! command -v tar >/dev/null 2>&1; then
+    echo "tar is required but not installed."
+    echo "You may need to install it using a package manager."
+    echo
+
+    # Provide examples of how to install tar depending on the system
+    if command -v apt >/dev/null 2>&1; then
+        echo "For Ubuntu or Debian-based systems, you can install tar by running:"
+        echo "    sudo apt update && sudo apt install tar"
+    elif command -v yum >/dev/null 2>&1; then
+        echo "For Red Hat, CentOS, or Fedora systems, you can install tar by running:"
+        echo "    sudo yum install tar"
+    elif command -v dnf >/dev/null 2>&1; then
+        echo "For newer Fedora systems (or RHEL 8+), you can install tar by running:"
+        echo "    sudo dnf install tar"
+    elif command -v zypper >/dev/null 2>&1; then
+        echo "For SUSE or openSUSE systems, you can install tar by running:"
+        echo "    sudo zypper install tar"
+    elif command -v brew >/dev/null 2>&1; then
+        echo "For macOS users, you can install GNU tar by running:"
+        echo "    brew install gnu-tar"
+    else
+        echo "Your system does not have a recognized package manager."
+        echo "Please refer to your system documentation on how to install tar."
+    fi
+
+    echo
+    echo "Please install tar and re-run the installer."
+
+    exit 1
+fi
+
+# Now we know we have Docker and tar we check with the user if
+# installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
+# If not, ask for an alternative.
+DEFAULT_INSTALL_DIR="$HOME/${INSTALL_FOLDER:-install_folder}"
+read -p "Enter installation directory (Press Enter for default: $DEFAULT_INSTALL_DIR): " INSTALL_DIR
+INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
+
+# Create the folder if it doesn't exist.
+if [ ! -d "$INSTALL_DIR" ]; then
+    mkdir -p "$INSTALL_DIR"
+fi
+
+# Generate a random file name using the %$RANDOM environment variable
+WRITE_TEST="${INSTALL_DIR}/$RANDOM-$RANDOM-$RANDOM-$RANDOM"
 
 # Check we have write access to the location the user has provided.
-# Create the folder if it doesn't exist.
+# We'll try to create a test directory to check write access.
+if ! mkdir "$WRITE_TEST" 2>/dev/null; then
+    echo "It looks like we can't write to the folder: $INSTALL_DIR."
+    echo "Please make sure you have permission to write to this directory and try again."
+    exit 1
+fi
 
-# Change directory to INSTALL_FOLDER. Here we download the latest
-# release from GitHub then unzip it
+# Delete the test directory after the check
+rmdir "$WRITE_TEST"
 
-# Once it's unzipped we're good to go! Display a success message
+# Download the latest release from GitHub to INSTALL_FOLDER
+echo "Downloading the latest version from GitHub..."
+curl -sL https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "$INSTALL_DIR/install.zip" --remove-on-error
+
+# Check if the download was successful
+if [ ! -f "$INSTALL_DIR/install.zip" ]; then
+    echo "Something went wrong during the download. Please try again."
+    exit 1
+fi
+
+# Warn the user that existing files will be overwritten. No going back now!
+echo "WARNING: This step will overwrite existing installation files in the directory:"
+echo "$INSTALL_DIR"
+echo "This will not erase any configuration files you have created as long as"
+echo "the file names do not match the names of files in the update."
+echo
+echo "Any configuration files or startup scripts should be safe; however, if"
+echo "you are unsure, cancel now and save your files to a safe place before proceeding."
+
+# Prompt the user for confirmation to proceed
+read -p "Are you sure you want to proceed with the installation? (Y/N): " CONTINUE
+CONTINUE=${CONTINUE,,}
+
+if [[ "$CONTINUE" != "y" ]]; then
+    echo "Extraction canceled. No changes were made."
+    # Cleanup and exit
+    exit 0
+fi
+
+# Proceed with unzipping the file using tar and overwrite existing files.
+# GitHub wraps the whole repository in a folder so we have to traverse
+# into that before before we can filter by the things we want to download.
+# After that, get the install script, the license and everything inside
+# the 'app' subdirectory. GNU tar and bsdtar behave differently so we need
+# to accomodate that
+if tar --version 2>&1 | grep -q "GNU tar"; then
+    echo "Detected GNU tar. Using --wildcards option."
+    tar -xvf "$INSTALL_DIR/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
+        --wildcards --no-anchored '*/install' '*/LICENSE' '*/app/*'
+elif tar --version 2>&1 | grep -qi "bsdtar"; then
+    echo "Detected bsdtar. Falling back to --include option."
+    tar -xvf "$INSTALL_DIR/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
+        --include="*/install" --include="*/LICENSE" --include="*/app/*"
+else
+    echo "Error: Unsupported version of tar detected."
+    exit 1
+fi
+
+# Check if the extraction was successful
+if [ $? -ne 0 ]; then
+    echo "Failed to extract the installation files. Please try again."
+    exit 1
+fi
+
+# Check if the install script exists (it should). Rename it to
+# install.sh to make running it from the command line easier later
+# and add a shebang
+if [ -f "$INSTALL_DIR/install" ]; then
+    # Rename the install script to install.sh
+    mv "$INSTALL_DIR/install" "$INSTALL_DIR/install.sh"
+
+    # Add the shebang at the top of the file
+    echo -e "#!/usr/bin/env bash\n$(cat \"$INSTALL_DIR/install.sh\")" > "$INSTALL_DIR/install.sh"
+
+    # Make sure the script is executable
+    chmod +x "$INSTALL_DIR/install.sh"
+else
+    echo "Error: install script not found in $INSTALL_DIR."
+    exit 1
+fi
+
+# Check if the Nomi creation script exists (it should). Copy and rename it to
+# create_nomi.sh to make running it from the command line easier later
+# and add a shebang
+if [ -f "$INSTALL_DIR/app/create_nomi" ]; then
+    # Rename the install script to install.sh
+    mv "$INSTALL_DIR/app/create_nomi" "$INSTALL_DIR/create_nomi.sh"
+
+    # Add the shebang at the top of the file
+    echo -e "#!/usr/bin/env bash\n$(cat \"$INSTALL_DIR/create_nomi.sh\")" > "$INSTALL_DIR/create_nomi.sh"
+
+    # Make sure the script is executable
+    chmod +x "$INSTALL_DIR/create_nomi.sh"
+else
+    echo "Error: create_nomi script not found in $INSTALL_DIR."
+    exit 1
+fi
+
+echo "The installation completed successfully."
+
+# Once everything unzipped we're good to go! Display a success message
 # to the user and ask if they want to set up any Nomis now. If the
 # user wants to set up a Nomi run the setup file in this directory
 # for them
+if [ -f "$INSTALL_DIR/create_nomi.sh" ]; then
+    # Prompt the user to set up a Nomi
+    read -p "Do you want to create a Nomi now? (Y/N): " RUN_SETUP
+    RUN_SETUP=${RUN_SETUP,,}
+
+    if [[ "$RUN_SETUP" == "y" ]]; then
+        echo "Creating a new Nomi..."
+        "$INSTALL_DIR/create_nomi.sh"
+    else
+        echo "Creating a new Nomi was skipped."
+        echo "You can run it later by executing 'create_nomi.sh' in the installation directory."
+    fi
+else
+    echo "Error: create_nomi script not found in $INSTALL_DIR."
+    exit 1
+fi
 
 # All done! Let's exit from the macOS/Linux part of the script
 exit 0
+
+===============================================================================
+================================== LICENSE ====================================
+===============================================================================
 
 LICENSE
 
