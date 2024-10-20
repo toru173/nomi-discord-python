@@ -222,7 +222,7 @@ IF EXIST "%INSTALL_DIR%\create_nomi.bat" (
     SET /P "RUN_SETUP=Do you want to create a Nomi now? [y/N]: "
     IF /I "%RUN_SETUP%" == "Y" (
         ECHO Creating a new Nomi...
-        START "%INSTALL_DIR%\create_nomi.bat"
+        START /I CMD /Q /K "%INSTALL_DIR%\create_nomi.bat"
     ) ELSE (
         ECHO Creating a new Nomi was skipped. You can run it later
         ECHO by running create_nomi.bat in the installation directory.
