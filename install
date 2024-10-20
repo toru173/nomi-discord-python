@@ -491,31 +491,29 @@ if [ $? -ne 0 ]; then
 fi
 
 function get_script() {
-    local source="$1"
-    local destination="$2"
+    local source_file="$1"
+    local destination_dir="$2"
     
     # Check if the source file exists
-    if [ ! -f "$source" ]; then
-        echo "Error: Source file '$source' not found!"
+    if [ ! -f "$source_file" ]; then
+        echo "Error: Source file '$source_file' not found!"
         return 1
     fi
 
-    local base_filename="$(basename "$source")"
-    local destination_dir="$(dirname "$destination")/"
-    local destination_file="${destination_dir}/${base_filename}"
+    local base_filename="$(basename "$source_file")"
 
     # Determine the destination file based on the OS
     if [ "$(uname -s)" == "Darwin" ]; then
-        destination_file="${destination_file}.command"
+        destination_file="${destination_dir}/${base_filename%.sh}.command"
     elif [ "$(uname -s)" == "Linux" ]; then
-        destination_file="${destination_file}.sh"
+        destination_file="${destination_dir}/${base_filename%.sh}.sh"
     else
         echo "Error: Unsupported operating system '$(uname -s)'."
         return 1
     fi
-    echo "Copying $source to $destination_file"
+    echo "Copying $source_file to $destination_file"
     echo "#!/usr/bin/env bash" > "$destination_file"
-    cat "$source" >> "$destination_file"
+    cat "$source_file" >> "$destination_file"
 
     chmod +x "$destination_file"
 }
@@ -524,7 +522,8 @@ function get_script() {
 # install.sh on linux and install.command on macOS to make running
 # it from the command line easier later and add a shebang
 if [ -f "$INSTALL_DIR/install" ]; then
-    get_script "$INSTALL_DIR/install" "$INSTALL_DIR"
+    get_script "$INSTALL_DIR/install" "$INSTALL_DIR/"
+    rm "$INSTALL_DIR/install"
 else
     echo "Error: install script not found in $INSTALL_DIR."
     exit 1
@@ -534,7 +533,7 @@ fi
 # from the /app directory into our install directory and make it
 # executable too
 if [ -f "$INSTALL_DIR/app/create_nomi" ]; then
-    get_script "$INSTALL_DIR/install" "$INSTALL_DIR"
+    get_script "$INSTALL_DIR/create_nomi" "$INSTALL_DIR/"
 else
     echo "Error: create_nomi script not found in $INSTALL_DIR/app."
     exit 1
