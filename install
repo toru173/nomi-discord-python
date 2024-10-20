@@ -510,9 +510,9 @@ function get_script() {
 
     # Determine the destination file based on the OS
     if [ "$(uname -s)" == "Darwin" ]; then
-        destination_file="${destination_dir}/${base_filename%.sh}.command"
+        destination_file="${destination_dir}/${base_filename}.command"
     elif [ "$(uname -s)" == "Linux" ]; then
-        destination_file="${destination_dir}/${base_filename%.sh}.sh"
+        destination_file="${destination_dir}/${base_filename}.sh"
     else
         echo "Error: Unsupported operating system '$(uname -s)'."
         return 1
@@ -543,7 +543,7 @@ fi
 
 echo "The installation completed successfully."
 
-"$INSTALL_DIR/create_nomi.sh"
+echo "$INSTALL_DIR/create_nomi.sh"
 
 # Once everything unzipped we're good to go! Display a success message
 # to the user and ask if they want to set up any Nomis now. If the
