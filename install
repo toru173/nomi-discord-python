@@ -30,9 +30,9 @@ IF NOT "%OS%" == "Windows_NT" (
     GOTO cleanup
 )
 
-ECHO ===============================================================================
-ECHO ============================== Easy Installer =================================
-ECHO ===============================================================================
+ECHO ===========================================================================
+ECHO ============================ Easy Installer ===============================
+ECHO ===========================================================================
 ECHO:
 ECHO Welcome to the easy installer for nomi-discord-python. We're going to check
 ECHO that your system has a few things installed already, then install the latest
@@ -90,6 +90,7 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
     SET /P "INSTALL_HELP=Would you like help installing the missing software? (Y/N): "
     IF /I "%INSTALL_HELP%" == "Y" (
         IF "%DOCKER_INSTALLED%" == "0" (
+            ECHO:
             ECHO Docker is required but not installed.
             SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? (Y/N): "
             IF /I "!OPEN_BROWSER!" == "Y" (
@@ -97,6 +98,7 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
             )
         )
         IF "%TAR_INSTALLED%" == "0" (
+            ECHO:
             ECHO tar is required but not installed. It was integrated into Windows 10 in 2018. Do you need to update?
             ECHO Alternatively tar can be installed by installing Git for Windows, which provides tar and other Unix tools.
             SET /P "OPEN_BROWSER=Would you like to open the Git for Windows download page now? (Y/N): "
@@ -278,9 +280,9 @@ function cleanup() {
     exit $exit_code
 }
 
-echo "==============================================================================="
-echo "============================== Easy Installer ================================="
-echo "==============================================================================="
+echo "==========================================================================="
+echo "============================ Easy Installer ==============================="
+echo "==========================================================================="
 echo
 echo "Welcome to the easy installer for nomi-discord-python. We're going to check"
 echo "that your system has a few things installed already, then install the latest"
@@ -326,6 +328,7 @@ if [ "$DOCKER_INSTALLED" -eq 1 ] && [ "$TAR_INSTALLED" -eq 1 ]; then
     echo "All required software is installed."
 else
     # We're missing some necessary software. Let's fix it.
+    echo
     echo "Please install the missing software and re-run the installer."
 
     # Prompt user for help installing the missing software
@@ -335,6 +338,7 @@ else
     if [[ "$INSTALL_HELP" == "y" ]]; then
         # If Docker is not installed, prompt to open the Docker download page
         if [ "$DOCKER_INSTALLED" -eq 0 ]; then
+            echo
             echo "Docker is required but not installed."
             read -p "Would you like to open the Docker download page now? (Y/N): " OPEN_BROWSER </dev/tty
             OPEN_BROWSER=$(echo "$OPEN_BROWSER" | tr '[:upper:]' '[:lower:]')
@@ -353,6 +357,7 @@ else
         # Check if tar is installed. Prompt the user to download it if not
         # by attempting to guess what package manager they are using (if any)
         if [ "$TAR_INSTALLED" -eq 0 ]; then
+            echo
             echo "tar is required but not installed."
             echo "You may need to install it using a package manager."
             echo
