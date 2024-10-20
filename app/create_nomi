@@ -237,6 +237,8 @@ create_new_nomi() {
                     break
                 fi
             fi
+        else
+            break
         fi
     done
 
@@ -297,29 +299,29 @@ fi
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Find all .conf files and extract NOMI_NAME
-conf_files=()
-nomi_names=()
+CONF_FILES=()
+NOMI_NAMES=()
 while IFS= read -r -d '' FILE; do
-    conf_files+=("$FILE")
+    CONF_FILES+=("$FILE")
     nomi_name=$(grep -m1 '^NOMI_NAME=' "$FILE" | cut -d '=' -f2)
-    nomi_names+=("$NOMI_NAME")
+    NOMI_NAMES+=("$NOMI_NAME")
 done < <(find . -maxdepth 1 -name '*.conf' -print0)
 
 # List Nomi names if there are any, or prompt to create new
-if [ "${#conf_files[@]}" -eq 0 ]; then
+if [ "${#CONF_FILES[@]}" -eq 0 ]; then
     echo "No Nomi configuration files found."
     prompt_confirm "Do you want to create a new Nomi?" && create_new_nomi
 else
     echo "These Nomi configuration files were found:"
-    for i in "${!nomi_names[@]}"; do
-        echo "$((i+1)). ${nomi_names[$i]}"
+    for i in "${!NOMI_NAMES[@]}"; do
+        echo "$((i+1)). ${NOMI_NAMES[$i]}"
     done
 
     read -r -p "Choose a Nomi by number or type 'new' to create a new Nomi: " CHOICE </dev/tty
 
-    if [[ "$CHOICE" =~ ^[0-9]+$ ]] && [ "$CHOICE" -le "${#nomi_names[@]}" ]; then
-        selected_nomi="${nomi_names[$((CHOICE-1))]}"
-        selected_conf="${conf_files[$((CHOICE-1))]}"
+    if [[ "$CHOICE" =~ ^[0-9]+$ ]] && [ "$CHOICE" -le "${#NOMI_NAMES[@]}" ]; then
+        selected_nomi="${NOMI_NAMES[$((CHOICE-1))]}"
+        selected_conf="${CONF_FILES[$((CHOICE-1))]}"
         manage_existing_nomi "$selected_nomi" "$selected_conf"
     elif [ "$CHOICE" == "new" ]; then
         create_new_nomi
