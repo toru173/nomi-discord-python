@@ -79,11 +79,12 @@ IF "%TAR_INSTALLED%"=="1" (
 
 :: If both are installed, continue
 IF "%DOCKER_INSTALLED%"=="1" IF "%TAR_INSTALLED%"=="1" (
-    ECHO All required software is installed.
     ECHO:
+    ECHO All required software is installed.
 ) ELSE (
 
     :: We're missing some necessary software. Let's fix it.
+    ECHO:
     ECHO Please install the missing software and re-run the installer.
 
     SET /P "INSTALL_HELP=Would you like help installing the missing software? (Y/N): "
@@ -119,7 +120,7 @@ ECHO Where would you like to install nomi-discord-python?
 
 :prompt_install_dir
 ECHO Current choice: %INSTALL_DIR%
-SET /P "USER_INPUT=> "
+SET /P "USER_INPUT=Enter to Accept > "
 
 IF NOT "%USER_INPUT%"=="" SET "INSTALL_DIR=%USER_INPUT%"
 
@@ -127,7 +128,7 @@ IF NOT "%USER_INPUT%"=="" SET "INSTALL_DIR=%USER_INPUT%"
 ECHO You chose: %INSTALL_DIR%
 SET /P "CONTINUE=Is this correct? (Y/N): "
 
-IF NOT /I "%CONTINUE%"!="Y" (
+IF NOT /I "%CONTINUE%"=="Y" (
     GOTO prompt_install_dir
 )
 
@@ -317,8 +318,8 @@ fi
 
 # If both are installed, continue
 if [ "$DOCKER_INSTALLED" -eq 1 ] && [ "$TAR_INSTALLED" -eq 1 ]; then
-    echo "All required software is installed."
     echo
+    echo "All required software is installed."
 else
     # We're missing some necessary software. Let's fix it.
     echo "Please install the missing software and re-run the installer."
@@ -385,7 +386,7 @@ echo "Where would you like to install nomi-discord-python?"
 while true; do
     # Prompt the user for the installation directory
     echo "Current choice: $DEFAULT_INSTALL_DIR"
-    read -p "> " INSTALL_DIR </dev/tty
+    read -p "Enter to Accept > " INSTALL_DIR </dev/tty
     INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
     
     # Display the chosen directory and ask for confirmation
