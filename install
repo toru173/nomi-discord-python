@@ -126,8 +126,8 @@ SET /P "USER_INPUT=Enter to Accept > "
 IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
 
 :: Display the chosen directory and ask for confirmation
-ECHO Your choice: %INSTALL_DIR%
 ECHO:
+ECHO Your choice: %INSTALL_DIR%
 SET /P "CONTINUE=Is this correct? (Y/N): "
 
 IF /I NOT "%CONTINUE%" == "Y" (
@@ -271,11 +271,11 @@ trap "cleanup" EXIT INT
 
 # Define cleanup function
 function cleanup() {
+    exit_code=$?
     if [ -n "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/install.zip" ]; then
-        echo "Deleting $INSTALL_DIR/install.zip"
-    else
-        echo "Warning: INSTALL_DIR is not set or install.zip does not exist."
+        rm "$INSTALL_DIR/install.zip"
     fi
+    exit $exit_code
 }
 
 echo "==============================================================================="
@@ -396,11 +396,11 @@ while true; do
     INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
     
     # Display the chosen directory and ask for confirmation
-    echo "Your choice: $INSTALL_DIR"
     echo
+    echo "Your choice: $INSTALL_DIR"
     read -p "Is this correct? (Y/N): " CONTINUE </dev/tty
     CONTINUE=$(echo "$CONTINUE" | tr '[:upper:]' '[:lower:]')
-    if [[ "$CONTINUE" != "y" ]]; then
+    if [[ "$CONTINUE" == "y" ]]; then
         break
     fi
 done
