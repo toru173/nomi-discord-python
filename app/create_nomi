@@ -205,28 +205,27 @@ manage_existing_nomi() {
     echo "NOMI_API_KEY: $NOMI_API_KEY"
     echo "NOMI_ID: $NOMI_ID"
     
-    if prompt_confirm "Are these values correct?"; then
-        # Save the config
-        if [ "$(uname -s)" == "Darwin" ]; then
-            sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
-            sed -i "" "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
-            sed -i "" "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
-        elif [ "$(uname -s)" == "Linux" ]; then
-            sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
-            sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
-            sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
-        else
-            echo "Error: Unsupported operating system '$(uname -s)'."
-            return 1
+    while true; do
+        if prompt_confirm "Are these values correct?"; then
+            # Save the config
+            if [ "$(uname -s)" == "Darwin" ]; then
+                sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+                sed -i "" "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+                sed -i "" "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+            elif [ "$(uname -s)" == "Linux" ]; then
+                sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+                sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+                sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+            else
+                echo "Error: Unsupported operating system '$(uname -s)'."
+                return 1
+            fi
+            break
         fi
+    done
 
-        # Ask if the user wants to start the Nomi
-        if prompt_confirm "Do you want to start this Nomi now?"; then
-            ./start_"$NOMI_NAME"
-        fi
-    else
-        echo "Configuration aborted."
-        exit 1
+    if prompt_confirm "Do you want to start this Nomi now?"; then
+        ./start_"$NOMI_NAME"
     fi
 }
 
@@ -258,42 +257,17 @@ create_new_nomi() {
     get_script "$SCRIPT_ROOT/start_$NOMI_FILENAME" "$SCRIPT_ROOT"
     rm "$SCRIPT_ROOT/start_$NOMI_FILENAME"
 
-    # Prompt for values
-    DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "")
-    NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "")
-    NOMI_ID=$(prompt_variable "NOMI_ID" "")
-
     # Populate nomi.conf file
     if [ "$(uname -s)" == "Darwin" ]; then
         sed -i "" "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
-        sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
-        sed -i "" "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
-        sed -i "" "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
     elif [ "$(uname -s)" == "Linux" ]; then
         sed -i "s/^NOMI_NAME=.*/NOMI_NAME=$NOMI_NAME/" "$CONF_FILE"
-        sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
-        sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
-        sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
     else
         echo "Error: Unsupported operating system '$(uname -s)'."
         return 1
     fi
-
-    # Display and confirm
-    echo "Configuration for $NOMI_NAME:"
-    echo "DISCORD_API_TOKEN: $DISCORD_API_TOKEN"
-    echo "NOMI_API_KEY: $NOMI_API_KEY"
-    echo "NOMI_ID: $NOMI_ID"
     
-    if prompt_confirm "Are these values correct?"; then
-        # Ask if the user wants to start the Nomi
-        if prompt_confirm "Do you want to start this Nomi now?"; then
-            ./start_"$NOMI_FILENAME"
-        fi
-    else
-        echo "Creation aborted."
-        exit 1
-    fi
+    manage_existing_nomi "$NOMI_NAME" "$CONF_FILE"
 }
 
 echo "==========================================================================="
@@ -319,7 +293,8 @@ CONF_FILES=()
 NOMI_NAMES=()
 while IFS= read -r -d '' FILE; do
     CONF_FILES+=("$FILE")
-    nomi_name=$(grep -m1 '^NOMI_NAME=' "$FILE" | cut -d '=' -f2)
+    NOMI_NAME=$(grep -m1 '^NOMI_NAME=' "$FILE" | cut -d '=' -f2)
+    NOMI_NAME=${NOMI_NAME:-"(Unknown Nomi)"}
     NOMI_NAMES+=("$NOMI_NAME")
 done < <(find . -maxdepth 1 -name '*.conf' -print0)
 
@@ -386,3 +361,17 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+    # Prompt for values
+    DISCORD_API_TOKEN=$(prompt_variable "DISCORD_API_TOKEN" "")
+    NOMI_API_KEY=$(prompt_variable "NOMI_API_KEY" "")
+    NOMI_ID=$(prompt_variable "NOMI_ID" "")
+
+        sed -i "" "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+        sed -i "" "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+        sed -i "" "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
+
+        sed -i "s/^DISCORD_API_TOKEN=.*/DISCORD_API_TOKEN=$DISCORD_API_TOKEN/" "$CONF_FILE"
+        sed -i "s/^NOMI_API_KEY=.*/NOMI_API_KEY=$NOMI_API_KEY/" "$CONF_FILE"
+        sed -i "s/^NOMI_ID=.*/NOMI_ID=$NOMI_ID/" "$CONF_FILE"
