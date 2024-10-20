@@ -212,6 +212,7 @@ IF EXIST "%INSTALL_DIR%\app\create_nomi" (
     COPY /Y "%INSTALL_DIR%\app\create_nomi" "%INSTALL_DIR%\create_nomi.bat" >NUL
 )
 
+ECHO:
 ECHO The installation completed succesfully.
 ECHO:
 
@@ -543,6 +544,7 @@ else
     echo "Error: create_nomi script not found in $INSTALL_DIR/app."
 fi
 
+echo
 echo "The installation completed successfully."
 echo
 
