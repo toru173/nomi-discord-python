@@ -1,0 +1,252 @@
+name: Deploy Nomi App to Render
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-nomi-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JQ
+        run: sudo apt-get install -y jq
+
+      - name: Validate Nomi AI API Key
+        env:
+          NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
+        run: |
+          set -e
+          response=$(curl -s -w "%{http_code}" -X GET \
+            -H "Authorization: Bearer $NOMI_API_KEY" \
+            "https://api.nomi.ai/nomis")
+          http_status="${response: -3}"
+          response_body="${response::-3}"
+          if [ "$http_status" -eq 400 ]; then
+            echo "Error: Invalid Nomi AI API Key. Authentication failed."
+            exit 1
+          elif [ "$http_status" -ne 200 ]; then
+            echo "Error: Failed to validate Nomi AI API Key. HTTP Status: $http_status"
+            exit 1
+          else
+            echo "Nomi AI API Key is valid."
+          fi
+
+      - name: Validate Render.com API Key
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          set -e
+          response=$(curl -s -w "%{http_code}" -X GET \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            "https://api.render.com/v1/users")
+          http_status="${response: -3}"
+          response_body="${response::-3}"
+          if [ "$http_status" -eq 401 ]; then
+            echo "Error: Invalid Render.com API Key. Authentication failed."
+            exit 1
+          elif [ "$http_status" -ne 200 ]; then
+            echo "Error: Failed to validate Render.com API Key. HTTP Status: $http_status"
+            exit 1
+          else
+            echo "Render.com API Key is valid."
+          fi        
+
+      - name: Get Nomi Name from Nomi AI API
+        env:
+          NOMI_ID: ${{ secrets.NOMI_ID }}
+          NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
+        run: |
+          set -e  # Exit immediately if a command exits with a non-zero status
+          # Make API call to Nomi AI
+          response=$(curl -s -w "%{http_code}" -X GET \
+            -H "Authorization: Bearer $NOMI_API_KEY" \
+            "https://api.nomi.ai/nomis/$NOMI_ID")
+          # Extract HTTP status code
+          http_status="${response: -3}"
+          # Extract response body
+          response_body="${response::-3}"
+          # Check if the HTTP status code is 200 (OK)
+          if [ "$http_status" -ne 200 ]; then
+            echo "Error: Failed to retrieve Nomi Name from Nomi AI API. HTTP Status: $http_status"
+            echo "Response: $response_body"
+            exit 1
+          fi
+          # Parse the Nomi Name from the response
+          NOMI_NAME=$(echo "$response_body" | jq -r '.name')
+          if [ -z "$NOMI_NAME" ] || [ "$NOMI_NAME" == "null" ]; then
+            echo "Error: Nomi Name not found in the API response."
+            exit 1
+          fi
+          echo "Successfully retrieved Nomi Name: $NOMI_NAME"
+          echo "NOMI_NAME=$NOMI_NAME" >> $GITHUB_ENV
+
+      - name: Normalize Nomi Name
+        run: |
+          set -e
+          if [ -z "$NOMI_NAME" ]; then
+            echo "Error: NOMI_NAME is empty."
+            exit 1
+          fi
+          NOMI_NAME_NORMALIZED=$(echo -n "$NOMI_NAME" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
+          if [ -z "$NOMI_NAME_NORMALIZED" ]; then
+            echo "Error: Normalized Nomi Name is empty."
+            exit 1
+          fi
+          echo "Normalized Nomi Name: $NOMI_NAME_NORMALIZED"
+          echo "NOMI_NAME_NORMALIZED=$NOMI_NAME_NORMALIZED" >> $GITHUB_ENV
+
+          - name: Check for Existing Deployment
+          id: check-existing-deployment
+          env:
+            RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+            NOMI_NAME_NORMALIZED: ${{ env.NOMI_NAME_NORMALIZED }}
+          run: |
+            set -e
+            # Check for existing blueprint instance
+            BLUEPRINTS=$(curl -s -X GET \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              "https://api.render.com/v1/blueprint-instances")
+            EXISTING_BLUEPRINT=$(echo "$BLUEPRINTS" | jq -r --arg NAME "$NOMI_NAME_NORMALIZED" '.[] | select(.name == $NAME)')
+            if [ -n "$EXISTING_BLUEPRINT" ]; then
+              echo "An existing deployment with the name $NOMI_NAME_NORMALIZED was found."
+              echo "::set-output name=EXISTING_DEPLOYMENT::true"
+            else
+              echo "No existing deployment found."
+              echo "::set-output name=EXISTING_DEPLOYMENT::false"
+            fi
+
+      - name: Check for Existing Deployment
+        id: check-existing-deployment
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          NOMI_NAME_NORMALIZED: ${{ env.NOMI_NAME_NORMALIZED }}
+        run: |
+          set -e
+          # Check for existing blueprint instance
+          BLUEPRINTS=$(curl -s -X GET \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            "https://api.render.com/v1/blueprint-instances")
+          EXISTING_BLUEPRINT=$(echo "$BLUEPRINTS" | jq -r --arg NAME "$NOMI_NAME_NORMALIZED" '.[] | select(.name == $NAME)')
+          if [ -n "$EXISTING_BLUEPRINT" ]; then
+            echo "An existing deployment with the name $NOMI_NAME_NORMALIZED was found."
+            echo "::set-output name=EXISTING_DEPLOYMENT::true"
+          else
+            echo "No existing deployment found."
+            echo "::set-output name=EXISTING_DEPLOYMENT::false"
+          fi            
+  
+      - name: Get Last Workflow Run
+        id: get-last-run
+        if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WORKFLOW_ID: ${{ github.workflow }}
+          BRANCH: ${{ github.ref_name }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -e
+          # Get the workflow runs for this workflow and branch
+          RESPONSE=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ github.workflow }}/runs?branch=${{ github.ref_name }}&status=completed&per_page=5")
+          # Parse the runs and find the last run before the current one
+          LAST_RUN_TIME=""
+          RUNS=$(echo "$RESPONSE" | jq -c '.workflow_runs[]')
+          for run in $RUNS; do
+            RUN_ID=$(echo "$run" | jq -r '.id')
+            if [ "$RUN_ID" -ne "${{ github.run_id }}" ]; then
+              LAST_RUN_TIME=$(echo "$run" | jq -r '.updated_at')
+              LAST_RUN_STATUS=$(echo "$run" | jq -r '.conclusion')
+              break
+            fi
+          done
+          if [ -z "$LAST_RUN_TIME" ]; then
+            echo "No previous workflow run found."
+            echo "::set-output name=OVERWRITE_ALLOWED::false"
+            exit 0
+          fi
+          # Convert times to seconds since epoch
+          LAST_RUN_TIMESTAMP=$(date -d "$LAST_RUN_TIME" +%s)
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          CURRENT_TIMESTAMP=$(date -d "$CURRENT_TIME" +%s)
+          TIME_DIFF=$(( CURRENT_TIMESTAMP - LAST_RUN_TIMESTAMP ))
+          if [ "$TIME_DIFF" -lt 30 ]; then
+            echo "The last workflow run was $TIME_DIFF seconds ago."
+            echo "::set-output name=OVERWRITE_ALLOWED::true"
+          else
+            echo "The last workflow run was more than 30 seconds ago."
+            echo "::set-output name=OVERWRITE_ALLOWED::false"
+          fi
+
+      - name: Handle Existing Deployment
+        if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'true' && steps.get-last-run.outputs.OVERWRITE_ALLOWED == 'false'
+        run: |
+          echo "Error: An existing deployment with the name ${{ env.NOMI_NAME_NORMALIZED }} already exists."
+          echo "You can re-run this workflow to force the deployment."
+          exit 1
+
+      - name: Proceed with Deployment
+        if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'false' || steps.get-last-run.outputs.OVERWRITE_ALLOWED == 'true'
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          NOMI_NAME_NORMALIZED: ${{ env.NOMI_NAME_NORMALIZED }}
+          NOMI_ID: ${{ secrets.NOMI_ID }}
+          NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
+          OTHER_API_KEYS: ${{ secrets.OTHER_API_KEYS }}
+          REPO_URL: https://github.com/${{ github.repository }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          set -e
+          if [ "${{ steps.get-last-run.outputs.OVERWRITE_ALLOWED }}" == "true" ]; then
+            echo "Proceeding to overwrite the existing deployment."
+          fi
+          # Generate render.yaml
+          cat > render.yaml <<EOF
+          services:
+            - type: web
+              name: ${NOMI_NAME_NORMALIZED}
+              runtime: docker
+              plan: free
+              rootDir: app
+              dockerfilePath: app/Dockerfile
+              repo: ${REPO_URL}
+              branch: ${BRANCH_NAME}
+              envVars:
+                - key: NOMI_ID
+                  value: ${NOMI_ID}
+                - key: NOMI_API_KEY
+                  value: ${NOMI_API_KEY}
+                - key: OTHER_API_KEYS
+                  value: ${OTHER_API_KEYS}
+          EOF
+          # Encode render.yaml in base64
+          ENCODED_BLUEPRINT=$(base64 -w 0 render.yaml)
+          if [ -z "$ENCODED_BLUEPRINT" ]; then
+            echo "Error: Failed to encode render.yaml."
+            exit 1
+          fi
+          # Update existing blueprint or create new one
+          if [ "${{ steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT }}" == "true" ]; then
+            # Update existing blueprint
+            BLUEPRINT_ID=$(echo "$EXISTING_BLUEPRINT" | jq -r '.id')
+            RESPONSE=$(curl -s -w "%{http_code}" -X PUT \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"blueprint": "'"$ENCODED_BLUEPRINT"'", "name": "'"${NOMI_NAME_NORMALIZED}"'"}' \
+              "https://api.render.com/v1/blueprint-instances/$BLUEPRINT_ID")
+          else
+            # Create new blueprint
+            RESPONSE=$(curl -s -w "%{http_code}" -X POST \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"blueprint": "'"$ENCODED_BLUEPRINT"'", "name": "'"${NOMI_NAME_NORMALIZED}"'"}' \
+              "https://api.render.com/v1/blueprint-instances")
+          fi
+          http_status="${RESPONSE: -3}"
+          response_body="${RESPONSE::-3}"
+          if [ "$http_status" -ne 200 ] && [ "$http_status" -ne 201 ]; then
+            echo "Error: Failed to create or update blueprint on Render.com. HTTP Status: $http_status"
+            exit 1
+          fi
+          echo "Successfully deployed the application."
