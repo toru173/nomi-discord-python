@@ -6,6 +6,7 @@ on:
 jobs:
   deploy-nomi:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
