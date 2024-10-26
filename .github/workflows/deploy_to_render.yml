@@ -2,6 +2,11 @@ name: Deploy Nomi to Render.com
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'The Name of your Nomi'
+        required: true
+        default: ''
 
 jobs:
   deploy-nomi:
