@@ -16,9 +16,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up JQ
-        run: sudo apt-get install -y jq
-
       - name: Validate Nomi AI API Key
         env:
           NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
@@ -150,7 +147,7 @@ jobs:
             exit 1
           fi
           # Check if a blueprint with the extracted name exists
-          EXISTING_BLUEPRINT=$(echo "$response_body" | jq -r --arg NAME "$BLUEPRINT_NAME" '.[] | select(.name == $NAME)')
+          EXISTING_BLUEPRINT=$(echo "$response_body" | jq -r --arg NAME "$BLUEPRINT_NAME" '.[] | select(.blueprint.name == $NAME) | .blueprint')
           if [ -n "$EXISTING_BLUEPRINT" ]; then
             echo "An existing blueprint with the name $BLUEPRINT_NAME was found."
             BLUEPRINT_ID=$(echo "$EXISTING_BLUEPRINT" | jq -r '.id')
