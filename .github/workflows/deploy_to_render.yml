@@ -206,18 +206,19 @@ jobs:
               MISSING_SECRETS+=("$KEY")
               continue
             fi
+          done
 
-            # After processing all env vars, check if there were any missing secrets
-            if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
-              echo "The following environment variables were not updated due to missing secrets:"
-              for KEY in "${MISSING_SECRETS[@]}"; do
-                echo "- $KEY"
-              done
-              exit 1
-            fi
+          # After processing all env vars, check if there were any missing secrets
+          if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
+            echo "The following environment variables were not updated due to missing secrets:"
+            for KEY in "${MISSING_SECRETS[@]}"; do
+              echo "- $KEY"
+            done
+            exit 1
+          fi
       
-            # Update the env var in the env group
-
+          # We have all the secrets we need. Update the env vars in the env group
+          for KEY in $ENV_VARS; do
             # URL-encode the KEY
             ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
 
