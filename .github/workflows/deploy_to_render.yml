@@ -21,6 +21,11 @@ jobs:
           NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
         run: |
           set -e
+          # Check if NOMI_API_KEY is populated
+          if [ -z "$NOMI_API_KEY" ]; then
+            echo "Error: NOMI_API_KEY is not set or is empty. Please add it to your repository secrets."
+            exit 1
+          fi
           response=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: $NOMI_API_KEY" \
@@ -43,6 +48,11 @@ jobs:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           set -e
+          # Check if RENDER_API_KEY is populated
+          if [ -z "$RENDER_API_KEY" ]; then
+            echo "Error: RENDER_API_KEY is not set or is empty. Please add it to your repository secrets."
+            exit 1
+          fi          
           response=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: Bearer $RENDER_API_KEY" \
@@ -58,7 +68,135 @@ jobs:
             exit 1
           else
             echo "Render.com API Key is valid."
-          fi        
+          fi
+
+      - name: Extract Service Name from render.yaml
+        id: extract-blueprint-name
+        run: |
+          SERVICE_NAME=$(grep '^\s*name:' render.yaml | sed 's/.*name: *//')
+          if [ -z "$SERVICE_NAME" ]; then
+            echo "Error: Could not find 'name:' field in render.yaml."
+            exit 1
+          fi
+          echo "Blueprint name extracted: $SERVICE_NAME"
+            echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_OUTPUT  
+
+      - name: Check for Existing Blueprint
+        id: check-existing-blueprint
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          set -e
+          # Fetch existing blueprints
+          response=$(curl -s -w "%{http_code}" \
+            --request GET \
+            --header "Authorization: Bearer $RENDER_API_KEY" \
+            --header "Accept: application/json" \
+            --url "https://api.render.com/v1/blueprints")
+          http_status="${response: -3}"
+          response_body="${response::-3}"
+          if [ "$http_status" -ne 200 ]; then
+            echo "Error: Failed to retrieve blueprints. HTTP Status: $http_status"
+            echo "Response: $response_body"
+            exit 1
+          fi
+          # Check if the response is a valid JSON array
+          IS_ARRAY=$(echo "$response_body" | jq 'type == "array"')
+          if [ "$IS_ARRAY" != "true" ]; then
+            echo "Error: Expected an array in the response."
+            exit 1
+          fi
+          # Check if any blueprints exist
+          BLUEPRINT_COUNT=$(echo "$response_body" | jq 'length')
+          if [ "$BLUEPRINT_COUNT" -eq 0 ]; then
+            echo "No existing blueprints found. Please add a blueprint."
+            exit 1
+          fi
+
+      - name: Check for Existing Environment Groups
+        id: check-existing-env-groups
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          set -e
+          # Fetch existing environment groups
+          response=$(curl -s -w "%{http_code}" \
+            --request GET \
+            --header "Authorization: Bearer $RENDER_API_KEY" \
+            --header "Accept: application/json" \
+            --url "https://api.render.com/v1/env-groups")
+          http_status="${response: -3}"
+          response_body="${response::-3}"
+          if [ "$http_status" -ne 200 ]; then
+            echo "Error: Failed to retrieve environment groups. HTTP Status: $http_status"
+            echo "Response: $response_body"
+            exit 1
+          fi
+          # Check if the response is a valid JSON array
+          IS_ARRAY=$(echo "$response_body" | jq 'type == "array"')
+          if [ "$IS_ARRAY" != "true" ]; then
+            echo "Error: Expected an array in the response."
+            exit 1
+          fi
+          # Check if any environment groups exist
+          ENV_GROUP_COUNT=$(echo "$response_body" | jq 'length')
+          if [ "$ENV_GROUP_COUNT" -eq 0 ]; then
+            echo "No existing environment groups found."
+            exit 1
+          fi          
+
+          
+
+    
+
+      - name: exit
+        run: |
+          exit 1              
+
+
+      - name: Get Last Workflow Run
+        id: get-last-run
+        if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WORKFLOW_ID: ${{ github.workflow }}
+          BRANCH: ${{ github.ref_name }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -e
+          # Get the workflow runs for this workflow and branch
+          RESPONSE=$(curl -s \
+            --request GET \
+            --header "Authorization: Bearer $GITHUB_TOKEN" \
+            --url "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ github.workflow }}/runs?branch=${{ github.ref_name }}&status=completed&per_page=5")
+          # Parse the runs and find the last run before the current one
+          LAST_RUN_TIME=""
+          RUNS=$(echo "$RESPONSE" | jq -c '.workflow_runs[]')
+          for run in $RUNS; do
+            RUN_ID=$(echo "$run" | jq -r '.id')
+            if [ "$RUN_ID" -ne "${{ github.run_id }}" ]; then
+              LAST_RUN_TIME=$(echo "$run" | jq -r '.updated_at')
+              LAST_RUN_STATUS=$(echo "$run" | jq -r '.conclusion')
+              break
+            fi
+          done
+          if [ -z "$LAST_RUN_TIME" ]; then
+            echo "No previous workflow run found."
+            echo "::set-output name=OVERWRITE_ALLOWED::false"
+            exit 0
+          fi
+          # Convert times to seconds since epoch
+          LAST_RUN_TIMESTAMP=$(date -d "$LAST_RUN_TIME" +%s)
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          CURRENT_TIMESTAMP=$(date -d "$CURRENT_TIME" +%s)
+          TIME_DIFF=$(( CURRENT_TIMESTAMP - LAST_RUN_TIMESTAMP ))
+          if [ "$TIME_DIFF" -lt 30 ]; then
+            echo "The last workflow run was $TIME_DIFF seconds ago."
+            echo "::set-output name=OVERWRITE_ALLOWED::true"
+          else
+            echo "The last workflow run was more than 30 seconds ago."
+            echo "::set-output name=OVERWRITE_ALLOWED::false"
+          fi          
 
       - name: Get Nomi Name from Nomi AI API
         env:
@@ -102,106 +240,3 @@ jobs:
           fi
           echo "Normalized Nomi Name: $NOMI_NAME_NORMALIZED"
           echo "NOMI_NAME_NORMALIZED=$NOMI_NAME_NORMALIZED" >> $GITHUB_ENV
-
-      - name: Extract Blueprint Name from render.yaml
-        id: extract-blueprint-name
-        run: |
-          BLUEPRINT_NAME=$(grep '^\s*name:' render.yaml | sed 's/.*name: *//')
-          if [ -z "$BLUEPRINT_NAME" ]; then
-            echo "Error: Could not find 'name:' field in render.yaml."
-            exit 1
-          fi
-          echo "Blueprint name extracted: $BLUEPRINT_NAME"
-          echo "BLUEPRINT_NAME=$BLUEPRINT_NAME" >> $GITHUB_OUTPUT
-
-      - name: Check for Existing Blueprint
-        id: check-existing-blueprint
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          BLUEPRINT_NAME: ${{ steps.extract-blueprint-name.outputs.BLUEPRINT_NAME }}
-        run: |
-          set -e
-          # Fetch existing blueprints
-          response=$(curl -s -w "%{http_code}" \
-            --request GET \
-            --header "Authorization: Bearer $RENDER_API_KEY" \
-            --header "Accept: application/json" \
-            --url "https://api.render.com/v1/blueprints")
-          http_status="${response: -3}"
-          response_body="${response::-3}"
-          if [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to retrieve blueprints. HTTP Status: $http_status"
-            echo "Response: $response_body"
-            exit 1
-          fi
-          # Check if the response is a valid JSON array
-          IS_ARRAY=$(echo "$response_body" | jq 'type == "array"')
-          if [ "$IS_ARRAY" != "true" ]; then
-            echo "Error: Expected an array in the response."
-            exit 1
-          fi
-          # Check if any blueprints exist
-          BLUEPRINT_COUNT=$(echo "$response_body" | jq 'length')
-          if [ "$BLUEPRINT_COUNT" -eq 0 ]; then
-            echo "No existing blueprints found."
-            exit 1
-          fi
-          # Check if a blueprint with the extracted name exists
-          EXISTING_BLUEPRINT=$(echo "$response_body" | jq -r --arg NAME "$BLUEPRINT_NAME" '.[] | select(.blueprint.name == $NAME) | .blueprint')
-          if [ -n "$EXISTING_BLUEPRINT" ]; then
-            echo "An existing blueprint with the name $BLUEPRINT_NAME was found."
-            BLUEPRINT_ID=$(echo "$EXISTING_BLUEPRINT" | jq -r '.id')
-            echo "EXISTING_BLUEPRINT_ID=$BLUEPRINT_ID" >> $GITHUB_OUTPUT
-            echo "EXISTING_BLUEPRINT=true" >> $GITHUB_OUTPUT
-          else
-            echo "No existing blueprint with the name $BLUEPRINT_NAME found."
-            exit 1
-          fi
-
-      - name: exit
-        run: |
-          exit 1
-       
-      - name: Get Last Workflow Run
-        id: get-last-run
-        if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WORKFLOW_ID: ${{ github.workflow }}
-          BRANCH: ${{ github.ref_name }}
-          CURRENT_RUN_ID: ${{ github.run_id }}
-        run: |
-          set -e
-          # Get the workflow runs for this workflow and branch
-          RESPONSE=$(curl -s \
-            --request GET \
-            --header "Authorization: Bearer $GITHUB_TOKEN" \
-            --url "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ github.workflow }}/runs?branch=${{ github.ref_name }}&status=completed&per_page=5")
-          # Parse the runs and find the last run before the current one
-          LAST_RUN_TIME=""
-          RUNS=$(echo "$RESPONSE" | jq -c '.workflow_runs[]')
-          for run in $RUNS; do
-            RUN_ID=$(echo "$run" | jq -r '.id')
-            if [ "$RUN_ID" -ne "${{ github.run_id }}" ]; then
-              LAST_RUN_TIME=$(echo "$run" | jq -r '.updated_at')
-              LAST_RUN_STATUS=$(echo "$run" | jq -r '.conclusion')
-              break
-            fi
-          done
-          if [ -z "$LAST_RUN_TIME" ]; then
-            echo "No previous workflow run found."
-            echo "::set-output name=OVERWRITE_ALLOWED::false"
-            exit 0
-          fi
-          # Convert times to seconds since epoch
-          LAST_RUN_TIMESTAMP=$(date -d "$LAST_RUN_TIME" +%s)
-          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          CURRENT_TIMESTAMP=$(date -d "$CURRENT_TIME" +%s)
-          TIME_DIFF=$(( CURRENT_TIMESTAMP - LAST_RUN_TIMESTAMP ))
-          if [ "$TIME_DIFF" -lt 30 ]; then
-            echo "The last workflow run was $TIME_DIFF seconds ago."
-            echo "::set-output name=OVERWRITE_ALLOWED::true"
-          else
-            echo "The last workflow run was more than 30 seconds ago."
-            echo "::set-output name=OVERWRITE_ALLOWED::false"
-          fi
