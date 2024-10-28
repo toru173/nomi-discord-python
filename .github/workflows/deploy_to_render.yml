@@ -75,11 +75,8 @@ jobs:
             --header "Authorization: $NOMI_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.nomi.ai/v1/nomis/$NOMI_ID")
-          # Extract HTTP status code
           http_status="${response: -3}"
-          # Extract response body
           response_body="${response::-3}"
-          # Check if the HTTP status code is 200 (OK)
           if [ "$http_status" -ne 200 ]; then
             echo "Error: Failed to retrieve Nomi Name from Nomi AI API. HTTP Status: $http_status"
             echo "Response: $response_body"
@@ -109,27 +106,52 @@ jobs:
           echo "Normalized Nomi Name: $NOMI_NAME_NORMALIZED"
           echo "NOMI_NAME_NORMALIZED=$NOMI_NAME_NORMALIZED" >> $GITHUB_ENV
 
-      - name: Check for Existing Deployment
-        id: check-existing-deployment
+      - name: Extract Blueprint Name from render.yaml
+        id: extract-blueprint-name
+        run: |
+          BLUEPRINT_NAME=$(grep '^\s*name:' render.yaml | sed 's/.*name: *//')
+          if [ -z "$BLUEPRINT_NAME" ]; then
+            echo "Error: Could not find 'name:' field in render.yaml."
+            exit 1
+          fi
+          echo "Blueprint name extracted: $BLUEPRINT_NAME"
+          echo "BLUEPRINT_NAME=$BLUEPRINT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Check for Existing Blueprint
+        id: check-existing-blueprint
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          NOMI_NAME_NORMALIZED: ${{ env.NOMI_NAME_NORMALIZED }}
+          BLUEPRINT_NAME: ${{ steps.extract-blueprint-name.outputs.BLUEPRINT_NAME }}
         run: |
           set -e
-          # Check for existing blueprint instance
-          BLUEPRINTS=$(curl -s \
+          # Fetch existing blueprints
+          response=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/blueprints")
-          EXISTING_BLUEPRINT=$(echo "$BLUEPRINTS" | jq -r --arg NAME "$NOMI_NAME_NORMALIZED" '.[] | select(.name == $NAME)')
-          if [ -n "$EXISTING_BLUEPRINT" ]; then
-            echo "An existing deployment with the name $NOMI_NAME_NORMALIZED was found."
-            echo "::set-output name=EXISTING_DEPLOYMENT::true"
-          else
-            echo "No existing deployment found."
-            echo "::set-output name=EXISTING_DEPLOYMENT::false"
+          http_status="${response: -3}"
+          response_body="${response::-3}"
+          if [ "$http_status" -ne 200 ]; then
+            echo "Error: Failed to retrieve blueprints. HTTP Status: $http_status"
+            echo "Response: $response_body"
+            exit 1
           fi
+          # Check if a blueprint with the extracted name exists
+          EXISTING_BLUEPRINT=$(echo "$response_body" | jq -r --arg NAME "$BLUEPRINT_NAME" '.blueprints[] | select(.name == $NAME)')
+          if [ -n "$EXISTING_BLUEPRINT" ]; then
+            echo "An existing blueprint with the name $BLUEPRINT_NAME was found."
+            BLUEPRINT_ID=$(echo "$EXISTING_BLUEPRINT" | jq -r '.id')
+            echo "EXISTING_BLUEPRINT_ID=$BLUEPRINT_ID" >> $GITHUB_OUTPUT
+            echo "EXISTING_BLUEPRINT=true" >> $GITHUB_OUTPUT
+          else
+            echo "No existing blueprint found."
+            exit 1
+          fi
+
+      - name: exit
+        run: |
+          exit 1
        
       - name: Get Last Workflow Run
         id: get-last-run
@@ -174,77 +196,3 @@ jobs:
             echo "The last workflow run was more than 30 seconds ago."
             echo "::set-output name=OVERWRITE_ALLOWED::false"
           fi
-
-      - name: Handle Existing Deployment
-        if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'true' && steps.get-last-run.outputs.OVERWRITE_ALLOWED == 'false'
-        run: |
-          echo "Error: An existing deployment with the name ${{ env.NOMI_NAME_NORMALIZED }} already exists."
-          echo "You can re-run this workflow to force the deployment."
-          exit 1
-
-      - name: Proceed with Deployment
-        if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'false' || steps.get-last-run.outputs.OVERWRITE_ALLOWED == 'true'
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          NOMI_NAME_NORMALIZED: ${{ env.NOMI_NAME_NORMALIZED }}
-          NOMI_ID: ${{ secrets.NOMI_ID }}
-          NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
-          OTHER_API_KEYS: ${{ secrets.OTHER_API_KEYS }}
-          REPO_URL: "https://github.com/${{ github.repository }}"
-          BRANCH_NAME: ${{ github.ref_name }}
-        run: |
-          set -e
-          if [ "${{ steps.get-last-run.outputs.OVERWRITE_ALLOWED }}" == "true" ]; then
-            echo "Proceeding to overwrite the existing deployment."
-          fi
-          # Generate render.yaml
-          cat > render.yaml <<EOF
-          services:
-            - type: web
-              name: ${NOMI_NAME_NORMALIZED}
-              runtime: docker
-              plan: free
-              rootDir: app
-              dockerfilePath: app/Dockerfile
-              repo: ${REPO_URL}
-              branch: ${BRANCH_NAME}
-              envVars:
-                - key: NOMI_ID
-                  value: ${NOMI_ID}
-                - key: NOMI_API_KEY
-                  value: ${NOMI_API_KEY}
-                - key: OTHER_API_KEYS
-                  value: ${OTHER_API_KEYS}
-          EOF
-          # Encode render.yaml in base64
-          ENCODED_BLUEPRINT=$(base64 -w 0 render.yaml)
-          if [ -z "$ENCODED_BLUEPRINT" ]; then
-            echo "Error: Failed to encode render.yaml."
-            exit 1
-          fi
-          # Update existing blueprint or create new one
-          if [ "${{ steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT }}" == "true" ]; then
-            # Update existing blueprint
-            BLUEPRINT_ID=$(echo "$EXISTING_BLUEPRINT" | jq -r '.id')
-            RESPONSE=$(curl -s -w "%{http_code}" \
-              --request PATCH \
-              --header "Authorization: Bearer $RENDER_API_KEY" \
-              --header "Content-Type: application/json" \
-              --data '{"blueprint": "'"$ENCODED_BLUEPRINT"'", "name": "'"${NOMI_NAME_NORMALIZED}"'"}' \
-              --url "https://api.render.com/v1/blueprint-instances/$BLUEPRINT_ID")
-          else
-            # Create new blueprint
-            RESPONSE=$(curl -s -w "%{http_code}" \
-              --request PATCH \
-              --header "Authorization: Bearer $RENDER_API_KEY" \
-              --header "Content-Type: application/json" \
-              --data '{"blueprint": "'"$ENCODED_BLUEPRINT"'", "name": "'"${NOMI_NAME_NORMALIZED}"'"}' \
-              --url "https://api.render.com/v1/blueprint-instances/$BLUEPRINT_ID")
-          fi
-          http_status="${RESPONSE: -3}"
-          response_body="${RESPONSE::-3}"
-          if [ "$http_status" -ne 200 ] && [ "$http_status" -ne 201 ]; then
-            echo "Error: Failed to create or update blueprint on Render.com. HTTP Status: $http_status"
-            exit 1
-          fi
-          echo "Successfully deployed the application."
