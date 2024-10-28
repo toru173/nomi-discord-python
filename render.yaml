@@ -15,3 +15,9 @@ services:
     dockerfilePath: ./Dockerfile
     dockerCommand: ./main.py
     healthCheckPath: /
+
+envVarGroups:
+- name: nomi-discord-python
+  envVars:
+    - key: NOMI_API_KEY
+    - key: DISCORD_BOT_TOKEN
