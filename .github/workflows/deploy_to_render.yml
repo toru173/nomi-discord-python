@@ -76,15 +76,15 @@ jobs:
             echo "Render.com API Key is valid."
           fi
 
-      - name: Extract Service Name from render.yaml
-        id: extract-blueprint-name
+      - name: Get Service Name from render.yaml
+        id: get-service-name
         run: |
           SERVICE_NAME=$(grep '^\s*name:' render.yaml | sed 's/.*name: *//')
           if [ -z "$SERVICE_NAME" ]; then
             echo "Error: Could not find 'name:' field in render.yaml."
             exit 1
           fi
-          echo "Blueprint name extracted: $SERVICE_NAME"
+          echo "Service name: $SERVICE_NAME"
             echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_OUTPUT  
 
       - name: Check for Existing Blueprint
@@ -127,6 +127,7 @@ jobs:
         id: check-existing-env-group
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         run: |
           set -e
 
@@ -167,7 +168,7 @@ jobs:
             echo "EXISTING_GROUP_ID=$ENV_GROUP_ID" >> $GITHUB_OUTPUT
             echo "EXISTING_GROUP=true" >> $GITHUB_OUTPUT
           else
-            echo "No existing environment groups with the name $SERVICE_NAME found."
+            echo "No existing environment groups with the name $SERVICE_NAME was found."
             exit 1
           fi
           
@@ -215,7 +216,7 @@ jobs:
 
             # URL-encode the KEY
             ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
-            
+
             # Ensure the value is properly escaped for JSON
             VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
 
