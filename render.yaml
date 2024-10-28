@@ -11,6 +11,6 @@ services:
     name: nomi-discord-python
     region: oregon
     plan: free
-    dockerCommand: ./webdis.sh # Default: Dockerfile CMD
+    dockerCommand: ./main.py
     dockerfilePath: app/Dockerfile
     healthCheckPath: /
