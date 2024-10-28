@@ -1,4 +1,4 @@
-name: Deploy Nomi to Render.com
+name: Deploy Nomi to Render
 
 on:
   workflow_dispatch:
@@ -137,15 +137,27 @@ jobs:
             echo "Response: $response_body"
             exit 1
           fi
+          # Check if the response is a valid JSON array
+          IS_ARRAY=$(echo "$response_body" | jq 'type == "array"')
+          if [ "$IS_ARRAY" != "true" ]; then
+            echo "Error: Expected an array in the response."
+            exit 1
+          fi
+          # Check if any blueprints exist
+          BLUEPRINT_COUNT=$(echo "$response_body" | jq 'length')
+          if [ "$BLUEPRINT_COUNT" -eq 0 ]; then
+            echo "No existing blueprints found."
+            exit 1
+          fi
           # Check if a blueprint with the extracted name exists
-          EXISTING_BLUEPRINT=$(echo "$response_body" | jq -r --arg NAME "$BLUEPRINT_NAME" '.blueprints[] | select(.name == $NAME)')
+          EXISTING_BLUEPRINT=$(echo "$response_body" | jq -r --arg NAME "$BLUEPRINT_NAME" '.[] | select(.name == $NAME)')
           if [ -n "$EXISTING_BLUEPRINT" ]; then
             echo "An existing blueprint with the name $BLUEPRINT_NAME was found."
             BLUEPRINT_ID=$(echo "$EXISTING_BLUEPRINT" | jq -r '.id')
             echo "EXISTING_BLUEPRINT_ID=$BLUEPRINT_ID" >> $GITHUB_OUTPUT
             echo "EXISTING_BLUEPRINT=true" >> $GITHUB_OUTPUT
           else
-            echo "No existing blueprint found."
+            echo "No existing blueprint with the name $BLUEPRINT_NAME found."
             exit 1
           fi
 
