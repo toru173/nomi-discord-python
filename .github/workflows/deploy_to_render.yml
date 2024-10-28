@@ -16,34 +16,37 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Validate Nomi AI API Key
-        env:
-          NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
-        run: |
-          set -e
-          # Check if NOMI_API_KEY is populated
-          if [ -z "$NOMI_API_KEY" ]; then
-            echo "Error: NOMI_API_KEY is not set or is empty. Please add it to your repository secrets."
-            exit 1
-          fi
-          response=$(curl -s -w "%{http_code}" \
-            --request GET \
-            --header "Authorization: $NOMI_API_KEY" \
-            --header "Accept: application/json" \
-            --url "https://api.nomi.ai/v1/nomis")
-          http_status="${response: -3}"
-          response_body="${response::-3}"
-          if [ "$http_status" -eq 400 ]; then
-            echo "Error: Invalid Nomi AI API Key. Authentication failed."
-            exit 1
-          elif [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to validate Nomi AI API Key. HTTP Status: $http_status"
-            exit 1
-          else
-            echo "Nomi AI API Key is valid."
-          fi
+      # - name: Validate Nomi AI API Key
+      #   env:
+      #     NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
+      #   run: |
+      #     set -e
+      #     # Check if NOMI_API_KEY is populated
+      #     if [ -z "$NOMI_API_KEY" ]; then
+      #       echo "Error: NOMI_API_KEY is not set or is empty. Please add it to your repository secrets."
+      #       exit 1
+      #     fi
 
-      - name: Validate Render.com API Key
+      #     # Check key is valid
+      #     response=$(curl -s -w "%{http_code}" \
+      #       --request GET \
+      #       --header "accept: application/json" \
+      #       --header "Authorization: $NOMI_API_KEY" \
+      #       --header "Accept: application/json" \
+      #       --url "https://api.nomi.ai/v1/nomis")
+      #     http_status="${response: -3}"
+      #     response_body="${response::-3}"
+      #     if [ "$http_status" -eq 400 ]; then
+      #       echo "Error: Invalid Nomi AI API Key. Authentication failed."
+      #       exit 1
+      #     elif [ "$http_status" -ne 200 ]; then
+      #       echo "Error: Failed to validate Nomi AI API Key. HTTP Status: $http_status"
+      #       exit 1
+      #     else
+      #       echo "Nomi AI API Key is valid."
+      #     fi
+
+      - name: Validate Render API Key
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
@@ -52,9 +55,12 @@ jobs:
           if [ -z "$RENDER_API_KEY" ]; then
             echo "Error: RENDER_API_KEY is not set or is empty. Please add it to your repository secrets."
             exit 1
-          fi          
+          fi
+
+          # Check key is valid
           response=$(curl -s -w "%{http_code}" \
             --request GET \
+            --header "accept: application/json" \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/services?limit=1")
@@ -87,9 +93,11 @@ jobs:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           set -e
+
           # Fetch existing blueprints
           response=$(curl -s -w "%{http_code}" \
             --request GET \
+            --header "accept: application/json" \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/blueprints")
@@ -100,12 +108,14 @@ jobs:
             echo "Response: $response_body"
             exit 1
           fi
+
           # Check if the response is a valid JSON array
           IS_ARRAY=$(echo "$response_body" | jq 'type == "array"')
           if [ "$IS_ARRAY" != "true" ]; then
             echo "Error: Expected an array in the response."
             exit 1
           fi
+
           # Check if any blueprints exist
           BLUEPRINT_COUNT=$(echo "$response_body" | jq 'length')
           if [ "$BLUEPRINT_COUNT" -eq 0 ]; then
@@ -113,15 +123,17 @@ jobs:
             exit 1
           fi
 
-      - name: Check for Existing Environment Groups
-        id: check-existing-env-groups
+      - name: Check for Existing Environment Group
+        id: check-existing-env-group
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           set -e
+
           # Fetch existing environment groups
           response=$(curl -s -w "%{http_code}" \
             --request GET \
+            --header "accept: application/json" \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/env-groups")
@@ -132,23 +144,98 @@ jobs:
             echo "Response: $response_body"
             exit 1
           fi
+
           # Check if the response is a valid JSON array
           IS_ARRAY=$(echo "$response_body" | jq 'type == "array"')
           if [ "$IS_ARRAY" != "true" ]; then
             echo "Error: Expected an array in the response."
             exit 1
           fi
+
           # Check if any environment groups exist
           ENV_GROUP_COUNT=$(echo "$response_body" | jq 'length')
           if [ "$ENV_GROUP_COUNT" -eq 0 ]; then
             echo "No existing environment groups found."
             exit 1
-          fi          
+          fi
 
+          # Ensure an environment group that matches our app   
+          EXISTING_GROUP=$(echo "$response_body" | jq -r --arg NAME "$SERVICE_NAME" '.[] | select(.envGroup.name == $NAME) | .envGroup')
+          if [ -n "$EXISTING_GROUP" ] && [ "$EXISTING_GROUP" != "null" ]; then
+            echo "An existing environment group with the name $SERVICE_NAME was found."
+            ENV_GROUP_ID=$(echo "$EXISTING_GROUP" | jq -r '.id')
+            echo "EXISTING_GROUP_ID=$ENV_GROUP_ID" >> $GITHUB_OUTPUT
+            echo "EXISTING_GROUP=true" >> $GITHUB_OUTPUT
+          else
+            echo "No existing environment groups with the name $SERVICE_NAME found."
+            exit 1
+          fi
           
+      - name: Check and Update Environment Variables in Env Group
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
+        run: |
+          set -e
+      
+          # Retrieve the existing env group
+          RESPONSE=$(curl -s \
+            --request GET \
+            --header "accept: application/json" \
+            --header "Authorization: Bearer $RENDER_API_KEY" \
+            --header "Accept: application/json" \
+            --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID")
+      
+          # Parse the envVars array
+          ENV_VARS=$(echo "$RESPONSE" | jq -r '.envVars[].key')
+      
+          # Initialize a variable to track missing secrets
+          MISSING_SECRETS=()
+      
+          # Iterate over each env var key
+          for KEY in $ENV_VARS; do
+            # Get the value from the environment variable (set from secrets)
+            VALUE=$(printenv "$KEY")
+            if [ -z "$VALUE" ]; then
+              echo "Error: No secret found for environment variable $KEY."
+              MISSING_SECRETS+=("$KEY")
+              continue
+            fi
 
-    
+            # After processing all env vars, check if there were any missing secrets
+            if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
+              echo "The following environment variables were not updated due to missing secrets:"
+              for KEY in "${MISSING_SECRETS[@]}"; do
+                echo "- $KEY"
+              done
+              exit 1
+            fi
+      
+            # Update the env var in the env group
 
+            # URL-encode the KEY
+            ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
+            
+            # Ensure the value is properly escaped for JSON
+            VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
+
+            UPDATE_RESPONSE=$(curl -s -w "%{http_code}" \
+              --request PUT \
+              --header "accept: application/json" \
+              --header "Authorization: Bearer $RENDER_API_KEY" \
+              --header "Content-Type: application/json" \
+              --data "{\"value\":$VALUE_ESCAPED}" \
+              --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID/env-vars/$ENCODED_KEY")
+            HTTP_STATUS="${UPDATE_RESPONSE: -3}"
+            RESPONSE_BODY="${UPDATE_RESPONSE::-3}"
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "Error: Failed to update env var $KEY. HTTP Status: $HTTP_STATUS"
+              echo "Response: $RESPONSE_BODY"
+              exit 1
+            fi
+            echo "Successfully updated env var $KEY."
+          done
+      
       - name: exit
         run: |
           exit 1              
