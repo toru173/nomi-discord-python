@@ -181,8 +181,7 @@ jobs:
           NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: |
-          # set -e
-          set -x          
+          set -e
       
           # Retrieve the existing env group
           RESPONSE=$(curl -s \
@@ -199,9 +198,9 @@ jobs:
           MISSING_SECRETS=()
       
           # Iterate over each env var key
-          VALUE="${!KEY}"
           for KEY in $ENV_VARS; do
             # Get the value from the environment variable (set from secrets)
+            VALUE=$(printenv $KEY)
             if [ -z "$VALUE" ]; then
               echo "Error: No secret found for environment variable $KEY."
               MISSING_SECRETS+=("$KEY")
