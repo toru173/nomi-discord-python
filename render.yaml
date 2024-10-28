@@ -1,5 +1,17 @@
-name: 
-runtime: docker
-plan: free
-rootDir: app
-dockerfilePath: app/Dockerfile
+# =============================================================================
+# ================= nomi-discord-python Render Blueprint File =================
+# =============================================================================
+
+previews:
+  generation: off
+
+services:
+  - type: web
+    runtime: docker
+    name: nomi-discord-python
+    region: oregon
+    plan: free
+    rootDir: app
+    dockerCommand: ./webdis.sh # Default: Dockerfile CMD
+    dockerfilePath: app/Dockerfile
+    healthCheckPath: /
