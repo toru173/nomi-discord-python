@@ -22,4 +22,6 @@ envVarGroups:
 - name: nomi-discord-python
   envVars:
     - key: NOMI_API_KEY
+      generateValue: true
     - key: DISCORD_BOT_TOKEN
+      generateValue: true
