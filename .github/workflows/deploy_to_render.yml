@@ -121,7 +121,7 @@ jobs:
             --request GET \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
-            --url "https://api.render.com/v1/blueprint-instances")
+            --url "https://api.render.com/v1/blueprints")
           EXISTING_BLUEPRINT=$(echo "$BLUEPRINTS" | jq -r --arg NAME "$NOMI_NAME_NORMALIZED" '.[] | select(.name == $NAME)')
           if [ -n "$EXISTING_BLUEPRINT" ]; then
             echo "An existing deployment with the name $NOMI_NAME_NORMALIZED was found."
@@ -130,8 +130,7 @@ jobs:
             echo "No existing deployment found."
             echo "::set-output name=EXISTING_DEPLOYMENT::false"
           fi
-      
-  
+       
       - name: Get Last Workflow Run
         id: get-last-run
         if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'true'
