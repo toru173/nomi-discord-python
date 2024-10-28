@@ -15,6 +15,7 @@ services:
     dockerfilePath: ./Dockerfile
     dockerCommand: ./main.py
     healthCheckPath: /
+    autoDeploy: false
     envVars:
       - fromGroup: nomi-discord-python
 
