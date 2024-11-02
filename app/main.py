@@ -2,30 +2,30 @@
 #
 # Copyright (c) 2024-present toru173 and contributors
 #
-# Redistribution and use in source and binary forms, with or without 
-# modification, are permitted (subject to the limitations in the disclaimer 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the disclaimer
 # below) provided that the following conditions are met:
 #
-# * Redistributions of source code must retain the above copyright notice, 
+# * Redistributions of source code must retain the above copyright notice,
 #   this list of conditions and the following disclaimer.
-# * Redistributions in binary form must reproduce the above copyright notice, 
-#   this list of conditions and the following disclaimer in the documentation 
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
 #   and/or other materials provided with the distribution.
 # * Neither the name of the copyright holder nor the names of the contributors
 #   may be used to endorse or promote products derived from this software
 #   without specific prior written permission.
 #
-# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY 
-# THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT 
-# NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
-# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER 
-# OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY
+# THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER
+# OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from typing import Optional
@@ -55,7 +55,7 @@ def read_variable_from_file(variable_name: str, filename: str) -> Optional[str]:
         # Return None if the file cannot be found or read
         return None
 
-  
+
 def strip_outer_quotation_marks(s: str) -> str:
     # Define a set of unicode-compatible quotation marks to remove
     quote_pairs = {
@@ -68,11 +68,11 @@ def strip_outer_quotation_marks(s: str) -> str:
         '„': '“',
         '‚': '‘',
     }
-    
+
     # Check if the string has at least two characters and the first and last form a valid pair
     if len(s) >= 2 and s[0] in quote_pairs and s[-1] == quote_pairs[s[0]]:
         return s[1:-1]
-    
+
     return s
 
 
@@ -112,7 +112,7 @@ if __name__ == "__main__":
         "default_message_prefix" : default_message_prefix,
         "default_message_suffix" : default_message_suffix,
         "channel_message_prefix" : channel_message_prefix,
-        "dm_message_prefix" : dm_message_prefix, 
+        "dm_message_prefix" : dm_message_prefix,
         "react_trigger_phrase" : react_trigger_phrase,
     }
 
@@ -121,7 +121,7 @@ if __name__ == "__main__":
             message_modifiers[modifier] = strip_outer_quotation_marks(value)
 
     nomi_session = Session(api_key = nomi_api_key)
-    nomi = Nomi.from_uuid(session = nomi_session, uuid = nomi_id)        
+    nomi = Nomi.from_uuid(session = nomi_session, uuid = nomi_id)
 
     intents = discord.Intents.default()
     intents.messages = True
@@ -132,5 +132,5 @@ if __name__ == "__main__":
                    message_modifiers = message_modifiers,
                    intents = intents
                 )
-    
+
     nomi.run(token = discord_api_token, root_logger = True)

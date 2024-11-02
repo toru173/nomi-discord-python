@@ -2,30 +2,30 @@
 #
 # Copyright (c) 2024-present toru173 and contributors
 #
-# Redistribution and use in source and binary forms, with or without 
-# modification, are permitted (subject to the limitations in the disclaimer 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the disclaimer
 # below) provided that the following conditions are met:
 #
-# * Redistributions of source code must retain the above copyright notice, 
+# * Redistributions of source code must retain the above copyright notice,
 #   this list of conditions and the following disclaimer.
-# * Redistributions in binary form must reproduce the above copyright notice, 
-#   this list of conditions and the following disclaimer in the documentation 
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
 #   and/or other materials provided with the distribution.
 # * Neither the name of the copyright holder nor the names of the contributors
 #   may be used to endorse or promote products derived from this software
 #   without specific prior written permission.
 #
-# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY 
-# THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT 
-# NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
-# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER 
-# OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY
+# THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER
+# OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ class NomiBot(commands.Bot):
     def __init__(self, *, nomi: Nomi, max_message_length: Optional[int] = None, message_modifiers: dict[str, str], intents: discord.Intents, **options) -> None:
         if type(nomi) is not Nomi:
             raise TypeError(f"Expected nomi to be a Nomi, got a {type(nomi).__name__}")
-        
+
         self.nomi = nomi
         for modifier, value in message_modifiers.items():
             if value is not None:
@@ -85,10 +85,10 @@ class NomiBot(commands.Bot):
 
         if max_message_length > self._max_max_message_length:
             raise ValueError(f"max_message_length should be equal to or less than {self._max_max_message_length}")
-        self.max_message_length = max_message_length      
-        
+        self.max_message_length = max_message_length
+
         super().__init__(command_prefix = "/", intents = intents, **options)
-        
+
 
     def _trim_message(self, message: str) -> str:
         if len(message) <= self.max_message_length:
@@ -101,7 +101,7 @@ class NomiBot(commands.Bot):
             trimmed_message = trimmed_message[:last_space]
 
         return trimmed_message + self.default_message_suffix
-    
+
 
     async def on_ready(self):
         logging.info(f"{self.user.display_name} is now online. Happy chatting!")
@@ -126,7 +126,7 @@ class NomiBot(commands.Bot):
                 if user.nick:
                     mention_id = f"<@!{user.id}>"
                 else:
-                    mention_id = f"<@{user.id}>"                
+                    mention_id = f"<@{user.id}>"
 
                 # Replace the mention with the user's name
                 discord_message_content = discord_message_content.replace(mention_id, f"@{name}")
@@ -136,7 +136,7 @@ class NomiBot(commands.Bot):
                 mention_id = f"<@&{role.id}>"
 
                 # Replace the mention with the role's name
-                discord_message_content = discord_message_content.replace(mention_id, f"@{role}")                
+                discord_message_content = discord_message_content.replace(mention_id, f"@{role}")
 
             # Set the typing indicator. The Nomi is 'typing' the whole time
             # we are communicating with them, which includes sending the message
@@ -161,7 +161,7 @@ class NomiBot(commands.Bot):
                                                      channel = channel,
                                                      guild = guild
                                                     )
-                
+
                 nomi_message = nomi_message + discord_message_content
                 nomi_message = self._trim_message(nomi_message)
 
@@ -179,7 +179,7 @@ class NomiBot(commands.Bot):
             # we are communicating with them, which includes sending the message
             # to the Nomi API, waiting for their response, and sending it back
             # to Discord
-            async with discord_message.channel.typing():                    
+            async with discord_message.channel.typing():
                 # Attempt to substitute user or role ID in any mentions
                 # Example: replace the <@userid>, <!@userid> or <@&roleid> with the name
                 #          of the user, the user's nickname or name of the role
@@ -215,7 +215,7 @@ class NomiBot(commands.Bot):
                             nomi_reply = nomi_reply.replace(f"@{match}", mention)
 
                 logging.error(nomi_reply)
-                
+
                 # If the nomi has reacted to the message using the react
                 # key phrase, attempt to get that from the Nomi's message
                 # and react to our message accordingly
@@ -242,11 +242,11 @@ class NomiBot(commands.Bot):
                                 raise
                     # Remove the Nomi's react from the text of their reply
                     nomi_reply = regex.sub(match, '', nomi_reply)
-                
+
                 # Clean up the reply message
                 nomi_reply = nomi_reply.replace("**", '')
                 nomi_reply.strip()
-                
+
                 # If there's more text, send that as a reply. Don't reply
                 # if the Nomi just send at reaction
                 if nomi_reply:
