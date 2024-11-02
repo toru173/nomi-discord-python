@@ -85,7 +85,7 @@ jobs:
             exit 1
           fi
           echo "Service name: $SERVICE_NAME"
-            echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_OUTPUT  
+            echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_OUTPUT
 
       - name: Check for Existing Blueprint
         id: check-existing-blueprint
@@ -160,7 +160,7 @@ jobs:
             exit 1
           fi
 
-          # Ensure an environment group that matches our app   
+          # Ensure an environment group that matches our app
           EXISTING_GROUP=$(echo "$response_body" | jq -r --arg NAME "$SERVICE_NAME" '.[] | select(.envGroup.name == $NAME) | .envGroup')
           if [ -n "$EXISTING_GROUP" ] && [ "$EXISTING_GROUP" != "null" ]; then
             echo "An existing environment group with the name $SERVICE_NAME was found."
@@ -171,18 +171,18 @@ jobs:
             echo "No existing environment groups with the name $SERVICE_NAME was found."
             exit 1
           fi
-          
-      - name: Check and Update Environment Variables in Env Group
+
+      - name: Update Environment Variables from GitHub Secrets
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
 
-          # Map environment variable keys to secrets
+          # All Secrets need to be expressed as environment variables
           NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: |
           set -e
-      
+
           # Retrieve the existing env group
           RESPONSE=$(curl -s \
             --request GET \
@@ -190,13 +190,13 @@ jobs:
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID")
-      
+
           # Parse the envVars array
           ENV_VARS=$(echo "$RESPONSE" | jq -r '.envVars[].key')
-      
+
           # Initialize a variable to track missing secrets
           MISSING_SECRETS=()
-      
+
           # Iterate over each env var key
           for KEY in $ENV_VARS; do
             # Get the value from the environment variable (set from secrets)
@@ -216,7 +216,7 @@ jobs:
             done
             exit 1
           fi
-      
+
           # We have all the secrets we need. Update the env vars in the env group
           for KEY in $ENV_VARS; do
             # URL-encode the KEY
@@ -241,11 +241,10 @@ jobs:
             fi
             echo "Successfully updated env var $KEY."
           done
-      
+
       - name: exit
         run: |
-          exit 1              
-
+          exit 1
 
       - name: Get Last Workflow Run
         id: get-last-run
@@ -289,7 +288,7 @@ jobs:
           else
             echo "The last workflow run was more than 30 seconds ago."
             echo "::set-output name=OVERWRITE_ALLOWED::false"
-          fi          
+          fi
 
       - name: Get Nomi Name from Nomi AI API
         env:
