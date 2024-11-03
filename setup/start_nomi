@@ -19,14 +19,13 @@ ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
 
 :: Get absolute path to app directory
-FOR %%I IN ("%~dp0app") DO SET APP_DIR=%%~fI
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
 
 SET "NOMI_NAME=placeholder_nomi_name"
 SET DOCKER_IMAGE_NAME=placeholder_docker_image_name
 SET CONFIG_FILE_NAME=%DOCKER_IMAGE_NAME%.conf
 
-:: Get the current directory
-SET "SCRIPT_ROOT=%~dp0"
+SET "APP_DIR=%SCRIPT_ROOT%\app"
 SET "CONFIG_FILE=%SCRIPT_ROOT%%CONFIG_FILE_NAME%"
 
 :: Check if Docker is installed

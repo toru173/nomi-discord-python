@@ -41,12 +41,12 @@ ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together
 ECHO:
 
-FOR %%I IN ("%~dp0") DO SET CURRENT_DIR=%%~fI
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
 
 :: Check if .nomi_setup_done exists in the script's current directory
 :: If it does, assume the user chose this directory last time
-if EXIST "%CURRENT_DIR%.nomi_setup_done" (
-    SET "INSTALL_DIR=%CURRENT_DIR%"
+if EXIST "%SCRIPT_ROOT%.nomi_setup_done" (
+    SET "INSTALL_DIR=%SCRIPT_ROOT%"
     GOTO do_update
 )
 

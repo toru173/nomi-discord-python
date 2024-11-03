@@ -21,7 +21,8 @@ ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
 
 :: Get the absolute path to the 'setup' directory
-FOR %%I IN ("%~dp0setup") DO SET SETUP_DIR=%%~fI
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
+SET "SETUP_DIR=%SCRIPT_ROOT%\setup"
 
 SET "DOCKER_IMAGE_NAME=nomi-config-setup"
 
