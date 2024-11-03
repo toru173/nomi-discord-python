@@ -136,11 +136,14 @@ def main() -> None:
         placeholder_nomi_name_key : nomi_name,
         placeholder_docker_image_name : normalised_name
     }
+
     modified_start_content = replace_placeholders(start_content, start_replacements)
 
     # Write the modified start_nomi file with the OS-specific extension
     start_output_path = Path(f"{output_dir}/start_{normalised_name}{extension}")
     with start_output_path.open("w") as start_output_file:
+        if "Windows_NT" not in os_type:
+            start_output_file.write("#!/usr/bin/env bash\n")
         start_output_file.write(modified_start_content)
 
 if __name__ == "__main__":
