@@ -46,7 +46,7 @@ class NomiBot(commands.Bot):
     _default_message_suffix = "... (the message was cut off because it was too long)"
     _default_channel_message_prefix = "*You receive a message from {author} in {channel} on {guild} on Discord* "
     _default_dm_message_prefix = "*You receive a DM from {author} on Discord* "
-    _default_react_trigger_phrase = "I\s*react.*?with\s*\p{Emoji}"
+    _default_react_trigger_phrase = r"I.*?react.*?with.*?\p{Emoji}.*?"
 
     _default_max_message_length = 400
     _max_max_message_length = 600
@@ -68,8 +68,7 @@ class NomiBot(commands.Bot):
                 else:
                     setattr(self, modifier, self._default_react_trigger_phrase)
 
-        self.react_trigger_phrase = regex.escape(self.react_trigger_phrase)
-        self.react_trigger_pattern = regex.compile(rf"{self.react_trigger_phrase}.*?(\*|$)", regex.IGNORECASE)
+        self.react_trigger_pattern = regex.compile(rf"{self.react_trigger_phrase}", regex.IGNORECASE)
 
         if max_message_length is None:
             max_message_length = self._default_max_message_length
@@ -228,6 +227,9 @@ class NomiBot(commands.Bot):
                     # Look for emojis
                     emojis = regex.findall(r"\p{Emoji}", match)
                     for emoji in emojis:
+                        # The regex matches * as an emoji
+                        if emoji == "*":
+                            continue
                         try:
                             # Attempt to send to Discord
                             await discord_message.add_reaction(emoji)

@@ -98,7 +98,7 @@ IF ERRORLEVEL 1 (
 )
 
 ECHO %NOMI_NAME%'s container is running! You can now talk to %NOMI_NAME% on Discord.
-ECHO Make sure you do not share your %CONFIG_FILE% file with ANYONE.
+ECHO Make sure you do not share your config file with ANYONE.
 
 :: All done! Let's exit from the Windows part of the script
 :cleanup
@@ -240,7 +240,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "$NOMI_NAME's container is running! You can now to talk to $NOMI_NAME on Discord."
-echo "Make sure you do not share your $CONFIG_FILE file with ANYONE"
+echo "Make sure you do not share your config file with ANYONE"
 echo "You may now close this window"
 echo
 
