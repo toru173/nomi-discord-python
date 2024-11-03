@@ -231,6 +231,8 @@ IF EXIST "%INSTALL_DIR%\setup.bat" (
     )
 )
 
+ECHO You can set up a Nomi's Docker container by running the setup script.
+
 ECHO:
 SET /P "OPEN_FOLDER=Would you like to open the installation folder in a file browser? [y/N]: "
 IF /I "!OPEN_FOLDER!" == "Y" (
@@ -560,16 +562,7 @@ else
     return 1
 fi
 
-if [ -f "$SETUP_SCRIPT" ]; then
-    # Prompt the user to set up a Nomi
-    if prompt_confirm "Do you want to set up up a Nomi now?"; then
-        echo
-        bash "$SETUP_SCRIPT"
-    else
-        echo "Setting up a new Nomi was skipped. You can run it later"
-        echo "by running the setup script in the installation directory."
-    fi
-fi
+echo "You can set up a Nomi's Docker container by running the setup script."
 
 if prompt_confirm "Would you like to open the installation folder in a file browser?"; then
     if command -v xdg-open >/dev/null 2>&1; then
