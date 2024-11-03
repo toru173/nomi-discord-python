@@ -13,14 +13,17 @@ ECHO ===========================================================================
 ECHO ============================= Nomi Launcher ===============================
 ECHO ===========================================================================
 ECHO:
-ECHO This launcher will create and start a Nomi running in a Docker container. It
-ECHO needs to be run whenever you make changes to your Nomi's configuration file.
+ECHO This launcher will start a Nomi running in a Docker container.
 ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
 
-SET NOMI_NAME=example_nomi
-SET CONFIG_FILE_NAME=%NOMI_NAME%.conf
+SET "NOMI_NAME=placeholder_nomi_name"
+SET DOCKER_IMAGE_NAME=placeholder_docker_image_name
+SET CONFIG_FILE_NAME=%DOCKER_IMAGE_NAME%.conf
+
+:: Get absolute path to app directory
+FOR %%I IN ("%~dp0app") DO SET APP_DIR=%%~fI
 
 :: Get the current directory
 SET "SCRIPT_ROOT=%~dp0"
@@ -33,13 +36,20 @@ IF ERRORLEVEL 1 (
     GOTO cleanup
 )
 
+:: Check if Docker daemon is running
+docker info >NUL 2>&1
+IF ERRORLEVEL 1 (
+    ECHO Docker is installed but the Docker daemon is not running. Please start Docker before continuing.
+    GOTO cleanup
+)
+
 :: Check for a configuration file
 IF EXIST "%CONFIG_FILE%" (
     ECHO Found %NOMI_NAME%'s configuration file. Reading contents...
     CALL "%CONFIG_FILE%"
 ) ELSE (
     ECHO A configuration file for %NOMI_NAME% was not found. Please re-run
-    ECHO the create_nomi script to set up %NOMI_NAME%.
+    ECHO the setup script to set up %NOMI_NAME%.
     GOTO cleanup
 )
 
@@ -60,19 +70,6 @@ IF "%MISSING_VARIABLE%"=="TRUE" (
     GOTO cleanup
 )
 
-ECHO Cannot yet build a Docker image name correctly
-EXIT /B
-
-:: Converts the Nomi's name to lowercase, replaces non-valid characters with
-:: an underscore, and strips trailing underscores
-FOR /F "tokens=* delims=" %%A IN ('echo %NOMI_NAME% ^| powershell -Command "$input.tolower()"') DO SET NOMI_NAME_LC=%%A
-SET DOCKER_IMAGE_NAME=%NOMI_NAME_LC%
-SET DOCKER_IMAGE_NAME=%DOCKER_IMAGE_NAME:.=_%
-SET DOCKER_IMAGE_NAME=%DOCKER_IMAGE_NAME:-=_%
-
-:: Remove trailing underscores
-FOR /F "tokens=* delims=_" %%A IN ("%DOCKER_IMAGE_NAME%") DO SET DOCKER_IMAGE_NAME=%%A
-
 :: Check if a Docker container already exists and remove it
 docker inspect %DOCKER_IMAGE_NAME% >NUL 2>&1
 IF NOT ERRORLEVEL 1 (
@@ -86,7 +83,7 @@ IF NOT ERRORLEVEL 1 (
 
 :: Build the Docker container
 ECHO Building a Docker container for %NOMI_NAME%
-docker build -t %DOCKER_IMAGE_NAME% "%SCRIPT_ROOT%" >NUL 2>&1
+docker build -t %DOCKER_IMAGE_NAME% "%APP_DIR%" >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Error when building container.
     GOTO cleanup
@@ -94,7 +91,7 @@ IF ERRORLEVEL 1 (
 
 :: Run the Docker container
 ECHO %NOMI_NAME%'s container built successfully. Running container...
-docker run -d --name %DOCKER_IMAGE_NAME% %DOCKER_IMAGE_NAME% >NUL 2>&1
+docker run -d --name %DOCKER_IMAGE_NAME% --env-file "%CONFIG_FILE%" %DOCKER_IMAGE_NAME% >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Error when running container.
     GOTO cleanup
@@ -159,20 +156,28 @@ echo "==========================================================================
 echo "============================= Nomi Launcher ==============================="
 echo "==========================================================================="
 echo
-echo "This launcher will create and start a Nomi running in a Docker container. It"
-echo "needs to be run whenever you make changes to your Nomi's configuration file"
+echo "This launcher will start a Nomi running in a Docker container."
 echo
 echo "If you ever want to quit the script, simply press CTRL+C together"
 echo
 
-CONFIG_FILE_NAME=
+NOMI_NAME="placeholder_nomi_name"
+DOCKER_IMAGE_NAME=placeholder_docker_image_name
+CONFIG_FILE_NAME=$DOCKER_IMAGE_NAME.conf
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_DIR="$SCRIPT_ROOT/app"
 CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
 
 # Check if Docker is installed
 if ! command -v docker >/dev/null 2>&1; then
     echo "Could not find Docker. Please re-run the installation script"
+    exit 1
+fi
+
+# Check if the Docker daemon is running
+if ! docker info > /dev/null 2>&1; then
+    echo "Docker is installed but the Docker daemon is not running. Please start Docker before continuing."
     exit 1
 fi
 
@@ -208,11 +213,6 @@ if [ MISSING_VARIABLE == true ]; then
     exit 1
 fi
 
-# Converts the Nomis's name to lower case, replaces
-# non-valid charactes with an underscore and strips any
-# trailing underscores as required by a Docker image name
-DOCKER_IMAGE_NAME=$(echo -n $NOMI_NAME | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
-
 if docker inspect $DOCKER_IMAGE_NAME > /dev/null 2>&1; then
     echo "A Docker container for $NOMI_NAME exists. Removing container..."
     DOCKER_REMOVE_OUTPUT=$(docker container rm $DOCKER_IMAGE_NAME -f 2>&1)
@@ -225,7 +225,7 @@ fi
 echo "Building a Docker container for $NOMI_NAME"
 echo "The container will be called '$DOCKER_IMAGE_NAME'"
 
-DOCKER_BUILD_OUTPUT=$(docker build -t $DOCKER_IMAGE_NAME "$SCRIPT_ROOT" 2>&1)
+DOCKER_BUILD_OUTPUT=$(docker build -t $DOCKER_IMAGE_NAME "$APP_DIR" 2>&1)
 if [ $? -ne 0 ]; then
     echo "Error when building container: $DOCKER_BUILD_OUTPUT"
     exit 1
@@ -233,7 +233,7 @@ fi
 
 echo "$NOMI_NAME's container built succesfully. Running container..."
 
-DOCKER_RUN_OUTPUT=$(docker run -d --name $DOCKER_IMAGE_NAME $DOCKER_IMAGE_NAME 2>&1)
+DOCKER_RUN_OUTPUT=$(docker run -d --name $DOCKER_IMAGE_NAME --env-file "$CONFIG_FILE" $DOCKER_IMAGE_NAME 2>&1)
 if [ $? -ne 0 ]; then
     echo "Error when running container: $DOCKER_RUN_OUTPUT"
     exit 1

@@ -13,17 +13,16 @@ ECHO ===========================================================================
 ECHO =============================== Nomi Setup ================================
 ECHO ===========================================================================
 ECHO:
-ECHO This setup will create a script that can be used to setup a script for
-ECHO running a Nomi running in a Docker container. It needs to be run whenever
-ECHO you want to make changes to your Nomi's configuration.
+ECHO This setup will create a script that can be used start running a Nomi
+ECHO in a Docker container. It needs to be run whenever you want to make changes
+ECHO to your Nomi's configuration.
 ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
 
 :: Get the absolute path to the 'setup' directory
-FOR %%I IN ("%~dp0setup") DO SET SETUP_PATH=%%~fI
-
-SET "IMAGE_NAME=nomi-config-setup"
+FOR %%I IN ("%~dp0setup") DO SET SETUP_DIR=%%~fI
+SET "DOCKER_IMAGE_NAME=nomi-config-setup"
 
 :: Check if Docker is installed
 docker --version >NUL 2>&1
@@ -32,11 +31,18 @@ IF ERRORLEVEL 1 (
     GOTO cleanup
 )
 
-:: Check if Docker image exists
-docker images -q %IMAGE_NAME% > NUL 2>&1
+:: Check if Docker daemon is running
+docker info >NUL 2>&1
 IF ERRORLEVEL 1 (
-    ECHO Image %IMAGE_NAME% not found. Building the image...
-    FOR /F "tokens=*" %%I IN ('docker build -t %IMAGE_NAME% "%SETUP_PATH%" 2^>^&1') DO SET "DOCKER_BUILD_OUTPUT=%%I"
+    ECHO Docker is installed but the Docker daemon is not running. Please start Docker before continuing.
+    GOTO cleanup
+)
+
+:: Check if the Docker image exists
+FOR /F "delims=" %%I IN ('docker images -q %DOCKER_IMAGE_NAME%') DO SET IMAGE_ID=%%I
+IF NOT DEFINED IMAGE_ID (
+    ECHO Setup Docker image (%DOCKER_IMAGE_NAME%) not found. Building the image...
+    FOR /F "tokens=*" %%I IN ('docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" 2^>^&1') DO SET "DOCKER_BUILD_OUTPUT=%%I"
     IF ERRORLEVEL 1 (
         ECHO Error when building container: %DOCKER_BUILD_OUTPUT%
         EXIT /B 1
@@ -48,17 +54,46 @@ IF NOT EXIST "%SETUP_DIR%\output" (
     MKDIR "%SETUP_DIR%\output"
 )
 
+:: Check if a Docker container already exists and remove it
+docker inspect --type=container %DOCKER_IMAGE_NAME% >NUL 2>&1
+IF NOT ERRORLEVEL 1 (
+    ECHO A Docker container for %NOMI_NAME% exists. Removing container...
+    docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
+    IF ERRORLEVEL 1 (
+        ECHO Error when removing container.
+        GOTO cleanup
+    )
+)
+
+ECHO Running %DOCKER_IMAGE_NAME% with Docker
+
 :: Run the Docker image with a mounted volume
-FOR /F "tokens=*" %%I IN ('docker run -it -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %IMAGE_NAME% 2^>^&1') DO SET "DOCKER_RUN_OUTPUT=%%I"
-IF ERRORLEVEL 1 (
-    ECHO Error when running container: %DOCKER_RUN_OUTPUT%
+docker run -it --name %DOCKER_IMAGE_NAME% -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %DOCKER_IMAGE_NAME% 2> NUL
+IF %ERRORLEVEL% NEQ 0 (
+    ECHO Error when running container: %ERRORLEVEL%
     EXIT /B 1
 )
 
 :: Get the script's name
-FOR %%F IN ("%SETUP_DIR%\output\*") DO SET "OUTPUT_FILE=%%~nxF"
+FOR %%F IN ("%SETUP_DIR%\output\*.bat") DO SET "OUTPUT_FILE=%%~nxF"
 
-MOVE "%SETUP_DIR%\output\%OUTPUT_FILE%" "%SCRIPT_ROOT%\%OUTPUT_FILE%"
+FOR %%F IN ("%SETUP_DIR%\*") DO (
+    SET "FILENAME=%%~nxF"
+    SET "DESTINATION=%SCRIPT_ROOT%\%%~nxF"
+
+    IF EXIST "%DESTINATION%" (
+        SET /P CONFIRM="File %FILENAME% already exists. Overwrite? (y/n): "
+        IF /I NOT "%CONFIRM%"=="y" (
+            ECHO Skipping %FILENAME%
+            GOTO :CONTINUE
+        )
+    )
+
+    COPY /Y "%%F" "%DESTINATION%" >NUL
+    :CONTINUE
+)
+
+:: Clean up the output folder
 DEL /Q "%SETUP_DIR%\output\*"
 
 ECHO Start script created. You can start your new Nomi by running %OUTPUT_FILE%
@@ -102,20 +137,59 @@ function cleanup() {
     exit $exit_code
 }
 
+# Prompt for and confirm user input
+function prompt_confirm() {
+    read -r -p "$1 [y/N] " RESPONSE </dev/tty
+    case "$RESPONSE" in
+        [yY][eE][sS]|[yY])
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
+function get_script() {
+    local source_file="$1"
+    local destination_dir="$2"
+
+    # Check if the source file exists
+    if [ ! -f "$source_file" ]; then
+        echo "Error: Source file '$source_file' not found!"
+        return 1
+    fi
+
+    local base_filename="$(basename $source_file)"
+
+    # Determine the destination file based on the OS
+    if [ "$(uname -s)" == "Darwin" ]; then
+        destination_file="${destination_dir}/${base_filename}.command"
+    elif [ "$(uname -s)" == "Linux" ]; then
+        destination_file="${destination_dir}/${base_filename}.sh"
+    else
+        echo "Error: Unsupported operating system '$(uname -s)'."
+        return 1
+    fi
+    echo "#!/usr/bin/env bash" > "$destination_file"
+    cat "$source_file" >> "$destination_file"
+    chmod +x "$destination_file"
+}
+
 echo "==========================================================================="
 echo "=============================== Nomi Setup ================================"
 echo "==========================================================================="
 echo
-echo "This setup will create a script that can be used to setup a script for"
-echo "running a Nomi running in a Docker container. It needs to be run whenever"
-echo "you want to make changes to your Nomi's configuration."
+echo "This setup will create a script that can be used start running a Nomi"
+echo "in a Docker container. It needs to be run whenever you want to make changes"
+echo "to your Nomi's configuration."
 echo
 echo "If you ever want to quit the script, simply press CTRL+C together."
 echo
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SETUP_DIR="$SCRIPT_ROOT/setup"
-IMAGE_NAME="nomi-config-setup"
+DOCKER_IMAGE_NAME="nomi-config-setup"
 
 # Check if Docker is installed
 if ! command -v docker >/dev/null 2>&1; then
@@ -123,10 +197,16 @@ if ! command -v docker >/dev/null 2>&1; then
     exit 1
 fi
 
+# Check if the Docker daemon is running
+if ! docker info > /dev/null 2>&1; then
+    echo "Docker is installed but the Docker daemon is not running. Please start Docker before continuing."
+    exit 1
+fi
+
 # Check if the Docker image exists
-if ! docker images -q "$IMAGE_NAME" > /dev/null; then
-    echo "Image $IMAGE_NAME not found. Building the image..."
-    DOCKER_BUILD_OUTPUT=$(docker build -t "$IMAGE_NAME" "$SETUP_PATH" 2>&1)
+if [ -z "$(docker images -q $DOCKER_IMAGE_NAME)" ]; then
+    echo "Setup Docker image ($DOCKER_IMAGE_NAME) not found. Building the image..."
+    DOCKER_BUILD_OUTPUT=$(docker build -t "$DOCKER_IMAGE_NAME" "$SETUP_DIR" 2>&1)
     if [ $? -ne 0 ]; then
         echo "Error when building container: $DOCKER_BUILD_OUTPUT"
         exit 1
@@ -138,20 +218,45 @@ if [ ! -d "$SETUP_DIR/output" ]; then
     mkdir -p "$SETUP_DIR/output"
 fi
 
+if docker inspect --type=container $DOCKER_IMAGE_NAME > /dev/null 2>&1; then
+    echo "A Docker container for $DOCKER_IMAGE_NAME exists. Removing container..."
+    DOCKER_REMOVE_OUTPUT=$(docker rm $DOCKER_IMAGE_NAME -f 2>&1)
+    if [ $? -ne 0 ]; then
+        echo "Error when removing container: $DOCKER_REMOVE_OUTPUT"
+        exit 1
+    fi
+fi
+
+echo "Running $DOCKER_IMAGE_NAME with Docker"
+
 # Run the Docker image with a mounted volume
-DOCKER_RUN_OUTPUT=$(docker run -it -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -a) "$IMAGE_NAME" 2>&1)
-if [ $? -ne 0 ]; then
-    echo "Error when running container: $DOCKER_RUN_OUTPUT"
+docker run -it --name $DOCKER_IMAGE_NAME -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -s) "$DOCKER_IMAGE_NAME"
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "Error when running container: $EXIT_CODE"
     exit 1
 fi
 
 # Get the script's name
-OUTPUT_FILE=$(basename "$SETUP_DIR/output/"*)
+OUTPUT_FILE=$(find "$SETUP_DIR/output/" -type f ! -name "*.conf" -exec basename {} \; | head -n 1)
 
-mv "$SETUP_DIR/output/$OUTPUT_FILE" "$SCRIPT_ROOT/OUTPUT_FILE"
-chmod +x "$OUTPUT_FILE"
+for FILE in "$SETUP_DIR/output/"*; do
+    FILENAME=$(basename "$FILE")
+    DESTINATION="$SCRIPT_ROOT/$FILENAME"
 
-rm -rf "$SETUP_DIR/output/*"
+    if [ -e "$DESTINATION" ]; then
+        if ! prompt_confirm "File $FILENAME already exists. Overwrite?"; then
+            echo "Skipping $FILENAME"
+            continue
+        fi
+    fi
+    cp "$FILE" "$DESTINATION"
+done
+
+# Clean up the output folder
+rm -f "$SETUP_DIR/output/"*
+
+chmod +x "$SCRIPT_ROOT/$OUTPUT_FILE"
 
 echo "Start script created. You can start your new Nomi by running $OUTPUT_FILE"
 echo "You may now close this window"

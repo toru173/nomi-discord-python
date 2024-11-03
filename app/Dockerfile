@@ -43,11 +43,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code into the working directory
 COPY . .
 
-# Define an environment variable for the Python script
-ENV PYTHON_SCRIPT=main.py
-
-# Make the script executable
-RUN chmod +x $PYTHON_SCRIPT
-
 # Set the entrypoint to the python script
-CMD ["./$PYTHON_SCRIPT"]
+CMD ["python", "main.py"]
