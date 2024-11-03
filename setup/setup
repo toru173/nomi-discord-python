@@ -1,0 +1,194 @@
+: << END_WIN
+@ECHO OFF
+::
+:: ============================================================================
+:: === The LICENSE for this script can be found at the bottom of this file ====
+:: ============================================================================
+::
+:: This is the Windows part of the script.
+
+SETLOCAL ENABLEDELAYEDEXPANSION
+
+ECHO ===========================================================================
+ECHO =============================== Nomi Setup ================================
+ECHO ===========================================================================
+ECHO:
+ECHO This setup will create a script that can be used to setup a script for
+ECHO running a Nomi running in a Docker container. It needs to be run whenever
+ECHO you want to make changes to your Nomi's configuration.
+ECHO:
+ECHO If you ever want to quit the script, simply press CTRL+C together.
+ECHO:
+
+:: Get the absolute path to the 'setup' directory
+FOR %%I IN ("%~dp0setup") DO SET SETUP_PATH=%%~fI
+
+SET "IMAGE_NAME=nomi-config-setup"
+
+:: Check if Docker is installed
+docker --version >NUL 2>&1
+IF ERRORLEVEL 1 (
+    ECHO Could not find Docker. Please re-run the installation script.
+    GOTO cleanup
+)
+
+:: Check if Docker image exists
+docker images -q %IMAGE_NAME% > NUL 2>&1
+IF ERRORLEVEL 1 (
+    ECHO Image %IMAGE_NAME% not found. Building the image...
+    FOR /F "tokens=*" %%I IN ('docker build -t %IMAGE_NAME% "%SETUP_PATH%" 2^>^&1') DO SET "DOCKER_BUILD_OUTPUT=%%I"
+    IF ERRORLEVEL 1 (
+        ECHO Error when building container: %DOCKER_BUILD_OUTPUT%
+        EXIT /B 1
+    )
+)
+
+:: Create the output folder if it doesn't exist
+IF NOT EXIST "%SETUP_DIR%\output" (
+    MKDIR "%SETUP_DIR%\output"
+)
+
+:: Run the Docker image with a mounted volume
+FOR /F "tokens=*" %%I IN ('docker run -it -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %IMAGE_NAME% 2^>^&1') DO SET "DOCKER_RUN_OUTPUT=%%I"
+IF ERRORLEVEL 1 (
+    ECHO Error when running container: %DOCKER_RUN_OUTPUT%
+    EXIT /B 1
+)
+
+:: Get the script's name
+FOR %%F IN ("%SETUP_DIR%\output\*") DO SET "OUTPUT_FILE=%%~nxF"
+
+MOVE "%SETUP_DIR%\output\%OUTPUT_FILE%" "%SCRIPT_ROOT%\%OUTPUT_FILE%"
+DEL /Q "%SETUP_DIR%\output\*"
+
+ECHO Start script created. You can start your new Nomi by running %OUTPUT_FILE%
+
+:: All done! Let's exit from the Windows part of the script
+:cleanup
+ENDLOCAL
+PAUSE
+ECHO You may now close this window
+EXIT /B
+END_WIN
+
+# This is the macOS/Linux part of the script. We have to do
+# The same steps here, but in a way that works for Bash.
+
+# Perform some basic sanity checks, then continue execution
+if [ -z "${BASH_VERSION:-}" ]; then
+    # Attempt to find Bash
+    if command -v bash >/dev/null 2>&1; then
+        # Re-execute the script with Bash by reading it from stdin if necessary
+        if [ -t 0 ]; then
+            # If the script is not being piped, re-execute the file with bash
+            exec bash "$0" "$@"
+        else
+            # If the script is being piped (non-interactive), re-execute from stdin
+            exec bash <(cat) "$@"
+        fi
+    else
+        # Unable to find Bash. Exit with an error
+        echo "Bash is required to run this script." >&2
+        exit 1
+    fi
+fi
+
+# Trap to function when we exit
+trap "cleanup" EXIT INT
+
+# Cleanup function
+function cleanup() {
+    exit_code=$?
+    exit $exit_code
+}
+
+echo "==========================================================================="
+echo "=============================== Nomi Setup ================================"
+echo "==========================================================================="
+echo
+echo "This setup will create a script that can be used to setup a script for"
+echo "running a Nomi running in a Docker container. It needs to be run whenever"
+echo "you want to make changes to your Nomi's configuration."
+echo
+echo "If you ever want to quit the script, simply press CTRL+C together."
+echo
+
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SETUP_DIR="$SCRIPT_ROOT/setup"
+IMAGE_NAME="nomi-config-setup"
+
+# Check if Docker is installed
+if ! command -v docker >/dev/null 2>&1; then
+    echo "Could not find Docker. Please re-run the installation script."
+    exit 1
+fi
+
+# Check if the Docker image exists
+if ! docker images -q "$IMAGE_NAME" > /dev/null; then
+    echo "Image $IMAGE_NAME not found. Building the image..."
+    DOCKER_BUILD_OUTPUT=$(docker build -t "$IMAGE_NAME" "$SETUP_PATH" 2>&1)
+    if [ $? -ne 0 ]; then
+        echo "Error when building container: $DOCKER_BUILD_OUTPUT"
+        exit 1
+    fi
+fi
+
+# Create the output folder if it doesn't exist.
+if [ ! -d "$SETUP_DIR/output" ]; then
+    mkdir -p "$SETUP_DIR/output"
+fi
+
+# Run the Docker image with a mounted volume
+DOCKER_RUN_OUTPUT=$(docker run -it -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -a) "$IMAGE_NAME" 2>&1)
+if [ $? -ne 0 ]; then
+    echo "Error when running container: $DOCKER_RUN_OUTPUT"
+    exit 1
+fi
+
+# Get the script's name
+OUTPUT_FILE=$(basename "$SETUP_DIR/output/"*)
+
+mv "$SETUP_DIR/output/$OUTPUT_FILE" "$SCRIPT_ROOT/OUTPUT_FILE"
+chmod +x "$OUTPUT_FILE"
+
+rm -rf "$SETUP_DIR/output/*"
+
+echo "Start script created. You can start your new Nomi by running $OUTPUT_FILE"
+echo "You may now close this window"
+
+# All done! Let's exit from the macOS/Linux part of the script
+exit 0
+
+===============================================================================
+================================== LICENSE ====================================
+===============================================================================
+
+LICENSE
+
+Copyright (c) 2024-present toru173 and contributors
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the disclaimer
+below) provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+* Neither the name of the copyright holder nor the names of the contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY
+THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
