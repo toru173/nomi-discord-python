@@ -217,33 +217,21 @@ IF EXIST "%INSTALL_DIR%\install" (
     REN "%INSTALL_DIR%\install" "install.bat"
 )
 
+# Copy the install script to update.extension to make it easier
+# for users to update
+COPY /Y "%INSTALL_DIR%\install.bat" "%INSTALL_DIR%\update.bat" >NUL
+
 :: Check if the Nomi setup script exists (it should). Copy and rename it to
 :: setup.bat to make running it from the command line easier later
 IF EXIST "%INSTALL_DIR%\setup\setup" (
     COPY /Y "%INSTALL_DIR%\setup\setup" "%INSTALL_DIR%\setup.bat" >NUL
 )
 
-
 ECHO:
 ECHO The installation completed succesfully.
 ECHO:
 
 ECHO: > "%INSTALL_DIR%\.nomi_setup_done"
-
-:: Once everything unzipped we're good to go! Display a success message
-:: to the user and ask if they want to set up any Nomis now. If the
-:: user wants to set up a Nomi run the setup file in this directory
-:: for them
-IF EXIST "%INSTALL_DIR%\setup.bat" (
-    SET /P "RUN_SETUP=Do you want to set up a Nomi now? [y/N]: "
-    ECHO "!RUN_SETUP!"
-    IF /I "!RUN_SETUP!" == "Y" (
-        START /I CMD /Q /K "%INSTALL_DIR%\setup.bat"
-    ) ELSE (
-        ECHO Setting up a new Nomi was skipped. You can run it later
-        ECHO by running the setup script in the installation directory.
-    )
-)
 
 ECHO You can set up a Nomi's Docker container by running the setup script.
 
@@ -558,6 +546,21 @@ if [ -f "$INSTALL_DIR/install" ]; then
 else
     echo "Error: install script not found in $INSTALL_DIR."
 fi
+
+# Copy the install script to update.extension to make it easier
+# for users to update
+if [ "$(uname -s)" == "Darwin" ]; then
+    INSTALL_SCRIPT="$INSTALL_DIR/install.command"
+    UPDATE_SCRIPT="$INSTALL_DIR/update.command"
+elif [ "$(uname -s)" == "Linux" ]; then
+    INSTALL_SCRIPT="$INSTALL_DIR/install.sh"
+    UPDATE_SCRIPT="$INSTALL_DIR/update.sh"
+else
+    echo "Error: Unsupported operating system '$(uname -s)'."
+    return 1
+fi
+
+cp "$INSTALL_SCRIPT" "$UPDATE_SCRIPT"
 
 # Check if the Nomi setup script exists (it should). Copy it
 # from the /setup directory into our install directory and make it
