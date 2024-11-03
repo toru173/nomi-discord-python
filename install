@@ -101,10 +101,10 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
         IF "%TAR_INSTALLED%" == "0" (
             ECHO:
             ECHO tar is required but not installed. It was integrated into Windows 10 in 2018. Do you need to update?
-            ECHO Alternatively tar can be installed by installing Git for Windows, which provides tar and other Unix tools.
-            SET /P "OPEN_BROWSER=Would you like to open the Git for Windows download page now? [y/N]: "
+            ECHO Alternatively tar can be installed by downloading the latest version of libarchive.
+            SET /P "OPEN_BROWSER=Would you like to open the libarchive download page now? [y/N]: "
             IF /I "!OPEN_BROWSER!" == "Y" (
-                START https://git-scm.com/download/win
+                START https://github.com/libarchive/libarchive/releases
             )
         )
     )
