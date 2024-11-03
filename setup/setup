@@ -22,6 +22,7 @@ ECHO:
 
 :: Get the absolute path to the 'setup' directory
 FOR %%I IN ("%~dp0setup") DO SET SETUP_DIR=%%~fI
+
 SET "DOCKER_IMAGE_NAME=nomi-config-setup"
 
 :: Check if Docker is installed
