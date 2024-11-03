@@ -32,11 +32,11 @@ from typing import Optional
 
 from sys import stderr
 import logging
+import os
 
 import discord
 from nomi import Session, Nomi
 from nomi_bot import NomiBot
-
 
 # Utility Functions
 def read_variable_from_file(variable_name: str, filename: str) -> Optional[str]:
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
 
     for variable in CONFIG_VARIABLES:
-        globals()[variable.lower()] = read_variable_from_file(variable, CONFIG_FILE)
+        globals()[variable.lower()] = os.getenv(variable)
 
     if discord_api_token is None:
         logging.error("DISCORD_API_TOKEN was not found in the configuration file, or the file was not found")
