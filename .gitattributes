@@ -3,3 +3,4 @@
 
 install -text
 setup/setup -text
+setup/start_nomi -text

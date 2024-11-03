@@ -1,3 +1,5 @@
 .DS_Store
 .env**
+
 nomi.conf*
+!setup/nomi.conf
