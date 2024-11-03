@@ -118,10 +118,11 @@ if [ -z "${BASH_VERSION:-}" ]; then
         # Re-execute the script with Bash by reading it from stdin if necessary
         if [ -t 0 ]; then
             # If the script is not being piped, re-execute the file with bash
-            exec bash "$0" "$@"
+            bash "$0" "$@"
         else
             # If the script is being piped (non-interactive), re-execute from stdin
-            exec bash <(cat) "$@"
+            bash -s "$@" < /dev/stdin
+            exit $?
         fi
     else
         # Unable to find Bash. Exit with an error
