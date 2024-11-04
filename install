@@ -217,8 +217,8 @@ IF EXIST "%INSTALL_DIR%\install" (
     REN "%INSTALL_DIR%\install" "install.bat"
 )
 
-# Copy the install script to update.extension to make it easier
-# for users to update
+:: Copy the install script to update.extension to make it easier
+:: for users to update
 COPY /Y "%INSTALL_DIR%\install.bat" "%INSTALL_DIR%\update.bat" >NUL
 
 :: Check if the Nomi setup script exists (it should). Copy and rename it to
