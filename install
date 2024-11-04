@@ -202,7 +202,7 @@ IF /I NOT "!CONTINUE!" == "Y" (
 :: After that, get the install script, the license and everything inside
 :: the 'app' subdirectory
 ECHO Extracting installation files...
-tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\app\*" --include="*\setup\*"
+tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\app" --include="*\setup"
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
@@ -522,10 +522,10 @@ fi
 echo "Extracting installation files..."
 if tar --version 2>&1 | grep -q "GNU tar"; then
     tar -xvf "$INSTALL_DIR/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
-        --wildcards --no-anchored '*/install' '*/LICENSE' '*/app/*' '*/setup/*'
+        --wildcards --no-anchored '*/install' '*/LICENSE' '*/app' '*/setup'
 elif tar --version 2>&1 | grep -qi "bsdtar"; then
     tar -xvf "$INSTALL_DIR/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
-        --include="*/install" --include="*/LICENSE" --include="*/app/*" --include="*/setup/*"
+        --include="*/install" --include="*/LICENSE" --include="*/app" --include="*/setup"
 else
     echo "Error: Unsupported version of tar detected."
     exit 1
