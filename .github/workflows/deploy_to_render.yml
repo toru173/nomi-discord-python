@@ -322,8 +322,8 @@ jobs:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
         run: |
-          $KEY="RUNNING_ON_RENDER"
-          $VALUE="True"
+          KEY="RUNNING_ON_RENDER"
+          VALUE="True"
 
           RESPONSE=$(curl -s -w "%{http_code}" \
             --request PUT \
