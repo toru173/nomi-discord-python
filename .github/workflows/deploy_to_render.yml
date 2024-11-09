@@ -8,8 +8,8 @@ on:
     inputs:
       environment:
         description: 'The Name of your Nomi'
-        required: false
-        default: 'Giselle'
+        required: true
+        default: ''
 
 jobs:
   deploy-nomi:
