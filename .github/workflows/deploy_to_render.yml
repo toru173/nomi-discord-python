@@ -128,7 +128,6 @@ jobs:
             exit 1
           fi
           # Parse the Nomi Name from the response
-          echo $RESPONSE_BODY
           NOMI_NAME=$(echo "$RESPONSE_BODY" | jq -r '.name')
           if [ -z "$NOMI_NAME" ] || [ "$NOMI_NAME" == "null" ]; then
             echo "Error: Nomi Name not found in the API response."
@@ -198,8 +197,6 @@ jobs:
             echo "No existing blueprints found. Please add a blueprint."
             exit 1
           fi
-
-          echo $RESPONSE_BODY
 
           MATCHES_SERVICE_NAME=$(echo "$RESPONSE_BODY" | jq -c --arg NAME "$SERVICE_NAME" '.[] | select(.blueprint.name == $NAME)')
           echo "$MATCHES_SERVICE_NAME"
@@ -280,13 +277,8 @@ jobs:
             exit 1
           fi
 
-          echo $CONF_JSON
-
           # Merge nomi.conf values first, then let secrets override them
           ALL_ENV_VARS=$(echo "$CONF_JSON" | jq --argjson secrets "$SECRETS" '. * $secrets')
-
-          echo $ALL_ENV_VARS
-
           ENV_VAR_KEYS=$(echo "$ALL_ENV_VARS" | jq -r 'keys[]')
 
           for KEY in $ENV_VAR_KEYS; do
