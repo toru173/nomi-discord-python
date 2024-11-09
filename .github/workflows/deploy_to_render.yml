@@ -1,18 +1,23 @@
 name: Deploy Nomi to Render
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       environment:
         description: 'The Name of your Nomi'
-        required: true
-        default: ''
+        required: False
+        default: 'Giselle'
 
 jobs:
   deploy-nomi:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
     steps:
+      - name: Set up environment variable
+        run: echo "ENVIRONMENT=${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'default' }}" >> $GITHUB_ENV
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
