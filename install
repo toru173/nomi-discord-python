@@ -182,7 +182,7 @@ IF NOT EXIST "%INSTALL_DIR%" (
 )
 
 :: Generate a random file name using the %RANDOM% environment variable
-SET "WRITE_TEST=%INSTALL_DIR%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%"
+SET "WRITE_TEST=%INSTALL_DIR%\.downloads"
 
 :: Check we have write access to the location the user has provided.
 :: We'll try to create a test directory to check write access.
@@ -193,13 +193,10 @@ IF ERRORLEVEL 1 (
     GOTO cleanup
 )
 
-:: Delete the test directory after the check
-RMDIR "%WRITE_TEST%"
-
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub...
-curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%INSTALL_DIR%\install.zip" --progress-bar --remove-on-error
-IF NOT EXIST "%INSTALL_DIR%\install.zip" (
+curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%INSTALL_DIR%\.downloads\install.zip" --progress-bar --remove-on-error
+IF NOT EXIST "%INSTALL_DIR%\.downloads\install.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO cleanup
 )
@@ -227,13 +224,11 @@ IF /I NOT "!CONTINUE!" == "Y" (
 :: After that, get the install script, the license and everything inside
 :: the 'app' subdirectory
 ECHO Extracting installation files...
-tar -xvf "%INSTALL_DIR%\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\run" --include="*\setup"
+tar -xvf "%INSTALL_DIR%\.downloads\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\run" --include="*\setup"
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
 )
-
-IF EXIST "%INSTALL_DIR%\install.zip" DEL /F /Q "%INSTALL_DIR%\install.zip"
 
 :: Check if the install script exists (it should). Rename it to
 :: install.bat to make running it from the command line easier later
@@ -270,7 +265,7 @@ IF /I "!OPEN_FOLDER!" == "Y" (
 :cleanup
 :: In case we received an error between downloading and extracting
 :: the install files, delete them here
-IF EXIST "%INSTALL_DIR%\install.zip" DEL /F /Q "%INSTALL_DIR%\install.zip"
+IF EXIST "%INSTALL_DIR%\.downloads\" DEL /F /Q "%INSTALL_DIR%\.downloads\"
 ENDLOCAL
 PAUSE
 ECHO You may now close this window
@@ -310,8 +305,8 @@ trap "cleanup" EXIT INT
 # Cleanup function
 function cleanup() {
     exit_code=$?
-    if [ -n "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/install.zip" ]; then
-        rm "$INSTALL_DIR/install.zip"
+    if [ -n "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/.downloads/install.zip" ]; then
+        rm -rf "$INSTALL_DIR/.downloads/"
     fi
     exit $exit_code
 }
@@ -519,7 +514,7 @@ if [ ! -d "$INSTALL_DIR" ]; then
 fi
 
 # Generate a random file name using the %$RANDOM environment variable
-WRITE_TEST="${INSTALL_DIR}/$RANDOM-$RANDOM-$RANDOM-$RANDOM"
+WRITE_TEST="${INSTALL_DIR}/.downloads"
 
 # Check we have write access to the location the user has provided.
 # We'll try to create a test directory to check write access.
@@ -529,15 +524,12 @@ if ! mkdir "$WRITE_TEST" 2>/dev/null; then
     exit 1
 fi
 
-# Delete the test directory after the check
-rmdir "$WRITE_TEST"
-
 # Download the latest release from GitHub to INSTALL_FOLDER
 echo "Downloading the latest version from GitHub..."
-curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "$INSTALL_DIR/install.zip" --progress-bar --remove-on-error
+curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "$INSTALL_DIR/.downloads/install.zip" --progress-bar --remove-on-error
 
 # Check if the download was successful
-if [ ! -f "$INSTALL_DIR/install.zip" ]; then
+if [ ! -f "$INSTALL_DIR/.downloads/install.zip" ]; then
     echo "Something went wrong during the download. Please try again."
     exit 1
 fi
@@ -567,10 +559,10 @@ fi
 # to accomodate that
 echo "Extracting installation files..."
 if tar --version 2>&1 | grep -q "GNU tar"; then
-    tar -xvf "$INSTALL_DIR/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
+    tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
         --wildcards --no-anchored '*/install' '*/LICENSE' '*/run' '*/setup'
 elif tar --version 2>&1 | grep -qi "bsdtar"; then
-    tar -xvf "$INSTALL_DIR/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
+    tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
         --include="*/install" --include="*/LICENSE" --include="*/run" --include="*/setup"
 else
     echo "Error: Unsupported version of tar detected."
