@@ -174,12 +174,13 @@ jobs:
 
       - name: Update Environment Variables from GitHub Secrets
         env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
-
           # All Secrets need to be expressed as environment variables
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
           DISCORD_API_KEY: ${{ secrets.DISCORD_API_KEY }}
+
+          # This isn't a secret, so isn't masked
+          ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
         run: |
           set -e
 
@@ -193,6 +194,8 @@ jobs:
 
           # Parse the envVars array
           ENV_VARS=$(echo "$RESPONSE" | jq -r '.envVars[].key')
+
+          echo "Checking keys..."
 
           # Initialize a variable to track missing secrets
           MISSING_SECRETS=()
@@ -208,14 +211,18 @@ jobs:
             fi
           done
 
+          echo "Checked keys. If a key was missing, display an error message"
+
           # After processing all env vars, check if there were any missing secrets
           if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
             echo "The following environment variables were not updated due to missing secrets:"
             for KEY in "${MISSING_SECRETS[@]}"; do
               echo "- $KEY"
             done
-            exit 1
+            exit 2
           fi
+
+          echo "Updating keys at Render..."
 
           # We have all the secrets we need. Update the env vars in the env group
           for KEY in $ENV_VARS; do
@@ -237,7 +244,7 @@ jobs:
             if [ "$HTTP_STATUS" -ne 200 ]; then
               echo "Error: Failed to update env var $KEY. HTTP Status: $HTTP_STATUS"
               echo "Response: $RESPONSE_BODY"
-              exit 1
+              exit 3
             fi
             echo "Successfully updated env var $KEY."
           done
