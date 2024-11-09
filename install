@@ -339,9 +339,9 @@ echo "that your system has a few things installed already, then install the late
 echo "version of nomi-python-discord."
 echo
 echo "If you ever want to quit the script, simply press CTRL+C together"
-echo
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_INSTALL_DIR="$HOME/$INSTALL_FOLDER"
 
 # Check if .nomi_setup_done exists in the script's current directory
 # If it does, assume the user chose this directory last time
@@ -365,6 +365,8 @@ if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
     else
         TAR_INSTALLED=0
     fi
+
+    echo
 
     # Display installation statuses
     if [ "$DOCKER_INSTALLED" -eq 1 ]; then
@@ -438,30 +440,44 @@ if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
         fi
         exit 1
     fi
-    DEFAULT_INSTALL_DIR="$HOME/$INSTALL_FOLDER"
+
+    echo
+    echo "Where would you like to install nomi-discord-python?"
+
+    # Now we know we have Docker and tar we check with the user if
+    # installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
+    # If not, ask for an alternative.
+    while true; do
+        # Prompt the user for the installation directory
+        echo "Current choice: $DEFAULT_INSTALL_DIR"
+        read -p "Press Enter to accept, or enter a new directory: " INSTALL_DIR </dev/tty
+        INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
+
+        # Display the chosen directory and ask for confirmation
+        echo
+        echo "Your choice: $INSTALL_DIR"
+        if prompt_confirm "Are you sure?"; then
+            break
+        fi
+    done
 else
     DEFAULT_INSTALL_DIR="$SCRIPT_ROOT"
+    echo "This will update nomi-discord-python in the existing directory"
+    while true; do
+        # Prompt the user for the installation directory
+        echo $DEFAULT_INSTALL_DIR"
+        read -p "Press Enter to accept, or enter a new directory: " INSTALL_DIR </dev/tty
+        INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
+
+        # Display the chosen directory and ask for confirmation
+        echo
+        echo "Your choice: $INSTALL_DIR"
+        if prompt_confirm "Are you sure?"; then
+            break
+        fi
+    done
+
 fi
-
-echo
-echo "Where would you like to install nomi-discord-python?"
-
-# Now we know we have Docker and tar we check with the user if
-# installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
-# If not, ask for an alternative.
-while true; do
-    # Prompt the user for the installation directory
-    echo "Current choice: $DEFAULT_INSTALL_DIR"
-    read -p "Enter to Accept > " INSTALL_DIR </dev/tty
-    INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
-
-    # Display the chosen directory and ask for confirmation
-    echo
-    echo "Your choice: $INSTALL_DIR"
-    if prompt_confirm "Are you sure?"; then
-        break
-    fi
-done
 
 echo
 echo "Proceeding with installation in: $INSTALL_DIR"
