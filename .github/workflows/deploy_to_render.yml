@@ -281,11 +281,11 @@ jobs:
           fi
 
           # Merge nomi.conf values first, then let secrets override them
-          MERGED=$(echo "$CONF_JSON" | jq --argjson secrets "$SECRETS" '. * $secrets')
+          ALL_ENV_VARS=$(echo "$CONF_JSON" | jq --argjson secrets "$SECRETS" '. * $secrets')
 
-          ENV_VARS=$(echo "$SECRETS" | jq -r 'keys[]')
+          ENV_VAR_KEYS=$(echo "$ALL_ENV_VARS" | jq -r 'keys[]')
 
-          for KEY in $ENV_VARS; do
+          for KEY in $ENV_VAR_KEYS; do
             if [[ $KEY == "github_token" || $KEY == "RENDER_API_KEY" ]]; then
               continue
             fi
