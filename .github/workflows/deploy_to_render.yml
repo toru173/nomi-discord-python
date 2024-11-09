@@ -2,7 +2,8 @@ name: Deploy Nomi to Render
 
 on:
   push:
-    - main
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
