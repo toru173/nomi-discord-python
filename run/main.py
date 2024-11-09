@@ -77,9 +77,7 @@ def strip_outer_quotation_marks(s: str) -> str:
 
 
 if __name__ == "__main__":
-    # Read variables from config file
-    CONFIG_FILE = "nomi.conf"
-
+    # Read variables from env
     CONFIG_VARIABLES = ["DISCORD_API_KEY",
                         "NOMI_API_KEY",
                         "NOMI_ID",
@@ -91,47 +89,44 @@ if __name__ == "__main__":
                         "REACT_TRIGGER_PHRASE",
     ]
 
-
-    config = {}
-
     for variable in CONFIG_VARIABLES:
-        config[variable.lower()] = os.getenv(variable) or None
+        globals()[variable.lower()] = os.getenv(variable) or None
 
-    if config['discord_api_key'] is None:
+    if discord_api_key is None:
         logging.error("DISCORD_API_KEY was not found in the configuration file, or the file was not found")
         exit(1)
 
-    if config['nomi_api_key'] is None:
+    if nomi_api_key is None:
         logging.error("NOMI_API_KEY was not found in the configuration file, or the file was not found")
         exit(1)
 
-    if config['nomi_id'] is None:
+    if nomi_id is None:
         logging.error("NOMI_ID was not found in the configuration file, or the file was not found")
         exit(1)
 
     message_modifiers = {
-        "default_message_prefix" : config['default_message_prefix'],
-        "default_message_suffix" : config['default_message_suffix'],
-        "channel_message_prefix" : config['channel_message_prefix'],
-        "dm_message_prefix" : config['dm_message_prefix'],
-        "react_trigger_phrase" : config['react_trigger_phrase'],
+        "default_message_prefix" : default_message_prefix,
+        "default_message_suffix" : default_message_suffix,
+        "channel_message_prefix" : channel_message_prefix,
+        "dm_message_prefix" : dm_message_prefix,
+        "react_trigger_phrase" : react_trigger_phrase,
     }
 
     for modifier, value in message_modifiers.items():
         if value is not None:
             message_modifiers[modifier] = strip_outer_quotation_marks(value)
 
-    nomi_session = Session(api_key = config['nomi_api_key'])
-    nomi = Nomi.from_uuid(session = nomi_session, uuid = config['nomi_id'])
+    nomi_session = Session(api_key = nomi_api_key)
+    nomi = Nomi.from_uuid(session = nomi_session, uuid = nomi_id)
 
     intents = discord.Intents.default()
     intents.messages = True
     intents.members = True
 
     nomi = NomiBot(nomi = nomi,
-                   max_message_length = config['max_message_length'],
+                   max_message_length = max_message_length,
                    message_modifiers = message_modifiers,
                    intents = intents
                 )
 
-    nomi.run(token = config['discord_api_key'], root_logger = True)
+    nomi.run(token = discord_api_key, root_logger = True)
