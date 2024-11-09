@@ -206,7 +206,7 @@ jobs:
           # Iterate over each env var key
           for KEY in $ENV_VARS; do
             # Get the value from the environment variable (set from secrets)
-            VALUE=$(printenv $KEY)
+            VALUE="${!KEY:-}"
             if [ -z "$VALUE" ]; then
               echo "Error: No secret found for environment variable $KEY."
               MISSING_SECRETS+=("$KEY")
