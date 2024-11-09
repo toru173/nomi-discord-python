@@ -286,13 +286,13 @@ jobs:
               VALUE=$(echo "$VALUE" | xargs) # Trim whitespace
               # Add key-value pair to CONF_JSON using jq
               CONF_JSON=$(echo "$CONF_JSON" | jq --arg KEY "$KEY" --arg VALUE "$VALUE" '.[$KEY] = $VALUE')
-            done < .env
+            done < setup/nomi.conf
           else
             echo "The file 'nomi.conf' was not found"
             exit 1
           fi
 
-          # Merge .env values first, then let secrets override them
+          # Merge nomi.conf values first, then let secrets override them
           MERGED=$(echo "$CONF_JSON" | jq --argjson secrets "$SECRETS" '. * $secrets')
 
           ENV_VARS=$(echo "$SECRETS" | jq -r 'keys[]')
