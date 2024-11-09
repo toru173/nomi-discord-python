@@ -41,6 +41,10 @@ ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together
 ECHO:
 
+if "%1"=="skip-checks" (
+    GOTO do_update
+)
+
 FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
 
 :: Check if .nomi_setup_done exists in the script's current directory
@@ -130,12 +134,11 @@ SET "DEFAULT_INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 SET "INSTALL_DIR=%DEFAULT_INSTALL_DIR%"
 
 ECHO:
-:do_update
 ECHO Where would you like to install nomi-discord-python?
 
 :prompt_install_dir
-ECHO Current choice: %INSTALL_DIR%
-SET /P "USER_INPUT=Enter to Accept > "
+ECHO Install Location: %INSTALL_DIR%
+SET /P "USER_INPUT=Press Enter to accept, or enter a new directory: "
 
 IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
 
@@ -147,6 +150,27 @@ SET /P "CONTINUE=Are you sure? [y/N]: "
 IF /I NOT "!CONTINUE!" == "Y" (
     GOTO prompt_install_dir
 )
+
+GOTO do_install
+
+:do_update
+ECHO This will update nomi-discord-python in the current directory
+
+:prompt_update_dir
+SET /P "USER_INPUT=Press Enter to accept, or enter a new directory: "
+
+IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
+
+:: Display the chosen directory and ask for confirmation
+ECHO:
+ECHO Your choice: %INSTALL_DIR%
+SET /P "CONTINUE=Are you sure? [y/N]: "
+
+IF /I NOT "!CONTINUE!" == "Y" (
+    GOTO prompt_update_dir
+)
+
+:do_install
 
 ECHO:
 ECHO Proceeding with installation in: %INSTALL_DIR%
@@ -304,48 +328,7 @@ function prompt_confirm() {
     esac
 }
 
-function get_script() {
-    local source_file="$1"
-    local destination_dir="$2"
-
-    # Check if the source file exists
-    if [ ! -f "$source_file" ]; then
-        echo "Error: Source file '$source_file' not found!"
-        return 1
-    fi
-
-    local base_filename="$(basename $source_file)"
-
-    # Determine the destination file based on the OS
-    if [ "$(uname -s)" == "Darwin" ]; then
-        destination_file="${destination_dir}/${base_filename}.command"
-    elif [ "$(uname -s)" == "Linux" ]; then
-        destination_file="${destination_dir}/${base_filename}.sh"
-    else
-        echo "Error: Unsupported operating system '$(uname -s)'."
-        return 1
-    fi
-    echo "#!/usr/bin/env bash" > "$destination_file"
-    cat "$source_file" >> "$destination_file"
-    chmod +x "$destination_file"
-}
-
-echo "==========================================================================="
-echo "============================ Easy Installer ==============================="
-echo "==========================================================================="
-echo
-echo "Welcome to the easy installer for nomi-discord-python. We're going to check"
-echo "that your system has a few things installed already, then install the latest"
-echo "version of nomi-python-discord."
-echo
-echo "If you ever want to quit the script, simply press CTRL+C together"
-
-SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DEFAULT_INSTALL_DIR="$HOME/$INSTALL_FOLDER"
-
-# Check if .nomi_setup_done exists in the script's current directory
-# If it does, assume the user chose this directory last time
-if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
+function check_dependancies() {
     # First, check for required dependencies. We need Docker for
     # this project to run, so check we have that installed. If
     # not, prompt the user to download it then re-run this script.
@@ -440,16 +423,64 @@ if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
         fi
         exit 1
     fi
+}
 
+function get_script() {
+    local source_file="$1"
+    local destination_dir="$2"
+
+    # Check if the source file exists
+    if [ ! -f "$source_file" ]; then
+        echo "Error: Source file '$source_file' not found!"
+        return 1
+    fi
+
+    local base_filename="$(basename $source_file)"
+
+    # Determine the destination file based on the OS
+    if [ "$(uname -s)" == "Darwin" ]; then
+        destination_file="${destination_dir}/${base_filename}.command"
+    elif [ "$(uname -s)" == "Linux" ]; then
+        destination_file="${destination_dir}/${base_filename}.sh"
+    else
+        echo "Error: Unsupported operating system '$(uname -s)'."
+        return 1
+    fi
+    echo "#!/usr/bin/env bash" > "$destination_file"
+    cat "$source_file" >> "$destination_file"
+    chmod +x "$destination_file"
+}
+
+echo "==========================================================================="
+echo "============================ Easy Installer ==============================="
+echo "==========================================================================="
+echo
+echo "Welcome to the easy installer for nomi-discord-python. We're going to check"
+echo "that your system has a few things installed already, then install the latest"
+echo "version of nomi-python-discord."
+echo
+echo "If you ever want to quit the script, simply press CTRL+C together"
+
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_INSTALL_DIR="$HOME/$INSTALL_FOLDER"
+
+if [ ! $1 == "skip-checks" ]; then
+    check_dependancies
+fi
+
+# Now we know we have Docker and tar we check with the user if
+# installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
+# If not, ask for an alternative.
+
+# Check if .nomi_setup_done exists in the script's current directory
+# If it does, assume the user chose this directory last time
+if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
     echo
     echo "Where would you like to install nomi-discord-python?"
 
-    # Now we know we have Docker and tar we check with the user if
-    # installing in our default location ($HOME/$INSTALL_FOLDER) is ok.
-    # If not, ask for an alternative.
     while true; do
         # Prompt the user for the installation directory
-        echo "Current choice: $DEFAULT_INSTALL_DIR"
+        echo "Install Location: $DEFAULT_INSTALL_DIR"
         read -p "Press Enter to accept, or enter a new directory: " INSTALL_DIR </dev/tty
         INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
 
@@ -462,10 +493,9 @@ if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
     done
 else
     DEFAULT_INSTALL_DIR="$SCRIPT_ROOT"
-    echo "This will update nomi-discord-python in the existing directory"
+    echo "This will update nomi-discord-python in the current directory"
     while true; do
         # Prompt the user for the installation directory
-        echo $DEFAULT_INSTALL_DIR"
         read -p "Press Enter to accept, or enter a new directory: " INSTALL_DIR </dev/tty
         INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
 
@@ -476,7 +506,6 @@ else
             break
         fi
     done
-
 fi
 
 echo
