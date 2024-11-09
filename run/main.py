@@ -123,11 +123,15 @@ if __name__ == "__main__":
     intents.messages = True
     intents.members = True
 
+    logging.info("Before creating bot")
+
     nomi = NomiBot(nomi = nomi,
                    max_message_length = max_message_length,
                    message_modifiers = message_modifiers,
                    intents = intents
                 )
+
+    logging.info("Created bot")
 
     try:
         if running_on_render is not None:
