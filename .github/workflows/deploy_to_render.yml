@@ -128,10 +128,11 @@ jobs:
           RESPONSE_BODY="${RESPONSE::-3}"
           if [ "$HTTP_STATUS" -ne 200 ]; then
             echo "Error: Failed to retrieve Nomi Name from Nomi API. HTTP Status: $HTTP_STATUS"
-            echo "Response: $response_body"
+            echo "Response: $RESPONSE_BODY"
             exit 1
           fi
           # Parse the Nomi Name from the response
+          echo $RESPONSE_BODY
           NOMI_NAME=$(echo "$RESPONSE_BODY" | jq -r '.name')
           if [ -z "$NOMI_NAME" ] || [ "$NOMI_NAME" == "null" ]; then
             echo "Error: Nomi Name not found in the API response."
