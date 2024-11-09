@@ -24,28 +24,28 @@ jobs:
         run: |
           MISSING_VARS=0
           # Check if DISCORD_API_KEY is populated
-          if [ -z "${DISCORD_API_KEY:-}" ]; then
+          if [ -z "$DISCORD_API_KEY" ]; then
             echo "Error: DISCORD_API_KEY is not set or is empty. Please add it to your repository secrets."
             ((MISSING_VARS++)) ||:
           else
             echo "DISCORD_API_KEY is set."
           fi
           # Check if RENDER_API_KEY is populated
-          if [ -z "${RENDER_API_KEY:-}" ]; then
+          if [ -z "$RENDER_API_KEY" ]; then
             echo "Error: RENDER_API_KEY is not set or is empty. Please add it to your repository secrets."
             ((MISSING_VARS++)) ||:
           else
             echo "RENDER_API_KEY is set."
           fi
           # Check if NOMI_API_KEY is populated
-          if [ -z "${NOMI_API_KEY:-}" ]; then
+          if [ -z "$NOMI_API_KEY" ]; then
             echo "Error: NOMI_API_KEY is not set or is empty. Please add it to your repository secrets."
             ((MISSING_VARS++)) ||:
           else
             echo "NOMI_API_KEY is set."
           fi
           # Check if NOMI_ID is populated
-          if [ -z "${NOMI_ID:-}" ]; then
+          if [ -z "$NOMI_ID" ]; then
             echo "Error: NOMI_ID is not set or is empty. Please add it to your repository secrets."
             ((MISSING_VARS++)) ||:
           else
