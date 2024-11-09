@@ -201,14 +201,12 @@ jobs:
             exit 1
           fi
 
-          MATCHES_SERVICE_NAME=$(echo "$response_body" | jq '.[] | select(.blueprint.name == "nomi-discord-python")')
-          echo $MATCHES_SERVICE_NAME
+          MATCHES_SERVICE_NAME=$(echo "$response_body" | jq -c '.[] | select(.blueprint.name == "nomi-discord-python")')
+          echo "$MATCHES_SERVICE_NAME"
           if [ -z "$MATCHES_SERVICE_NAME" ]; then
             echo "No existing blueprints with the name $SERVICE_NAME were found."
             exit 1
           fi
-
-
 
       - name: Check for Existing Environment Group
         id: check-existing-env-group
