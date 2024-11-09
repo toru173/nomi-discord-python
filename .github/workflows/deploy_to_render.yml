@@ -242,10 +242,6 @@ jobs:
             echo "Successfully updated env var $KEY."
           done
 
-      - name: exit
-        run: |
-          exit 1
-
       - name: Get Last Workflow Run
         id: get-last-run
         if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'true'
