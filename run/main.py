@@ -129,4 +129,24 @@ if __name__ == "__main__":
                    intents = intents
                 )
 
+    if running_on_render is not None:
+        import http.server
+        import threading
+
+        port = os.getenv("PORT")
+
+        class HealthHandler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(200)
+                self.end_headers()
+
+        def start_health_handler():
+            server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
+            print(f"Health check server running on port {port}")
+            server.serve_forever()
+
+        health_thread = threading.Thread(target = start_health_handler)
+        health_thread.daemon = True
+        health_thread.start()
+
     nomi.run(token = discord_api_key, root_logger = True)

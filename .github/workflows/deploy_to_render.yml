@@ -262,7 +262,6 @@ jobs:
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
           SECRETS: ${{ toJSON(secrets) }}
         run: |
-          set -x
           # Read nomi.conf file and convert to JSON object
           CONF_JSON="{}"
           if [ -f setup/nomi.conf ]; then
@@ -318,79 +317,26 @@ jobs:
             echo "Successfully updated env var $KEY."
           done
 
-      # - name: Update Environment Variables from GitHub Secrets
-      #   env:
-      #     SECRETS: ${{ toJSON(secrets) }}
-      #     ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
-      #   run: |
-      #     set -e
-
-      #     SECRETS_KEYS=$(echo "$SECRETS" | jq -r 'keys[]')
-
-      #     for KEY in $SECRETS_KEYS; do
-      #       # URL-encode the KEY
-      #       ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
-
-      #       # Ensure the value is properly escaped for JSON
-      #       VALUE=$(echo "$SECRETS" | jq -r --arg KEY "$KEY" '.[$KEY]')
-      #       VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
-
-      #       RESPONSE=$(curl -s -w "%{http_code}" \
-      #         --request PUT \
-      #         --header "Authorization: Bearer $RENDER_API_KEY" \
-      #         --header "Content-Type: application/json" \
-      #         --data "{\"value\":$VALUE_ESCAPED}" \
-      #         --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID/env-vars/$ENCODED_KEY")
-      #       HTTP_STATUS="${RESPONSE: -3}"
-      #       RESPONSE_BODY="${RESPONSE::-3}"
-      #       if [ "$HTTP_STATUS" -ne 200 ]; then
-      #         echo "Error: Failed to update env var $KEY. HTTP Status: $HTTP_STATUS"
-      #         echo "Response: $RESPONSE_BODY"
-      #         exit 1
-      #       fi
-      #       echo "Successfully updated env var $KEY."
-      #     done
-
-      - name: Get Last Workflow Run
-        id: get-last-run
-        if: steps.check-existing-deployment.outputs.EXISTING_DEPLOYMENT == 'true'
+      - name: Inform App it is running on Render
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WORKFLOW_ID: ${{ github.workflow }}
-          BRANCH: ${{ github.ref_name }}
-          CURRENT_RUN_ID: ${{ github.run_id }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
         run: |
-          set -e
-          # Get the workflow runs for this workflow and branch
-          RESPONSE=$(curl -s \
-            --request GET \
-            --header "Authorization: Bearer $GITHUB_TOKEN" \
-            --url "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ github.workflow }}/runs?branch=${{ github.ref_name }}&status=completed&per_page=5")
-          # Parse the runs and find the last run before the current one
-          LAST_RUN_TIME=""
-          RUNS=$(echo "$RESPONSE" | jq -c '.workflow_runs[]')
-          for run in $RUNS; do
-            RUN_ID=$(echo "$run" | jq -r '.id')
-            if [ "$RUN_ID" -ne "${{ github.run_id }}" ]; then
-              LAST_RUN_TIME=$(echo "$run" | jq -r '.updated_at')
-              LAST_RUN_STATUS=$(echo "$run" | jq -r '.conclusion')
-              break
-            fi
-          done
-          if [ -z "$LAST_RUN_TIME" ]; then
-            echo "No previous workflow run found."
-            echo "::set-output name=OVERWRITE_ALLOWED::false"
-            exit 0
+          $KEY=RUNNING_ON_RENDER
+          $VALUE=true
+
+          RESPONSE=$(curl -s -w "%{http_code}" \
+            --request PUT \
+            --header "Authorization: Bearer $RENDER_API_KEY" \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --data "{\"value\":$VALUE}" \
+            --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID/env-vars/$KEY")
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to update env var $KEY. HTTP Status: $HTTP_STATUS"
+            echo "Response: $RESPONSE_BODY"
+            exit 1
           fi
-          # Convert times to seconds since epoch
-          LAST_RUN_TIMESTAMP=$(date -d "$LAST_RUN_TIME" +%s)
-          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          CURRENT_TIMESTAMP=$(date -d "$CURRENT_TIME" +%s)
-          TIME_DIFF=$(( CURRENT_TIMESTAMP - LAST_RUN_TIMESTAMP ))
-          if [ "$TIME_DIFF" -lt 30 ]; then
-            echo "The last workflow run was $TIME_DIFF seconds ago."
-            echo "::set-output name=OVERWRITE_ALLOWED::true"
-          else
-            echo "The last workflow run was more than 30 seconds ago."
-            echo "::set-output name=OVERWRITE_ALLOWED::false"
-          fi
+          echo "Successfully updated env var $KEY."
