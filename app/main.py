@@ -80,7 +80,7 @@ if __name__ == "__main__":
     # Read variables from config file
     CONFIG_FILE = "nomi.conf"
 
-    CONFIG_VARIABLES = ["DICSORD_API_KEY",
+    CONFIG_VARIABLES = ["DISCORD_API_KEY",
                         "NOMI_API_KEY",
                         "NOMI_ID",
                         "MAX_MESSAGE_LENGTH",
@@ -96,8 +96,8 @@ if __name__ == "__main__":
     for variable in CONFIG_VARIABLES:
         globals()[variable.lower()] = os.getenv(variable)
 
-    if DICSORD_API_KEY is None:
-        logging.error("DICSORD_API_KEY was not found in the configuration file, or the file was not found")
+    if DISCORD_API_KEY is None:
+        logging.error("DISCORD_API_KEY was not found in the configuration file, or the file was not found")
         exit(1)
 
     if nomi_api_key is None:
@@ -133,4 +133,4 @@ if __name__ == "__main__":
                    intents = intents
                 )
 
-    nomi.run(token = DICSORD_API_KEY, root_logger = True)
+    nomi.run(token = DISCORD_API_KEY, root_logger = True)

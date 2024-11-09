@@ -54,7 +54,7 @@ IF EXIST "%CONFIG_FILE%" (
 
 :: Check required variables are in the configuration file
 SET MISSING_VARIABLE=FALSE
-FOR %%V IN (DICSORD_API_KEY NOMI_API_KEY NOMI_NAME NOMI_ID) DO (
+FOR %%V IN (DISCORD_API_KEY NOMI_API_KEY NOMI_NAME NOMI_ID) DO (
     IF "%%~V"=="" (
         ECHO %%V not found in the configuration file.
         SET MISSING_VARIABLE=TRUE
@@ -194,7 +194,7 @@ else
 fi
 
 # Check required variables are in the configuration file
-REQUIRED_VARIABLES=("DICSORD_API_KEY" "NOMI_API_KEY" "NOMI_NAME" "NOMI_ID")
+REQUIRED_VARIABLES=("DISCORD_API_KEY" "NOMI_API_KEY" "NOMI_NAME" "NOMI_ID")
 
 MISSING_VARIABLE=false
 for var in "${REQUIRED_VARIABLES[@]}"; do
