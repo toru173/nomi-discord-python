@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up environment variable
-        run: echo "ENVIRONMENT=${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'default' }}" >> $GITHUB_ENV
+        run: echo "ENVIRONMENT=${{ github.event_name == 'workflow_dispatch' && inputs.environment }}" >> $GITHUB_ENV
 
       - name: Checkout Repository
         uses: actions/checkout@v4
