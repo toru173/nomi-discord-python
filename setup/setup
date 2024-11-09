@@ -77,6 +77,13 @@ IF %ERRORLEVEL% NEQ 0 (
     EXIT /B 1
 )
 
+:: Remove container once we're done to avoid confusion
+docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
+IF ERRORLEVEL 1 (
+    ECHO Error when removing container.
+    GOTO cleanup
+)
+
 :: Create the nomis folder if it doesn't exist
 IF NOT EXIST "%SETUP_DIR%\nomis" (
     MKDIR "%SETUP_DIR%\nomis"
@@ -246,6 +253,13 @@ docker run -it --name $DOCKER_IMAGE_NAME -v "$SETUP_DIR/output:/app/output" -e H
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
     echo "Error when running container: $EXIT_CODE"
+    exit 1
+fi
+
+# Remove the container once we're done to avoid confusion
+DOCKER_REMOVE_OUTPUT=$(docker rm $DOCKER_IMAGE_NAME -f 2>&1)
+if [ $? -ne 0 ]; then
+    echo "Error when removing container: $DOCKER_REMOVE_OUTPUT"
     exit 1
 fi
 
