@@ -323,7 +323,7 @@ jobs:
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
         run: |
           KEY="RUNNING_ON_RENDER"
-          VALUE="True"
+          VALUE="true"
 
           RESPONSE=$(curl -s -w "%{http_code}" \
             --request PUT \
