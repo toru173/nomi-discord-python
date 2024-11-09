@@ -20,7 +20,9 @@ services:
 envVarGroups:
 - name: nomi-discord-python
   envVars:
+    - key: DISCORD_API_KEY
+      generateValue: true
     - key: NOMI_API_KEY
       generateValue: true
-    - key: DISCORD_API_KEY
+    - key: NOMI_ID
       generateValue: true
