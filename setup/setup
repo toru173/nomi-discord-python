@@ -76,12 +76,17 @@ IF %ERRORLEVEL% NEQ 0 (
     EXIT /B 1
 )
 
+:: Create the nomis folder if it doesn't exist
+IF NOT EXIST "%SETUP_DIR%\nomis" (
+    MKDIR "%SETUP_DIR%\nomis"
+)
+
 :: Get the script's name
 FOR %%F IN ("%SETUP_DIR%\output\*.bat") DO SET "OUTPUT_FILE=%%~nxF"
 
 FOR %%F IN ("%SETUP_DIR%\*") DO (
     SET "FILENAME=%%~nxF"
-    SET "DESTINATION=%SCRIPT_ROOT%\%%~nxF"
+    SET "DESTINATION=%SCRIPT_ROOT%\nomis\%%~nxF"
 
     IF EXIST "%DESTINATION%" (
         SET /P CONFIRM="File %FILENAME% already exists. Overwrite? (y/n): "
@@ -234,7 +239,7 @@ fi
 
 echo "Running $DOCKER_IMAGE_NAME with Docker"
 
-# Run the Docker image with a mounted volume
+# Run the Docker image with a mounted volume for output files
 docker run -it --name $DOCKER_IMAGE_NAME -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -s) "$DOCKER_IMAGE_NAME"
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
@@ -242,12 +247,17 @@ if [ $EXIT_CODE -ne 0 ]; then
     exit 1
 fi
 
+# Create the nomis folder if it doesn't exist.
+if [ ! -d "$SCRIPT_ROOT/nomis" ]; then
+    mkdir -p "$SCRIPT_ROOT/nomis"
+fi
+
 # Get the script's name
 OUTPUT_FILE=$(find "$SETUP_DIR/output/" -type f ! -name "*.conf" -exec basename {} \; | head -n 1)
 
 for FILE in "$SETUP_DIR/output/"*; do
     FILENAME=$(basename "$FILE")
-    DESTINATION="$SCRIPT_ROOT/$FILENAME"
+    DESTINATION="$SCRIPT_ROOT/nomis/$FILENAME"
 
     if [ -e "$DESTINATION" ]; then
         if ! prompt_confirm "File $FILENAME already exists. Overwrite?"; then
@@ -261,7 +271,7 @@ done
 # Clean up the output folder
 rm -f "$SETUP_DIR/output/"*
 
-chmod +x "$SCRIPT_ROOT/$OUTPUT_FILE"
+chmod +x "$SCRIPT_ROOT/nomis/$OUTPUT_FILE"
 
 echo "Start script created. You can start your new Nomi by running $OUTPUT_FILE"
 echo "You may now close this window"
