@@ -290,6 +290,7 @@ jobs:
             RESPONSE=$(curl -s -w "%{http_code}" \
               --request PUT \
               --header "Authorization: Bearer $RENDER_API_KEY" \
+              --header "Accept: application/json" \
               --header "Content-Type: application/json" \
               --data "{\"value\":$VALUE_ESCAPED}" \
               --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID/env-vars/$ENCODED_KEY")
@@ -303,38 +304,38 @@ jobs:
             echo "Successfully updated env var $KEY."
           done
 
-      - name: Update Environment Variables from GitHub Secrets
-        env:
-          SECRETS: ${{ toJSON(secrets) }}
-          ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
-        run: |
-          set -e
+      # - name: Update Environment Variables from GitHub Secrets
+      #   env:
+      #     SECRETS: ${{ toJSON(secrets) }}
+      #     ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
+      #   run: |
+      #     set -e
 
-          SECRETS_KEYS=$(echo "$SECRETS" | jq -r 'keys[]')
+      #     SECRETS_KEYS=$(echo "$SECRETS" | jq -r 'keys[]')
 
-          for KEY in $SECRETS_KEYS; do
-            # URL-encode the KEY
-            ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
+      #     for KEY in $SECRETS_KEYS; do
+      #       # URL-encode the KEY
+      #       ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
 
-            # Ensure the value is properly escaped for JSON
-            VALUE=$(echo "$SECRETS" | jq -r --arg KEY "$KEY" '.[$KEY]')
-            VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
+      #       # Ensure the value is properly escaped for JSON
+      #       VALUE=$(echo "$SECRETS" | jq -r --arg KEY "$KEY" '.[$KEY]')
+      #       VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
 
-            RESPONSE=$(curl -s -w "%{http_code}" \
-              --request PUT \
-              --header "Authorization: Bearer $RENDER_API_KEY" \
-              --header "Content-Type: application/json" \
-              --data "{\"value\":$VALUE_ESCAPED}" \
-              --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID/env-vars/$ENCODED_KEY")
-            HTTP_STATUS="${RESPONSE: -3}"
-            RESPONSE_BODY="${RESPONSE::-3}"
-            if [ "$HTTP_STATUS" -ne 200 ]; then
-              echo "Error: Failed to update env var $KEY. HTTP Status: $HTTP_STATUS"
-              echo "Response: $RESPONSE_BODY"
-              exit 1
-            fi
-            echo "Successfully updated env var $KEY."
-          done
+      #       RESPONSE=$(curl -s -w "%{http_code}" \
+      #         --request PUT \
+      #         --header "Authorization: Bearer $RENDER_API_KEY" \
+      #         --header "Content-Type: application/json" \
+      #         --data "{\"value\":$VALUE_ESCAPED}" \
+      #         --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID/env-vars/$ENCODED_KEY")
+      #       HTTP_STATUS="${RESPONSE: -3}"
+      #       RESPONSE_BODY="${RESPONSE::-3}"
+      #       if [ "$HTTP_STATUS" -ne 200 ]; then
+      #         echo "Error: Failed to update env var $KEY. HTTP Status: $HTTP_STATUS"
+      #         echo "Response: $RESPONSE_BODY"
+      #         exit 1
+      #       fi
+      #       echo "Successfully updated env var $KEY."
+      #     done
 
       - name: Get Last Workflow Run
         id: get-last-run
