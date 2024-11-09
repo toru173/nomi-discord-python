@@ -45,16 +45,6 @@ if "%1"=="skip-checks" (
     GOTO do_update
 )
 
-FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
-
-:: Check if .nomi_setup_done exists in the script's current directory
-:: If it does, assume the user chose this directory last time
-if EXIST "%SCRIPT_ROOT%.nomi_setup_done" (
-    SET "INSTALL_DIR=%SCRIPT_ROOT%"
-    GOTO do_update
-)
-
-
 :: First, check for required dependencies. We need Docker for
 :: this project to run, so check we have that installed. If
 :: not, prompt the user to download it then re-run this script.
@@ -126,12 +116,22 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
     GOTO cleanup
 )
 
+
 :: Now we know know we have Docker and tar we check with the user if
 :: installing in our default location (%USERPROFILE%\%INSTALL_FOLDER%)
 :: is ok. If not, ask for an alternative.
 :: Set default installation directory
 SET "DEFAULT_INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 SET "INSTALL_DIR=%DEFAULT_INSTALL_DIR%"
+
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
+
+:: Check if .nomi_setup_done exists in the script's current directory
+:: If it does, assume the user chose this directory last time
+if EXIST "%SCRIPT_ROOT%.nomi_setup_done" (
+    SET "INSTALL_DIR=%SCRIPT_ROOT%"
+    GOTO do_update
+)
 
 ECHO:
 ECHO Where would you like to install nomi-discord-python?
