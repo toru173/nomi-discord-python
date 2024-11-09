@@ -440,7 +440,7 @@ if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
     fi
     DEFAULT_INSTALL_DIR="$HOME/$INSTALL_FOLDER"
 else
-    DEFAULT_INSTALL_DIR="SCRIPT_ROOT"
+    DEFAULT_INSTALL_DIR="$SCRIPT_ROOT"
 fi
 
 echo
