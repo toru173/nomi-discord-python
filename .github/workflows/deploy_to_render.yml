@@ -186,7 +186,6 @@ jobs:
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
         run: |
           set -e
-          set -x
 
           # Retrieve the existing env group
           RESPONSE=$(curl -s \
@@ -199,8 +198,6 @@ jobs:
           # Parse the envVars array
           ENV_VARS=$(echo "$RESPONSE" | jq -r '.envVars[].key')
 
-          echo "Checking keys..."
-
           MISSING_SECRETS=()
 
           # Iterate over each env var key
@@ -208,24 +205,20 @@ jobs:
             # Get the value from the environment variable (set from secrets)
             VALUE="${!KEY:-}"
             if [ -z "$VALUE" ]; then
-              echo "Error: No secret found for environment variable $KEY."
+              echo "Error: No secret found for Render environment variable $KEY."
               MISSING_SECRETS+=("$KEY")
               continue
             fi
           done
 
-          echo "Checked keys. If a key was missing, display an error message"
-
           # After processing all env vars, check if there were any missing secrets
           if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
-            echo "The following environment variables were not updated due to missing secrets:"
+            echo "The following Render environment variables were not updated due to missing secrets:"
             for KEY in "${MISSING_SECRETS[@]}"; do
               echo "- $KEY"
             done
-            exit 2
+            exit 1
           fi
-
-          echo "Updating keys at Render..."
 
           # We have all the secrets we need. Update the env vars in the env group
           for KEY in $ENV_VARS; do
