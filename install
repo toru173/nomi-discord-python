@@ -512,7 +512,6 @@ if ! prompt_confirm "Are you sure you want to proceed with the installation?"; t
     exit 0
 fi
 
-
 # Proceed with unzipping the file using tar and overwrite existing files.
 # GitHub wraps the whole repository in a folder so we have to traverse
 # into that before before we can filter by the things we want to download.
@@ -557,7 +556,7 @@ elif [ "$(uname -s)" == "Linux" ]; then
     UPDATE_SCRIPT="$INSTALL_DIR/update.sh"
 else
     echo "Error: Unsupported operating system '$(uname -s)'."
-    return 1
+    exit 1
 fi
 
 cp "$INSTALL_SCRIPT" "$UPDATE_SCRIPT"
@@ -587,7 +586,7 @@ elif [ "$(uname -s)" == "Linux" ]; then
     SETUP_SCRIPT="$INSTALL_DIR/setup.sh"
 else
     echo "Error: Unsupported operating system '$(uname -s)'."
-    return 1
+    exit 1
 fi
 
 echo "You can set up a Nomi's Docker container by running the setup script."
