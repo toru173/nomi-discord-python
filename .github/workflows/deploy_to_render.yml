@@ -26,21 +26,29 @@ jobs:
           if [ -z "$RENDER_API_KEY" ]; then
             echo "Error: DISCORD_API_KEY is not set or is empty. Please add it to your repository secrets."
             $MISSING_VARS+=1
+          else
+            echo "DISCORD_API_KEY is set."
           fi
           # Check if RENDER_API_KEY is populated
           if [ -z "$RENDER_API_KEY" ]; then
             echo "Error: RENDER_API_KEY is not set or is empty. Please add it to your repository secrets."
             $MISSING_VARS+=1
+          else
+            echo "RENDER_API_KEY is set."
           fi
           # Check if NOMI_API_KEY is populated
           if [ -z "$NOMI_API_KEY" ]; then
             echo "Error: NOMI_API_KEY is not set or is empty. Please add it to your repository secrets."
             $MISSING_VARS+=1
+          else
+            echo "NOMI_API_KEY is set."
           fi
           # Check if NOMI_ID is populated
           if [ -z "$NOMI_ID" ]; then
             echo "Error: NOMI_ID is not set or is empty. Please add it to your repository secrets."
             $MISSING_VARS+=1
+          else
+            echo "NOMI_ID is set."
           fi
           exit $MISSING_VARS
 
@@ -48,6 +56,7 @@ jobs:
         env:
           ${{ secrets }}
         run: |
+          set -e
           INVALID_API_KEYS=0
           # Check Render API key is valid
           response=$(curl -s -w "%{http_code}" \
@@ -104,6 +113,48 @@ jobs:
           fi
           exit $INVALID_API_KEYS
 
+      - name: Get Nomi Name from Nomi AI API
+        env:
+          ${{ secrets }}
+        run: |
+          set -e
+          # Get Nomi name from Nomi ID
+          response=$(curl -s -w "%{http_code}" \
+            --request GET \
+            --header "Authorization: $NOMI_API_KEY" \
+            --header "Accept: application/json" \
+            --url "https://api.nomi.ai/v1/nomis/$NOMI_ID")
+          http_status="${response: -3}"
+          response_body="${response::-3}"
+          if [ "$http_status" -ne 200 ]; then
+            echo "Error: Failed to retrieve Nomi Name from Nomi API. HTTP Status: $http_status"
+            echo "Response: $response_body"
+            exit 1
+          fi
+          # Parse the Nomi Name from the response
+          NOMI_NAME=$(echo "$response_body" | jq -r '.name')
+          if [ -z "$NOMI_NAME" ] || [ "$NOMI_NAME" == "null" ]; then
+            echo "Error: Nomi Name not found in the API response."
+            exit 1
+          fi
+          echo "Successfully retrieved Nomi Name: $NOMI_NAME"
+          echo "NOMI_NAME=$NOMI_NAME" >> $GITHUB_ENV
+
+      - name: Normalize Nomi Name
+        run: |
+          set -e
+          if [ -z "$NOMI_NAME" ]; then
+            echo "Error: NOMI_NAME is empty."
+            exit 1
+          fi
+          NOMI_NAME_NORMALIZED=$(echo -n "$NOMI_NAME" | iconv -f utf-8 -t ascii//TRANSLIT | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_')
+          if [ -z "$NOMI_NAME_NORMALIZED" ]; then
+            echo "Error: Normalized Nomi Name is empty."
+            exit 1
+          fi
+          echo "Normalized Nomi Name: $NOMI_NAME_NORMALIZED"
+          echo "NOMI_NAME_NORMALIZED=$NOMI_NAME_NORMALIZED" >> $GITHUB_ENV
+
       - name: Get Service Name from render.yaml
         id: get-service-name
         run: |
@@ -122,7 +173,6 @@ jobs:
           SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         run: |
           set -e
-
           # Fetch existing blueprints
           response=$(curl -s -w "%{http_code}" \
             --request GET \
@@ -149,9 +199,16 @@ jobs:
           if [ "$BLUEPRINT_COUNT" -eq 0 ]; then
             echo "No existing blueprints found. Please add a blueprint."
             exit 1
-          else
-            echo "An existing blueprint with the name $SERVICE_NAME was found."
           fi
+
+          MATCHES_SERVICE_NAME=$(echo "$response_body" | jq '.[] | select(.blueprint.name == "nomi-discord-python")')
+          echo $MATCHES_SERVICE_NAME
+          if [ -z "$MATCHES_SERVICE_NAME" ]; then
+            echo "No existing blueprints with the name $SERVICE_NAME were found."
+            exit 1
+          fi
+
+
 
       - name: Check for Existing Environment Group
         id: check-existing-env-group
@@ -197,7 +254,7 @@ jobs:
             echo "EXISTING_GROUP_ID=$ENV_GROUP_ID" >> $GITHUB_OUTPUT
             echo "EXISTING_GROUP=true" >> $GITHUB_OUTPUT
           else
-            echo "No existing environment groups with the name $SERVICE_NAME was found."
+            echo "No existing environment groups with the name $SERVICE_NAME were found."
             exit 1
           fi
 
@@ -312,46 +369,3 @@ jobs:
             echo "The last workflow run was more than 30 seconds ago."
             echo "::set-output name=OVERWRITE_ALLOWED::false"
           fi
-
-      - name: Get Nomi Name from Nomi AI API
-        env:
-          NOMI_ID: ${{ secrets.NOMI_ID }}
-          NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
-        run: |
-          set -e
-          # Get Nomi name from Nomi ID
-          response=$(curl -s -w "%{http_code}" \
-            --request GET \
-            --header "Authorization: $NOMI_API_KEY" \
-            --header "Accept: application/json" \
-            --url "https://api.nomi.ai/v1/nomis/$NOMI_ID")
-          http_status="${response: -3}"
-          response_body="${response::-3}"
-          if [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to retrieve Nomi Name from Nomi AI API. HTTP Status: $http_status"
-            echo "Response: $response_body"
-            exit 1
-          fi
-          # Parse the Nomi Name from the response
-          NOMI_NAME=$(echo "$response_body" | jq -r '.name')
-          if [ -z "$NOMI_NAME" ] || [ "$NOMI_NAME" == "null" ]; then
-            echo "Error: Nomi Name not found in the API response."
-            exit 1
-          fi
-          echo "Successfully retrieved Nomi Name: $NOMI_NAME"
-          echo "NOMI_NAME=$NOMI_NAME" >> $GITHUB_ENV
-
-      - name: Normalize Nomi Name
-        run: |
-          set -e
-          if [ -z "$NOMI_NAME" ]; then
-            echo "Error: NOMI_NAME is empty."
-            exit 1
-          fi
-          NOMI_NAME_NORMALIZED=$(echo -n "$NOMI_NAME" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_' | sed 's/_*$//')
-          if [ -z "$NOMI_NAME_NORMALIZED" ]; then
-            echo "Error: Normalized Nomi Name is empty."
-            exit 1
-          fi
-          echo "Normalized Nomi Name: $NOMI_NAME_NORMALIZED"
-          echo "NOMI_NAME_NORMALIZED=$NOMI_NAME_NORMALIZED" >> $GITHUB_ENV
