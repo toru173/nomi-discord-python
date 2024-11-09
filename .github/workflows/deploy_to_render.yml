@@ -59,54 +59,54 @@ jobs:
           set -e
           INVALID_API_KEYS=0
           # Check Render API key is valid
-          response=$(curl -s -w "%{http_code}" \
+          RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/services?limit=1")
-          http_status="${response: -3}"
-          response_body="${response::-3}"
-          if [ "$http_status" -eq 401 ]; then
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -eq 401 ]; then
             echo "Error: Invalid Render API Key. Authentication failed."
             $INVALID_API_KEYS+=1
-          elif [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to validate Render API Key. HTTP Status: $http_status"
+          elif [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to validate Render API Key. HTTP Status: $HTTP_STATUS"
             exit 1
           else
             echo "Render API Key is valid."
           fi
 
           # Check Nomi API key is valid
-          response=$(curl -s -w "%{http_code}" \
+          RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: $NOMI_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.nomi.ai/v1/nomis")
-          http_status="${response: -3}"
-          response_body="${response::-3}"
-          if [ "$http_status" -eq 400 ]; then
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -eq 400 ]; then
             echo "Error: Invalid Nomi API Key. Authentication failed."
             $INVALID_API_KEYS+=1
-          elif [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to validate Nomi API Key. HTTP Status: $http_status"
+          elif [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to validate Nomi API Key. HTTP Status: $HTTP_STATUS"
             exit 1
           else
             echo "Nomi API Key is valid."
           fi
 
           # Check Discord API key is valid
-          response=$(curl -s -w "%{http_code}" \
+          RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: Bot $DISCORD_API_KEY" \
             --header "Accept: application/json" \
             --url "https://discord.com/api/v10/users/@me")
-          http_status="${response: -3}"
-          response_body="${response::-3}"
-          if [ "$http_status" -eq 400 ]; then
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -eq 400 ]; then
             echo "Error: Invalid Discord API Key. Authentication failed."
             $INVALID_API_KEYS+=1
-          elif [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to validate Discord API Key. HTTP Status: $http_status"
+          elif [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to validate Discord API Key. HTTP Status: $HTTP_STATUS"
             exit 1
           else
             echo "Discord API Key is valid."
@@ -119,20 +119,20 @@ jobs:
         run: |
           set -e
           # Get Nomi name from Nomi ID
-          response=$(curl -s -w "%{http_code}" \
+          RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: $NOMI_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.nomi.ai/v1/nomis/$NOMI_ID")
-          http_status="${response: -3}"
-          response_body="${response::-3}"
-          if [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to retrieve Nomi Name from Nomi API. HTTP Status: $http_status"
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to retrieve Nomi Name from Nomi API. HTTP Status: $HTTP_STATUS"
             echo "Response: $response_body"
             exit 1
           fi
           # Parse the Nomi Name from the response
-          NOMI_NAME=$(echo "$response_body" | jq -r '.name')
+          NOMI_NAME=$(echo "$RESPONSE_BODY" | jq -r '.name')
           if [ -z "$NOMI_NAME" ] || [ "$NOMI_NAME" == "null" ]; then
             echo "Error: Nomi Name not found in the API response."
             exit 1
@@ -174,34 +174,34 @@ jobs:
         run: |
           set -e
           # Fetch existing blueprints
-          response=$(curl -s -w "%{http_code}" \
+          RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/blueprints")
-          http_status="${response: -3}"
-          response_body="${response::-3}"
-          if [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to retrieve blueprints. HTTP Status: $http_status"
-            echo "Response: $response_body"
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to retrieve blueprints. HTTP Status: $HTTP_STATUS"
+            echo "Response: $RESPONSE_BODY"
             exit 1
           fi
 
           # Check if the response is a valid JSON array
-          IS_ARRAY=$(echo "$response_body" | jq 'type == "array"')
+          IS_ARRAY=$(echo "$RESPONSE_BODY" | jq 'type == "array"')
           if [ "$IS_ARRAY" != "true" ]; then
             echo "Error: Expected an array in the response."
             exit 1
           fi
 
           # Check if any blueprints exist
-          BLUEPRINT_COUNT=$(echo "$response_body" | jq 'length')
+          BLUEPRINT_COUNT=$(echo "$RESPONSE_BODY" | jq 'length')
           if [ "$BLUEPRINT_COUNT" -eq 0 ]; then
             echo "No existing blueprints found. Please add a blueprint."
             exit 1
           fi
 
-          MATCHES_SERVICE_NAME=$(echo "$response_body" | jq -c '.[] | select(.blueprint.name == "nomi-discord-python")')
+          MATCHES_SERVICE_NAME=$(echo "$RESPONSE_BODY" | jq -c '.[] | select(.blueprint.name == "nomi-discord-python")')
           echo "$MATCHES_SERVICE_NAME"
           if [ -z "$MATCHES_SERVICE_NAME" ]; then
             echo "No existing blueprints with the name $SERVICE_NAME were found."
@@ -219,35 +219,35 @@ jobs:
           set -e
 
           # Fetch existing environment groups
-          response=$(curl -s -w "%{http_code}" \
+          RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/env-groups")
-          http_status="${response: -3}"
-          response_body="${response::-3}"
-          if [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to retrieve environment groups. HTTP Status: $http_status"
-            echo "Response: $response_body"
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to retrieve environment groups. HTTP Status: $HTTP_STATUS"
+            echo "Response: $RESPONSE_BODY"
             exit 1
           fi
 
           # Check if the response is a valid JSON array
-          IS_ARRAY=$(echo "$response_body" | jq 'type == "array"')
+          IS_ARRAY=$(echo "$RESPONSE_BODY" | jq 'type == "array"')
           if [ "$IS_ARRAY" != "true" ]; then
             echo "Error: Expected an array in the response."
             exit 1
           fi
 
           # Check if any environment groups exist
-          ENV_GROUP_COUNT=$(echo "$response_body" | jq 'length')
+          ENV_GROUP_COUNT=$(echo "$RESPONSE_BODY" | jq 'length')
           if [ "$ENV_GROUP_COUNT" -eq 0 ]; then
             echo "No existing environment groups found."
             exit 1
           fi
 
           # Ensure an environment group that matches our app
-          EXISTING_GROUP=$(echo "$response_body" | jq -r --arg NAME "$SERVICE_NAME" '.[] | select(.envGroup.name == $NAME) | .envGroup')
+          EXISTING_GROUP=$(echo "$RESPONSE_BODY" | jq -r --arg NAME "$SERVICE_NAME" '.[] | select(.envGroup.name == $NAME) | .envGroup')
           if [ -n "$EXISTING_GROUP" ] && [ "$EXISTING_GROUP" != "null" ]; then
             echo "An existing environment group with the name $SERVICE_NAME was found."
             ENV_GROUP_ID=$(echo "$EXISTING_GROUP" | jq -r '.id')
@@ -277,14 +277,14 @@ jobs:
             VALUE=$(echo "$json" | jq -r --arg key "$key" '.[$key]')
             VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
 
-            UPDATE_RESPONSE=$(curl -s -w "%{http_code}" \
+            RESPONSE=$(curl -s -w "%{http_code}" \
               --request PUT \
               --header "Authorization: Bearer $RENDER_API_KEY" \
               --header "Content-Type: application/json" \
               --data "{\"value\":$VALUE_ESCAPED}" \
               --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID/env-vars/$ENCODED_KEY")
-            HTTP_STATUS="${UPDATE_RESPONSE: -3}"
-            RESPONSE_BODY="${UPDATE_RESPONSE::-3}"
+            HTTP_STATUS="${RESPONSE: -3}"
+            RESPONSE_BODY="${RESPONSE::-3}"
             if [ "$HTTP_STATUS" -ne 200 ]; then
               echo "Error: Failed to update env var $KEY. HTTP Status: $HTTP_STATUS"
               echo "Response: $RESPONSE_BODY"
