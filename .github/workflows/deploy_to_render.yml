@@ -298,12 +298,7 @@ jobs:
             ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
 
             # Ensure the value is properly escaped for JSON
-            VALUE=$(echo "$SECRETS" | jq -r --arg KEY "$KEY" '.[$KEY]')
-
-            if [[ "$VALUE" == "null" ]]; then
-              $VALUE=""
-            fi
-
+            VALUE=$(echo "$ENV_VAR_KEYS" | jq -r --arg KEY "$KEY" '.[$KEY]')
             VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
 
             RESPONSE=$(curl -s -w "%{http_code}" \
