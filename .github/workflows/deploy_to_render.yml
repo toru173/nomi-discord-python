@@ -262,6 +262,7 @@ jobs:
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
           SECRETS: ${{ toJSON(secrets) }}
         run: |
+          set -x
           # Read nomi.conf file and convert to JSON object
           CONF_JSON="{}"
           if [ -f setup/nomi.conf ]; then
@@ -272,9 +273,6 @@ jobs:
               fi
               KEY=$(echo "$KEY" | xargs)
               VALUE=$(echo "$VALUE" | xargs)
-
-              echo "$KEY"
-              echo "$VALUE"
               # Add key-value pair to CONF_JSON using jq
               CONF_JSON=$(echo "$CONF_JSON" | jq --arg KEY "$KEY" --arg VALUE "$VALUE" '.[$KEY] = $VALUE')
             done < setup/nomi.conf
@@ -287,6 +285,8 @@ jobs:
 
           # Merge nomi.conf values first, then let secrets override them
           ALL_ENV_VARS=$(echo "$CONF_JSON" | jq --argjson secrets "$SECRETS" '. * $secrets')
+
+          echo $ALL_ENV_VARS
 
           ENV_VAR_KEYS=$(echo "$ALL_ENV_VARS" | jq -r 'keys[]')
 
