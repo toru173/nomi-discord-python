@@ -294,8 +294,8 @@ jobs:
           NOMI_ID: ${{ secrets.NOMI_ID }}
           NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
         run: |
-          set -e  # Exit immediately if a command exits with a non-zero status
-          # Make API call to Nomi AI
+          set -e
+          # Get Nomi name from Nomi ID
           response=$(curl -s -w "%{http_code}" \
             --request GET \
             --header "Authorization: $NOMI_API_KEY" \
