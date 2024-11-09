@@ -1,9 +1,6 @@
 name: Deploy Nomi to Render
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       environment:
