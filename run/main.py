@@ -110,28 +110,28 @@ if __name__ == "__main__":
         exit(1)
 
     message_modifiers = {
-        "default_message_prefix" : default_message_prefix,
-        "default_message_suffix" : default_message_suffix,
-        "channel_message_prefix" : channel_message_prefix,
-        "dm_message_prefix" : dm_message_prefix,
-        "react_trigger_phrase" : react_trigger_phrase,
+        "default_message_prefix" : config['default_message_prefix'],
+        "default_message_suffix" : config['default_message_suffix'],
+        "channel_message_prefix" : config['channel_message_prefix'],
+        "dm_message_prefix" : config['dm_message_prefix'],
+        "react_trigger_phrase" : config['react_trigger_phrase'],
     }
 
     for modifier, value in message_modifiers.items():
         if value is not None:
             message_modifiers[modifier] = strip_outer_quotation_marks(value)
 
-    nomi_session = Session(api_key = nomi_api_key)
-    nomi = Nomi.from_uuid(session = nomi_session, uuid = nomi_id)
+    nomi_session = Session(api_key = config['nomi_api_key'])
+    nomi = Nomi.from_uuid(session = nomi_session, uuid = config['nomi_id'])
 
     intents = discord.Intents.default()
     intents.messages = True
     intents.members = True
 
     nomi = NomiBot(nomi = nomi,
-                   max_message_length = max_message_length,
+                   max_message_length = config['max_message_length'],
                    message_modifiers = message_modifiers,
                    intents = intents
                 )
 
-    nomi.run(token = DISCORD_API_KEY, root_logger = True)
+    nomi.run(token = config['discord_api_key'], root_logger = True)
