@@ -27,8 +27,8 @@ jobs:
         run: |
           set -e
           MISSING_VARS=0
-          # Check if RENDER_API_KEY is populated
-          if [ -z "$RENDER_API_KEY" ]; then
+          # Check if DISCORD_API_KEY is populated
+          if [ -z "$DISCORD_API_KEY" ]; then
             echo "Error: DISCORD_API_KEY is not set or is empty. Please add it to your repository secrets."
             ((MISSING_VARS++))
           else
