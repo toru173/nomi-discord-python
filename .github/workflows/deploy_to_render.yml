@@ -270,8 +270,11 @@ jobs:
               if [[ -z "$KEY" || "$KEY" =~ ^# ]]; then
                 continue
               fi
-              KEY=$(echo "$KEY" | xargs)   # Trim whitespace
-              VALUE=$(echo "$VALUE" | xargs) # Trim whitespace
+              KEY=$(echo "$KEY" | xargs)
+              VALUE=$(echo "$VALUE" | xargs)
+
+              echo "$KEY"
+              echo "$VALUE"
               # Add key-value pair to CONF_JSON using jq
               CONF_JSON=$(echo "$CONF_JSON" | jq --arg KEY "$KEY" --arg VALUE "$VALUE" '.[$KEY] = $VALUE')
             done < setup/nomi.conf
@@ -279,6 +282,8 @@ jobs:
             echo "The file 'nomi.conf' was not found"
             exit 1
           fi
+
+          echo $CONF_JSON
 
           # Merge nomi.conf values first, then let secrets override them
           ALL_ENV_VARS=$(echo "$CONF_JSON" | jq --argjson secrets "$SECRETS" '. * $secrets')
@@ -294,6 +299,11 @@ jobs:
 
             # Ensure the value is properly escaped for JSON
             VALUE=$(echo "$SECRETS" | jq -r --arg KEY "$KEY" '.[$KEY]')
+
+            if [[ "$VALUE" == "null" ]]; then
+              $VALUE=""
+            fi
+
             VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
 
             RESPONSE=$(curl -s -w "%{http_code}" \
