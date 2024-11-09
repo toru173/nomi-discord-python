@@ -266,7 +266,7 @@ jobs:
             exit 1
           fi
 
-      - name: Update Environment Variables from GitHub Secrets
+      - name: Update Environment Variables from GitHub Secrets and nomi.conf
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
@@ -274,9 +274,30 @@ jobs:
         run: |
           set -e
 
-          SECRETS_KEYS=$(echo "$SECRETS" | jq -r 'keys[]')
+          # Read nomi.conf file and convert to JSON object
+          CONF_JSON="{}"
+          if [ -f setup/nomi.conf ]; then
+            while IFS='=' read -r KEY VALUE; do
+              # Skip lines that are empty or start with a comment
+              if [[ -z "$KEY" || "$KEY" =~ ^# ]]; then
+                continue
+              fi
+              KEY=$(echo "$KEY" | xargs)   # Trim whitespace
+              VALUE=$(echo "$VALUE" | xargs) # Trim whitespace
+              # Add key-value pair to CONF_JSON using jq
+              CONF_JSON=$(echo "$CONF_JSON" | jq --arg KEY "$KEY" --arg VALUE "$VALUE" '.[$KEY] = $VALUE')
+            done < .env
+          else
+            echo "The file 'nomi.conf' was not found"
+            exit 1
+          fi
 
-          for KEY in $SECRETS_KEYS; do
+          # Merge .env values first, then let secrets override them
+          MERGED=$(echo "$CONF_JSON" | jq --argjson secrets "$SECRETS" '. * $secrets')
+
+          ENV_VARS=$(echo "$SECRETS" | jq -r 'keys[]')
+
+          for KEY in $ENV_VARS; do
             if [[ $KEY == "github_token" || $KEY == "RENDER_API_KEY" ]]; then
               continue
             fi
