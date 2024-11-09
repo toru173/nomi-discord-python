@@ -25,24 +25,24 @@ jobs:
           # Check if RENDER_API_KEY is populated
           if [ -z "$RENDER_API_KEY" ]; then
             echo "Error: DISCORD_API_KEY is not set or is empty. Please add it to your repository secrets."
-            MISSING_VARS+=1
+            $MISSING_VARS+=1
           fi
           # Check if RENDER_API_KEY is populated
           if [ -z "$RENDER_API_KEY" ]; then
             echo "Error: RENDER_API_KEY is not set or is empty. Please add it to your repository secrets."
-            MISSING_VARS+=1
+            $MISSING_VARS+=1
           fi
           # Check if NOMI_API_KEY is populated
           if [ -z "$NOMI_API_KEY" ]; then
             echo "Error: NOMI_API_KEY is not set or is empty. Please add it to your repository secrets."
-            MISSING_VARS+=1
+            $MISSING_VARS+=1
           fi
           # Check if NOMI_ID is populated
           if [ -z "$NOMI_ID" ]; then
             echo "Error: NOMI_ID is not set or is empty. Please add it to your repository secrets."
-            MISSING_VARS+=1
+            $MISSING_VARS+=1
           fi
-          exit MISSING_VARS
+          exit $MISSING_VARS
 
       - name: Validate API Keys
         env:
@@ -59,7 +59,7 @@ jobs:
           response_body="${response::-3}"
           if [ "$http_status" -eq 401 ]; then
             echo "Error: Invalid Render API Key. Authentication failed."
-            INVALID_API_KEYS+=1
+            $INVALID_API_KEYS+=1
           elif [ "$http_status" -ne 200 ]; then
             echo "Error: Failed to validate Render API Key. HTTP Status: $http_status"
             exit 1
@@ -77,7 +77,7 @@ jobs:
           response_body="${response::-3}"
           if [ "$http_status" -eq 400 ]; then
             echo "Error: Invalid Nomi API Key. Authentication failed."
-            INVALID_API_KEYS+=1
+            $INVALID_API_KEYS+=1
           elif [ "$http_status" -ne 200 ]; then
             echo "Error: Failed to validate Nomi API Key. HTTP Status: $http_status"
             exit 1
@@ -95,14 +95,14 @@ jobs:
           response_body="${response::-3}"
           if [ "$http_status" -eq 400 ]; then
             echo "Error: Invalid Discord API Key. Authentication failed."
-            INVALID_API_KEYS+=1
+            $INVALID_API_KEYS+=1
           elif [ "$http_status" -ne 200 ]; then
             echo "Error: Failed to validate Discord API Key. HTTP Status: $http_status"
             exit 1
           else
             echo "Discord API Key is valid."
           fi
-          exit INVALID_API_KEYS
+          exit $INVALID_API_KEYS
 
       - name: Get Service Name from render.yaml
         id: get-service-name
