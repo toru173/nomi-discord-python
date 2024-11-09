@@ -25,7 +25,7 @@ SET "NOMI_NAME=placeholder_nomi_name"
 SET DOCKER_IMAGE_NAME=placeholder_docker_image_name
 SET CONFIG_FILE_NAME=%DOCKER_IMAGE_NAME%.conf
 
-SET "APP_DIR=%SCRIPT_ROOT%\app"
+SET "APP_DIR=%SCRIPT_ROOT%\..\run"
 SET "CONFIG_FILE=%SCRIPT_ROOT%%CONFIG_FILE_NAME%"
 
 :: Check if Docker is installed
@@ -162,7 +162,7 @@ echo "If you ever want to quit the script, simply press CTRL+C together"
 echo
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_DIR="$SCRIPT_ROOT/app"
+APP_DIR="$SCRIPT_ROOT/../run"
 CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
 
 NOMI_NAME="placeholder_nomi_name"

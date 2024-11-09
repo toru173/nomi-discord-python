@@ -138,7 +138,7 @@ ECHO Where would you like to install nomi-discord-python?
 
 :prompt_install_dir
 ECHO Install Location: %INSTALL_DIR%
-SET /P "USER_INPUT=Press Enter to accept, or enter a new directory: "
+SET /P "USER_INPUT=Press Enter to accept, or choose a new location: "
 
 IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
 
@@ -154,10 +154,11 @@ IF /I NOT "!CONTINUE!" == "Y" (
 GOTO do_install
 
 :do_update
+ECHO:
 ECHO This will update nomi-discord-python in the current directory
 
 :prompt_update_dir
-SET /P "USER_INPUT=Press Enter to accept, or enter a new directory: "
+SET /P "USER_INPUT=Press Enter to accept, or enter a choose location: "
 
 IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
 
@@ -481,27 +482,28 @@ if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
     while true; do
         # Prompt the user for the installation directory
         echo "Install Location: $DEFAULT_INSTALL_DIR"
-        read -p "Press Enter to accept, or enter a new directory: " INSTALL_DIR </dev/tty
+        read -p "Press Enter to accept, or enter a new location: " INSTALL_DIR </dev/tty
         INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
 
         # Display the chosen directory and ask for confirmation
         echo
-        echo "Your choice: $INSTALL_DIR"
+        echo "Install Location: $INSTALL_DIR"
         if prompt_confirm "Are you sure?"; then
             break
         fi
     done
 else
     DEFAULT_INSTALL_DIR="$SCRIPT_ROOT"
+    echo
     echo "This will update nomi-discord-python in the current directory"
     while true; do
         # Prompt the user for the installation directory
-        read -p "Press Enter to accept, or enter a new directory: " INSTALL_DIR </dev/tty
+        read -p "Press Enter to accept, or choose a new location: " INSTALL_DIR </dev/tty
         INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
 
         # Display the chosen directory and ask for confirmation
         echo
-        echo "Your choice: $INSTALL_DIR"
+        echo "Install Location: $INSTALL_DIR"
         if prompt_confirm "Are you sure?"; then
             break
         fi
