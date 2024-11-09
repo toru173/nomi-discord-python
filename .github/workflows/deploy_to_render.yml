@@ -114,6 +114,7 @@ jobs:
           exit $INVALID_API_KEYS
 
       - name: Get Nomi Name from Nomi API
+        id: get-nomi-name
         env:
           NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
           NOMI_ID: ${{ secrets.NOMI_ID }}
@@ -140,10 +141,12 @@ jobs:
             exit 1
           fi
           echo "Successfully retrieved Nomi Name: $NOMI_NAME"
-          echo "NOMI_NAME=$NOMI_NAME" >> $GITHUB_ENV
+          echo "NOMI_NAME=$NOMI_NAME" >> $GITHUB_OUTPUT
 
       - name: Normalize Nomi Name
         id: normalize-nomi-name
+        env:
+          NOMI_NAME: ${{ steps.get-nomi-name.outputs.NOMI_NAME }}
         run: |
           set -e
           if [ -z "$NOMI_NAME" ]; then
@@ -265,14 +268,18 @@ jobs:
 
       - name: Update Environment Variables from GitHub Secrets
         env:
-          SECRETS: ${{ toJSON(secrets) }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
+          SECRETS: ${{ toJSON(secrets) }}
         run: |
           set -e
 
           SECRETS_KEYS=$(echo "$SECRETS" | jq -r 'keys[]')
 
           for KEY in $SECRETS_KEYS; do
+            if [[ $KEY == "github_token" || $KEY == "RENDER_API_KEY" ]]; then
+              continue
+            fi
             # URL-encode the KEY
             ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
 
