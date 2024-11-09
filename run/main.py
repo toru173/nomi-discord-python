@@ -77,6 +77,8 @@ def strip_outer_quotation_marks(s: str) -> str:
 
 
 if __name__ == "__main__":
+
+    exit()
     # Read variables from env
     CONFIG_VARIABLES = ["DISCORD_API_KEY",
                         "NOMI_API_KEY",
@@ -156,6 +158,7 @@ if __name__ == "__main__":
             health_thread.daemon = True
             health_thread.start()
         else:
+
             print("Not running on Render")
     except NameError:
         print("Not running on Render")
