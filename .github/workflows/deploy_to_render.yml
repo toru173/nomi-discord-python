@@ -16,8 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate Environment Secrets
-        env:
-          ${{ secrets }}
+        env: ${{ secrets }}
         run: |
           MISSING_VARS=0
           # Check if DISCORD_API_KEY is populated
@@ -51,8 +50,7 @@ jobs:
           exit $MISSING_VARS
 
       - name: Validate API Keys
-        env:
-          ${{ secrets }}
+        env: ${{ secrets }}
         run: |
           INVALID_API_KEYS=0
           # Check Render API key is valid
