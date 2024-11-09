@@ -91,6 +91,7 @@ jobs:
         id: check-existing-blueprint
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         run: |
           set -e
 
@@ -121,6 +122,8 @@ jobs:
           if [ "$BLUEPRINT_COUNT" -eq 0 ]; then
             echo "No existing blueprints found. Please add a blueprint."
             exit 1
+          else
+            echo "An existing blueprint with the name $SERVICE_NAME was found."
           fi
 
       - name: Check for Existing Environment Group
@@ -183,6 +186,7 @@ jobs:
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
         run: |
           set -e
+          set -x
 
           # Retrieve the existing env group
           RESPONSE=$(curl -s \
@@ -197,7 +201,6 @@ jobs:
 
           echo "Checking keys..."
 
-          # Initialize a variable to track missing secrets
           MISSING_SECRETS=()
 
           # Iterate over each env var key
