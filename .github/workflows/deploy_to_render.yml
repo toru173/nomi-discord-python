@@ -115,7 +115,7 @@ jobs:
 
       - name: Get Nomi Name from Nomi AI API
         env:
-          ${{ secrets }}
+          NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
         run: |
           set -e
           # Get Nomi name from Nomi ID
@@ -170,7 +170,7 @@ jobs:
         id: check-existing-blueprint
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
+          # SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         run: |
           set -e
           # Fetch existing blueprints
@@ -206,13 +206,15 @@ jobs:
           if [ -z "$MATCHES_SERVICE_NAME" ]; then
             echo "No existing blueprints with the name $SERVICE_NAME were found."
             exit 1
+          else
+            echo "An existing blueprint with the name $SERVICE_NAME was found."
           fi
 
       - name: Check for Existing Environment Group
         id: check-existing-env-group
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
+          # SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         run: |
           set -e
 
@@ -258,54 +260,21 @@ jobs:
 
       - name: Update Environment Variables from GitHub Secrets
         env:
-          # All Secrets need to be expressed as environment variables
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
-          DISCORD_API_KEY: ${{ secrets.DISCORD_API_KEY }}
+          SECRETS: ${{ toJSON(secrets) }}
 
           # This isn't a secret, so isn't masked
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
         run: |
           set -e
 
-          # Retrieve the existing env group
-          RESPONSE=$(curl -s \
-            --request GET \
-            --header "Authorization: Bearer $RENDER_API_KEY" \
-            --header "Accept: application/json" \
-            --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID")
+          SECRETS_KEYS=$(echo "$SECRETS" | jq -r 'keys[]')
 
-          # Parse the envVars array
-          ENV_VARS=$(echo "$RESPONSE" | jq -r '.envVars[].key')
-
-          MISSING_SECRETS=()
-
-          # Iterate over each env var key
-          for KEY in $ENV_VARS; do
-            # Get the value from the environment variable (set from secrets)
-            VALUE="${!KEY:-}"
-            if [ -z "$VALUE" ]; then
-              echo "Error: No secret found for Render environment variable $KEY."
-              MISSING_SECRETS+=("$KEY")
-              continue
-            fi
-          done
-
-          # After processing all env vars, check if there were any missing secrets
-          if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
-            echo "The following Render environment variables were not updated due to missing secrets:"
-            for KEY in "${MISSING_SECRETS[@]}"; do
-              echo "- $KEY"
-            done
-            exit 1
-          fi
-
-          # We have all the secrets we need. Update the env vars in the env group
-          for KEY in $ENV_VARS; do
+          for KEY in $SECRETS_KEYS; do
             # URL-encode the KEY
             ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
 
             # Ensure the value is properly escaped for JSON
+            VALUE=$(echo "$json" | jq -r --arg key "$key" '.[$key]')
             VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
 
             UPDATE_RESPONSE=$(curl -s -w "%{http_code}" \
@@ -319,7 +288,7 @@ jobs:
             if [ "$HTTP_STATUS" -ne 200 ]; then
               echo "Error: Failed to update env var $KEY. HTTP Status: $HTTP_STATUS"
               echo "Response: $RESPONSE_BODY"
-              exit 3
+              exit 1
             fi
             echo "Successfully updated env var $KEY."
           done
