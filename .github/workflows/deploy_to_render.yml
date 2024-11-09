@@ -16,65 +16,93 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # - name: Validate Nomi AI API Key
-      #   env:
-      #     NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
-      #   run: |
-      #     set -e
-      #     # Check if NOMI_API_KEY is populated
-      #     if [ -z "$NOMI_API_KEY" ]; then
-      #       echo "Error: NOMI_API_KEY is not set or is empty. Please add it to your repository secrets."
-      #       exit 1
-      #     fi
-
-      #     # Check key is valid
-      #     response=$(curl -s -w "%{http_code}" \
-      #       --request GET \
-      #       --header "accept: application/json" \
-      #       --header "Authorization: $NOMI_API_KEY" \
-      #       --header "Accept: application/json" \
-      #       --url "https://api.nomi.ai/v1/nomis")
-      #     http_status="${response: -3}"
-      #     response_body="${response::-3}"
-      #     if [ "$http_status" -eq 400 ]; then
-      #       echo "Error: Invalid Nomi AI API Key. Authentication failed."
-      #       exit 1
-      #     elif [ "$http_status" -ne 200 ]; then
-      #       echo "Error: Failed to validate Nomi AI API Key. HTTP Status: $http_status"
-      #       exit 1
-      #     else
-      #       echo "Nomi AI API Key is valid."
-      #     fi
-
-      - name: Validate Render API Key
+      - name: Validate Environment Secrets
         env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          ${{ secrets }}
         run: |
           set -e
+          MISSING_VARS=0
+          # Check if RENDER_API_KEY is populated
+          if [ -z "$RENDER_API_KEY" ]; then
+            echo "Error: DISCORD_API_KEY is not set or is empty. Please add it to your repository secrets."
+            MISSING_VARS+=1
+          fi
           # Check if RENDER_API_KEY is populated
           if [ -z "$RENDER_API_KEY" ]; then
             echo "Error: RENDER_API_KEY is not set or is empty. Please add it to your repository secrets."
-            exit 1
+            MISSING_VARS+=1
           fi
+          # Check if NOMI_API_KEY is populated
+          if [ -z "$NOMI_API_KEY" ]; then
+            echo "Error: NOMI_API_KEY is not set or is empty. Please add it to your repository secrets."
+            MISSING_VARS+=1
+          fi
+          # Check if NOMI_ID is populated
+          if [ -z "$NOMI_ID" ]; then
+            echo "Error: NOMI_ID is not set or is empty. Please add it to your repository secrets."
+            MISSING_VARS+=1
+          fi
+          exit MISSING_VARS
 
-          # Check key is valid
+      - name: Validate API Keys
+        env:
+          ${{ secrets }}
+        run: |
+          INVALID_API_KEYS=0
+          # Check Render API key is valid
           response=$(curl -s -w "%{http_code}" \
             --request GET \
-            --header "accept: application/json" \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/services?limit=1")
           http_status="${response: -3}"
           response_body="${response::-3}"
           if [ "$http_status" -eq 401 ]; then
-            echo "Error: Invalid Render.com API Key. Authentication failed."
-            exit 1
+            echo "Error: Invalid Render API Key. Authentication failed."
+            INVALID_API_KEYS+=1
           elif [ "$http_status" -ne 200 ]; then
-            echo "Error: Failed to validate Render.com API Key. HTTP Status: $http_status"
+            echo "Error: Failed to validate Render API Key. HTTP Status: $http_status"
             exit 1
           else
-            echo "Render.com API Key is valid."
+            echo "Render API Key is valid."
           fi
+
+          # Check Nomi API key is valid
+          response=$(curl -s -w "%{http_code}" \
+            --request GET \
+            --header "Authorization: $NOMI_API_KEY" \
+            --header "Accept: application/json" \
+            --url "https://api.nomi.ai/v1/nomis")
+          http_status="${response: -3}"
+          response_body="${response::-3}"
+          if [ "$http_status" -eq 400 ]; then
+            echo "Error: Invalid Nomi API Key. Authentication failed."
+            INVALID_API_KEYS+=1
+          elif [ "$http_status" -ne 200 ]; then
+            echo "Error: Failed to validate Nomi API Key. HTTP Status: $http_status"
+            exit 1
+          else
+            echo "Nomi API Key is valid."
+          fi
+
+          # Check Discord API key is valid
+          response=$(curl -s -w "%{http_code}" \
+            --request GET \
+            --header "Authorization: Bot $DISCORD_API_KEY" \
+            --header "Accept: application/json" \
+            --url "https://discord.com/api/v10/users/@me")
+          http_status="${response: -3}"
+          response_body="${response::-3}"
+          if [ "$http_status" -eq 400 ]; then
+            echo "Error: Invalid Discord API Key. Authentication failed."
+            INVALID_API_KEYS+=1
+          elif [ "$http_status" -ne 200 ]; then
+            echo "Error: Failed to validate Discord API Key. HTTP Status: $http_status"
+            exit 1
+          else
+            echo "Discord API Key is valid."
+          fi
+          exit INVALID_API_KEYS
 
       - name: Get Service Name from render.yaml
         id: get-service-name
@@ -98,7 +126,6 @@ jobs:
           # Fetch existing blueprints
           response=$(curl -s -w "%{http_code}" \
             --request GET \
-            --header "accept: application/json" \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/blueprints")
@@ -137,7 +164,6 @@ jobs:
           # Fetch existing environment groups
           response=$(curl -s -w "%{http_code}" \
             --request GET \
-            --header "accept: application/json" \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/env-groups")
@@ -190,7 +216,6 @@ jobs:
           # Retrieve the existing env group
           RESPONSE=$(curl -s \
             --request GET \
-            --header "accept: application/json" \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --url "https://api.render.com/v1/env-groups/$ENV_GROUP_ID")
@@ -230,7 +255,6 @@ jobs:
 
             UPDATE_RESPONSE=$(curl -s -w "%{http_code}" \
               --request PUT \
-              --header "accept: application/json" \
               --header "Authorization: Bearer $RENDER_API_KEY" \
               --header "Content-Type: application/json" \
               --data "{\"value\":$VALUE_ESCAPED}" \
