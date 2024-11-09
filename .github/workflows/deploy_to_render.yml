@@ -298,7 +298,7 @@ jobs:
             ENCODED_KEY=$(printf '%s' "$KEY" | jq -sRr @uri)
 
             # Ensure the value is properly escaped for JSON
-            VALUE=$(echo "$ENV_VAR_KEYS" | jq -r --arg KEY "$KEY" '.[$KEY]')
+            VALUE=$(echo "$ALL_ENV_VARS" | jq -r --arg KEY "$KEY" '.[$KEY]')
             VALUE_ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
 
             RESPONSE=$(curl -s -w "%{http_code}" \
