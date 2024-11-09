@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
     try:
         if running_on_render is not None:
-            logging.info("Running on Render. Starting Health Service")
+            print("Running on Render. Starting Health Service")
             import http.server
             import threading
 
@@ -151,8 +151,8 @@ if __name__ == "__main__":
             health_thread.daemon = True
             health_thread.start()
         else:
-            logging.info("Not running on Render")
+            print("Not running on Render")
     except NameError:
-        logging.info("Not running on Render")
+        print("Not running on Render")
 
     nomi.run(token = discord_api_key, root_logger = True)
