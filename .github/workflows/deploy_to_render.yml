@@ -25,6 +25,8 @@ jobs:
         env:
           ${{ secrets }}
         run: |
+          set -e
+          set -x
           MISSING_VARS=0
           # Check if DISCORD_API_KEY is populated
           if [ -z "$DISCORD_API_KEY" ]; then
