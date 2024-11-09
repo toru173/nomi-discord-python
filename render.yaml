@@ -13,7 +13,6 @@ services:
     plan: free
     rootDir: app
     dockerfilePath: ./Dockerfile
-    dockerCommand: ./main.py
     healthCheckPath: /
     autoDeploy: false
     envVars:
