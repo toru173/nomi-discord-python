@@ -92,19 +92,20 @@ if __name__ == "__main__":
     ]
 
 
+    config = {}
 
     for variable in CONFIG_VARIABLES:
-        globals()[variable.lower()] = os.getenv(variable) or None
+        config[variable.lower()] = os.getenv(variable) or None
 
-    if DISCORD_API_KEY is None:
+    if config['discord_api_key'] is None:
         logging.error("DISCORD_API_KEY was not found in the configuration file, or the file was not found")
         exit(1)
 
-    if nomi_api_key is None:
+    if config['nomi_api_key'] is None:
         logging.error("NOMI_API_KEY was not found in the configuration file, or the file was not found")
         exit(1)
 
-    if nomi_id is None:
+    if config['nomi_id'] is None:
         logging.error("NOMI_ID was not found in the configuration file, or the file was not found")
         exit(1)
 
