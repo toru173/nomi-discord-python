@@ -135,6 +135,7 @@ if __name__ == "__main__":
 
     try:
         if running_on_render is not None:
+            exit()
             print("Running on Render. Starting Health Service")
             import http.server
             import threading
