@@ -23,5 +23,5 @@ envVarGroups:
   envVars:
     - key: NOMI_API_KEY
       generateValue: true
-    - key: DISCORD_API_TOKEN
+    - key: DISCORD_API_KEY
       generateValue: true

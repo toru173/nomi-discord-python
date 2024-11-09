@@ -179,7 +179,7 @@ jobs:
 
           # All Secrets need to be expressed as environment variables
           NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DICSORD_API_KEY: ${{ secrets.DICSORD_API_KEY }}
         run: |
           set -e
 

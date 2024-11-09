@@ -80,7 +80,7 @@ if __name__ == "__main__":
     # Read variables from config file
     CONFIG_FILE = "nomi.conf"
 
-    CONFIG_VARIABLES = ["DISCORD_API_TOKEN",
+    CONFIG_VARIABLES = ["DICSORD_API_KEY",
                         "NOMI_API_KEY",
                         "NOMI_ID",
                         "MAX_MESSAGE_LENGTH",
@@ -96,8 +96,8 @@ if __name__ == "__main__":
     for variable in CONFIG_VARIABLES:
         globals()[variable.lower()] = os.getenv(variable)
 
-    if discord_api_token is None:
-        logging.error("DISCORD_API_TOKEN was not found in the configuration file, or the file was not found")
+    if DICSORD_API_KEY is None:
+        logging.error("DICSORD_API_KEY was not found in the configuration file, or the file was not found")
         exit(1)
 
     if nomi_api_key is None:
@@ -133,4 +133,4 @@ if __name__ == "__main__":
                    intents = intents
                 )
 
-    nomi.run(token = discord_api_token, root_logger = True)
+    nomi.run(token = DICSORD_API_KEY, root_logger = True)
