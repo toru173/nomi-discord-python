@@ -172,7 +172,7 @@ jobs:
         id: check-existing-blueprint
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          # SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
+          SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         run: |
           set -e
           # Fetch existing blueprints
@@ -203,7 +203,7 @@ jobs:
             exit 1
           fi
 
-          MATCHES_SERVICE_NAME=$(echo "$RESPONSE_BODY" | jq -c '.[] | select(.blueprint.name == "nomi-discord-python")')
+          MATCHES_SERVICE_NAME=$(echo "$RESPONSE_BODY" | jq -c '.[] | select(.blueprint.name == "$SERVICE_NAME")')
           echo "$MATCHES_SERVICE_NAME"
           if [ -z "$MATCHES_SERVICE_NAME" ]; then
             echo "No existing blueprints with the name $SERVICE_NAME were found."
@@ -216,7 +216,7 @@ jobs:
         id: check-existing-env-group
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          # SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
+          SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         run: |
           set -e
 
