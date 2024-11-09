@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
 
     for variable in CONFIG_VARIABLES:
-        globals()[variable.lower()] = os.getenv(variable)
+        globals()[variable.lower()] = os.getenv(variable) or None
 
     if DISCORD_API_KEY is None:
         logging.error("DISCORD_API_KEY was not found in the configuration file, or the file was not found")

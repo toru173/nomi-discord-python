@@ -108,13 +108,12 @@ FOR %%F IN ("%SETUP_DIR%\*") DO (
     :CONTINUE
 )
 
-:: Clean up the output folder
-DEL /Q "%SETUP_DIR%\output\*"
-
 ECHO Start script created. You can start your new Nomi by running %OUTPUT_FILE%
 
 :: All done! Let's exit from the Windows part of the script
 :cleanup
+:: Clean up the output folder
+DEL /Q "%SETUP_DIR%\output\*"
 ENDLOCAL
 PAUSE
 ECHO You may now close this window
@@ -151,6 +150,8 @@ trap "cleanup" EXIT INT
 
 # Cleanup function
 function cleanup() {
+    # Clean up the output folder
+    rm -f "$SETUP_DIR/output/"*
     exit_code=$?
     exit $exit_code
 }
@@ -283,9 +284,6 @@ for FILE in "$SETUP_DIR/output/"*; do
     fi
     cp "$FILE" "$DESTINATION"
 done
-
-# Clean up the output folder
-rm -f "$SETUP_DIR/output/"*
 
 chmod +x "$SCRIPT_ROOT/nomis/$OUTPUT_FILE"
 

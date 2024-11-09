@@ -23,10 +23,11 @@ FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
 
 SET "NOMI_NAME=placeholder_nomi_name"
 SET DOCKER_IMAGE_NAME=placeholder_docker_image_name
+
 SET CONFIG_FILE_NAME=%DOCKER_IMAGE_NAME%.conf
+SET "CONFIG_FILE=%SCRIPT_ROOT%%CONFIG_FILE_NAME%"
 
 SET "APP_DIR=%SCRIPT_ROOT%\..\run"
-SET "CONFIG_FILE=%SCRIPT_ROOT%%CONFIG_FILE_NAME%"
 
 :: Check if Docker is installed
 docker --version >NUL 2>&1
@@ -163,11 +164,12 @@ echo
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$SCRIPT_ROOT/../run"
-CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
 
 NOMI_NAME="placeholder_nomi_name"
 DOCKER_IMAGE_NAME=placeholder_docker_image_name
+
 CONFIG_FILE_NAME=$DOCKER_IMAGE_NAME.conf
+CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
 
 # Check if Docker is installed
 if ! command -v docker >/dev/null 2>&1; then
@@ -184,8 +186,8 @@ fi
 # Check for a configuration file
 if [ -f "$CONFIG_FILE" ]; then
     # Inform user we've found the config file
-    source "$CONFIG_FILE"
     echo "Found $NOMI_NAME's configuration file. Reading contents..."
+    source "$CONFIG_FILE"
 else
     # No configuration file found. Ask the user to run create_nomi to set one up
     echo "A configuration file for $NOMI_NAME was not found. Please re-run"
