@@ -264,7 +264,7 @@ jobs:
           NAME_ESCAPED=$(printf '%s' "$NOMI_NAME" | jq -Rs '.')
           # Fetch existing services
           RESPONSE=$(curl -s -w "%{http_code}" \
-            --request GET \
+            --request PATCH \
             --header "Authorization: Bearer $RENDER_API_KEY" \
             --header "Accept: application/json" \
             --header "Content-Type: application/json" \
