@@ -89,6 +89,7 @@ if __name__ == "__main__":
                         "CHANNEL_MESSAGE_PREFIX",
                         "DM_MESSAGE_PREFIX",
                         "REACT_TRIGGER_PHRASE",
+                        "ON_RENDER"
     ]
 
     for variable in CONFIG_VARIABLES:
