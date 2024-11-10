@@ -276,6 +276,8 @@ jobs:
             echo "Error: Failed to rename Service. HTTP Status: $HTTP_STATUS"
             echo "Response: $RESPONSE_BODY"
             exit 1
+          else
+            echo "Renamed service to $NOMI_NAME"
           fi
 
       # This is a sanity check more than anything. Here,

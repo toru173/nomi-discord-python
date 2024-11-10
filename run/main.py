@@ -135,9 +135,13 @@ if __name__ == "__main__":
 
     try:
         if on_render is not None:
-            logging.info("Running on Render. Starting Health Service")
+            logging.info("Running on Render")
+            logging.info("Starting Health Service and Heartbeat")
+
             import http.server
+            import time
             import threading
+
 
             port = os.getenv("PORT")
             port = int(port)
@@ -158,9 +162,18 @@ if __name__ == "__main__":
                 logging.info(f"Render health check running on port {port}")
                 server.serve_forever()
 
+            def start_heartbeat():
+                while True:
+                    heartbeat = Session(api_key = nomi_api_key)
+                    time.sleep(870) # Sleep 14.5 minutes
+
             health_thread = threading.Thread(target = start_health_handler)
             health_thread.daemon = True
             health_thread.start()
+
+            heartbeat_thread = threading.Thread(target = start_heartbeat)
+            heartbeat_thread.daemon = True
+            heartbeat_thread.start()
     except NameError:
         logging.info("Not running on Render")
 
