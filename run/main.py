@@ -78,7 +78,6 @@ def strip_outer_quotation_marks(s: str) -> str:
 
 if __name__ == "__main__":
 
-    exit()
     # Read variables from env
     CONFIG_VARIABLES = ["DISCORD_API_KEY",
                         "NOMI_API_KEY",
@@ -126,20 +125,15 @@ if __name__ == "__main__":
     intents.messages = True
     intents.members = True
 
-    logging.info("Before creating bot")
-
     nomi = NomiBot(nomi = nomi,
                    max_message_length = max_message_length,
                    message_modifiers = message_modifiers,
                    intents = intents
                 )
 
-    logging.info("Created bot")
-
     try:
-        if running_on_render is not None:
-            exit()
-            print("Running on Render. Starting Health Service")
+        if on_render is not None:
+            logger.info("Running on Render. Starting Health Service")
             import http.server
             import threading
 
@@ -158,10 +152,7 @@ if __name__ == "__main__":
             health_thread = threading.Thread(target = start_health_handler)
             health_thread.daemon = True
             health_thread.start()
-        else:
-
-            print("Not running on Render")
     except NameError:
-        print("Not running on Render")
+        pass
 
     nomi.run(token = discord_api_key, root_logger = True)
