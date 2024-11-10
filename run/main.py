@@ -131,6 +131,8 @@ if __name__ == "__main__":
                    intents = intents
                 )
 
+    logger.info("Checking if we're on Render...")
+
     try:
         if on_render is not None:
             logger.info("Running on Render. Starting Health Service")
@@ -153,6 +155,6 @@ if __name__ == "__main__":
             health_thread.daemon = True
             health_thread.start()
     except NameError:
-        pass
+        logger.info("Not running on Render")
 
     nomi.run(token = discord_api_key, root_logger = True)
