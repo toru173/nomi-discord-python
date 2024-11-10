@@ -131,11 +131,11 @@ if __name__ == "__main__":
                    intents = intents
                 )
 
-    logger.info("Checking if we're on Render...")
+    logging.info("Checking if we're on Render...")
 
     try:
         if on_render is not None:
-            logger.info("Running on Render. Starting Health Service")
+            logging.info("Running on Render. Starting Health Service")
             import http.server
             import threading
 
@@ -148,13 +148,13 @@ if __name__ == "__main__":
 
             def start_health_handler():
                 server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
-                print(f"Health check server running on port {port}")
+                logging.info(f"Render health check running on port {port}")
                 server.serve_forever()
 
             health_thread = threading.Thread(target = start_health_handler)
             health_thread.daemon = True
             health_thread.start()
     except NameError:
-        logger.info("Not running on Render")
+        logging.info("Not running on Render")
 
     nomi.run(token = discord_api_key, root_logger = True)
