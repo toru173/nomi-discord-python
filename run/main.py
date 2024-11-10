@@ -140,6 +140,7 @@ if __name__ == "__main__":
             import threading
 
             port = os.getenv("PORT")
+            port = int(port)
 
             class HealthHandler(http.server.BaseHTTPRequestHandler):
                 def do_GET(self):
