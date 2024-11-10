@@ -137,7 +137,7 @@ jobs:
           echo "NOMI_NAME=$NOMI_NAME" >> $GITHUB_OUTPUT
 
       - name: Normalize Nomi Name
-        id: normalize-nomi-name
+        id: get-normalized-nomi-name
         env:
           NOMI_NAME: ${{ steps.get-nomi-name.outputs.NOMI_NAME }}
         run: |
@@ -145,13 +145,13 @@ jobs:
             echo "Error: NOMI_NAME is empty."
             exit 1
           fi
-          NOMI_NAME_NORMALIZED=$(echo -n "$NOMI_NAME" | iconv -f utf-8 -t ascii//TRANSLIT | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_')
-          if [ -z "$NOMI_NAME_NORMALIZED" ]; then
+          NORMALIZED_NOMI_NAME=$(echo -n "$NOMI_NAME" | iconv -f utf-8 -t ascii//TRANSLIT | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9.-' '_')
+          if [ -z "$NORMALIZED_NOMI_NAME" ]; then
             echo "Error: Normalized Nomi Name is empty."
             exit 1
           fi
-          echo "Normalized Nomi Name: $NOMI_NAME_NORMALIZED"
-          echo "NOMI_NAME_NORMALIZED=$NOMI_NAME_NORMALIZED" >> $GITHUB_OUTPUT
+          echo "Normalized Nomi Name: $NORMALIZED_NOMI_NAME"
+          echo "NORMALIZED_NOMI_NAME=$NORMALIZED_NOMI_NAME" >> $GITHUB_OUTPUT
 
       - name: Get Service Name from render.yaml
         id: get-service-name
@@ -198,13 +198,131 @@ jobs:
             exit 1
           fi
 
-          MATCHES_SERVICE_NAME=$(echo "$RESPONSE_BODY" | jq -c --arg NAME "$SERVICE_NAME" '.[] | select(.blueprint.name == $NAME)')
-          echo "$MATCHES_SERVICE_NAME"
-          if [ -z "$MATCHES_SERVICE_NAME" ]; then
+          EXISTING_BLUEPRINT=$(echo "$RESPONSE_BODY" | jq -c --arg NAME "$SERVICE_NAME" '.[] | select(.blueprint.name == $NAME)')
+          echo "$EXISTING_BLUEPRINT"
+          if [ -z "$EXISTING_BLUEPRINT" ]; then
             echo "No existing blueprints with the name $SERVICE_NAME were found."
             exit 1
           else
             echo "An existing blueprint with the name $SERVICE_NAME was found."
+          fi
+
+      - name: Check for Existing Generic Service
+        id: check-existing-service
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
+        continue-on-error: true
+        run: |
+          # Fetch existing services
+          RESPONSE=$(curl -s -w "%{http_code}" \
+            --request GET \
+            --header "Authorization: Bearer $RENDER_API_KEY" \
+            --header "Accept: application/json" \
+            --url "https://api.render.com/v1/services?includePreviews=true&limit=50")
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to retrieve services. HTTP Status: $HTTP_STATUS"
+            echo "Response: $RESPONSE_BODY"
+            exit 1
+          fi
+
+          # Check if the response is a valid JSON array
+          IS_ARRAY=$(echo "$RESPONSE_BODY" | jq 'type == "array"')
+          if [ "$IS_ARRAY" != "true" ]; then
+            echo "Error: Expected an array in the response."
+            exit 1
+          fi
+
+          # Check if any blueprints exist
+          BLUEPRINT_COUNT=$(echo "$RESPONSE_BODY" | jq 'length')
+          if [ "$BLUEPRINT_COUNT" -eq 0 ]; then
+            echo "No existing services found."
+            exit 1
+          fi
+
+          EXISTING_SERVICE=$(echo "$RESPONSE_BODY" | jq -r --arg NAME "$SERVICE_NAME" '.[] | select(.service.name == $NAME) | .service')
+          if [ -n "$EXISTING_SERVICE" ] && [ "$EXISTING_SERVICE" != "null" ]; then
+            echo "An existing service with the name $SERVICE_NAME was found."
+            SERVICE_ID=$(echo "$EXISTING_SERVICE" | jq -r '.id')
+            echo "SERVICE_ID=$SERVICE_ID" >> $GITHUB_OUTPUT
+          else
+            echo "No existing services the name $SERVICE_NAME were found."
+            exit 1
+          fi
+
+      - name: Rename Service to match our Nomi's Name
+        if: steps.check-existing-service.outcome == 'success'
+        id: rename-generic-service
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_ID: ${{ steps.check-existing-service.outputs.SERVICE_ID }}
+          NOMI_NAME: ${{ steps.get-normalized-nomi-name.outputs.NORMALIZED_NOMI_NAME }}
+        run: |
+          # Ensure the value is properly escaped for JSON
+          NAME_ESCAPED=$(printf '%s' "$NOMI_NAME" | jq -Rs '.')
+          # Fetch existing services
+          RESPONSE=$(curl -s -w "%{http_code}" \
+            --request GET \
+            --header "Authorization: Bearer $RENDER_API_KEY" \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --data "{\"name\":$NAME_ESCAPED}" \
+            --url "https://api.render.com/v1/services/$SERVICE_ID")
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to rename Service. HTTP Status: $HTTP_STATUS"
+            echo "Response: $RESPONSE_BODY"
+            exit 1
+          fi
+
+      # This is a sanity check more than anything. Here,
+      # We just make sure that a service corresponding
+      # to our nomi's name exists
+      - name: Check Existing Named Service
+        id: check-existing-named-service
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          NOMI_NAME: ${{ steps.get-normalized-nomi-name.outputs.NORMALIZED_NOMI_NAME }}
+        run: |
+          # Fetch existing services
+          RESPONSE=$(curl -s -w "%{http_code}" \
+            --request GET \
+            --header "Authorization: Bearer $RENDER_API_KEY" \
+            --header "Accept: application/json" \
+            --url "https://api.render.com/v1/services?includePreviews=true&limit=50")
+          HTTP_STATUS="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE::-3}"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to retrieve services. HTTP Status: $HTTP_STATUS"
+            echo "Response: $RESPONSE_BODY"
+            exit 1
+          fi
+
+          # Check if the response is a valid JSON array
+          IS_ARRAY=$(echo "$RESPONSE_BODY" | jq 'type == "array"')
+          if [ "$IS_ARRAY" != "true" ]; then
+            echo "Error: Expected an array in the response."
+            exit 1
+          fi
+
+          # Check if any blueprints exist
+          BLUEPRINT_COUNT=$(echo "$RESPONSE_BODY" | jq 'length')
+          if [ "$BLUEPRINT_COUNT" -eq 0 ]; then
+            echo "No existing services found."
+            exit 1
+          fi
+
+          EXISTING_SERVICE=$(echo "$RESPONSE_BODY" | jq -r --arg NAME "$NOMI_NAME" '.[] | select(.service.name == $NAME) | .service')
+          if [ -n "$EXISTING_SERVICE" ] && [ "$EXISTING_SERVICE" != "null" ]; then
+            echo "An existing service with the name $NOMI_NAME was found."
+            ENV_GROUP_ID=$(echo "$EXISTING_SERVICE" | jq -r '.id')
+            echo "EXISTING_SERVICE=$ENV_GROUP_ID" >> $GITHUB_OUTPUT
+          else
+            echo "No existing service the name $NOMI_NAME was found."
+            exit 1
           fi
 
       - name: Check for Existing Environment Group
@@ -309,7 +427,7 @@ jobs:
             echo "Successfully updated env var $KEY."
           done
 
-      - name: Inform App it is running on Render
+      - name: Inform Nomi Container it is running on Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
