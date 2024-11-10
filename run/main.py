@@ -142,10 +142,16 @@ if __name__ == "__main__":
             port = os.getenv("PORT")
             port = int(port)
 
+            # We just need to return a '200' on any request. Absolutely
+            # minimal setup here, returns 200 to request
             class HealthHandler(http.server.BaseHTTPRequestHandler):
                 def do_GET(self):
                     self.send_response(200)
                     self.end_headers()
+
+                # Suppress logging the health check
+                def log_message(self, format, *args):
+                    return
 
             def start_health_handler():
                 server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
@@ -157,5 +163,6 @@ if __name__ == "__main__":
             health_thread.start()
     except NameError:
         logging.info("Not running on Render")
+
 
     nomi.run(token = discord_api_key, root_logger = True)
