@@ -66,6 +66,9 @@ def do_render_housekeeping(render_external_url: str) -> None:
     port = os.getenv("PORT")
     port = int(port)
 
+    render_external_url.replace('https://', '')
+    render_external_url.replace('http://', '')
+
     # We just need to return a '200' on any request to prove
     # we're healthty. Absolutely minimal setup here, but
     # we also use this as an opportunity to make a request to
