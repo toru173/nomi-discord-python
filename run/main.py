@@ -133,16 +133,14 @@ def start_health_handler():
     HealthHandler.render_external_url = render_external_url
 
     with http.server.ThreadingHTTPServer(('', port), HealthHandler) as server:
-        while True:
-            server.handle_one_request()
+        server.serve_forever()
     os.sys.stderr.write("Shutting down health handler\n")
 
 
 def start_heartbeat_handler():
     os.sys.stderr.write("Starting heartbeat handler\n")
     with http.server.ThreadingHTTPServer(('', 443), HeartbeatHandler) as server:
-        while True:
-            server.handle_one_request()
+        server.serve_forever()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
 
@@ -206,12 +204,12 @@ if __name__ == "__main__":
     # to health checks and keeping the service running.
     if render_external_url is not None:
         os.sys.stderr.write("Running on Render. Starting health and heartbeat handlers...\n")
-        # health_thread = threading.Thread(target = start_health_handler)
-        # health_thread.daemon = True
-        # health_thread.start()
-
-        health_thread = threading.Thread(target = start_heartbeat_handler)
+        health_thread = threading.Thread(target = start_health_handler)
         health_thread.daemon = True
         health_thread.start()
+
+        heartbeat_thread = threading.Thread(target = start_heartbeat_handler)
+        heartbeat_thread.daemon = True
+        heartbeat_thread.start()
 
     nomi.run(token = discord_api_key, root_logger = True)
