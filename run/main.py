@@ -205,9 +205,9 @@ if __name__ == "__main__":
     # to health checks and keeping the service running.
     if render_external_url is not None:
         os.sys.stderr.write("Running on Render. Starting health and heartbeat handlers...\n")
-        health_thread = threading.Thread(target = start_health_handler)
-        health_thread.daemon = True
-        health_thread.start()
+        # health_thread = threading.Thread(target = start_health_handler)
+        # health_thread.daemon = True
+        # health_thread.start()
 
         health_thread = threading.Thread(target = start_heartbeat_handler)
         health_thread.daemon = True
