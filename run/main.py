@@ -88,18 +88,14 @@ def do_render_housekeeping(render_external_url: str) -> None:
         #     return
 
     class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
-        def do_HEAD(self):
-            self.send_response(200)
-            self.end_headers()
-
         def do_POST(self):
             # Respond to the heartbeat check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
 
         # Suppress logging the heartbeat check
-        def log_message(self, format, *args):
-            return
+        # def log_message(self, format, *args):
+        #     return
 
     def start_health_handler():
         os.sys.stderr.write("Starting health handler\n")
