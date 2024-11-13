@@ -70,6 +70,10 @@ def strip_outer_quotation_marks(quoted_string: str) -> str:
 # ourselves to stop Render spinning the app down
 class HealthHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
+
+        os.sys.stderr.write("Received health check-in\n")
+        os.sys.stderr.write("Checking heartbeat endpoint\n")
+
         # Use this as a timing mechanism to keep our app alive
         conn = http.client.HTTPSConnection(self.render_external_url)
         conn.request("GET", "/heartbeat")
@@ -106,12 +110,13 @@ def start_health_handler():
         return
 
     os.sys.stderr.write("Starting health handler\n")
-    os.sys.stderr.write(f"Port: {port}\n")
-    os.sys.stderr.write(f"External URL: {render_external_url}\n")
 
     # Strip leading protocol indicator
     render_external_url = render_external_url.replace('https://', '')
     render_external_url = render_external_url.replace('http://', '')
+
+    os.sys.stderr.write(f"Port: {port}\n")
+    os.sys.stderr.write(f"External URL: {render_external_url}\n")
 
     HealthHandler.render_external_url = render_external_url
 
