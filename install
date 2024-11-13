@@ -187,7 +187,7 @@ SET "DOWNLOAD_DIR=%INSTALL_DIR%\download"
 
 :: Check we have write access to the location the user has provided.
 :: We'll try to create a test directory to check write access.
-MKDIR %DOWNLOAD_DIR%
+MKDIR %DOWNLOAD_DIR% >NUL
 IF ERRORLEVEL 1 (
     ECHO It looks like we can't write to the folder: %INSTALL_DIR%.
     ECHO Please make sure you have permission to write to this directory and try again.
@@ -278,7 +278,7 @@ IF /I "!OPEN_FOLDER!" == "Y" (
 :cleanup
 :: In case we received an error between downloading and extracting
 :: the install files, delete them here
-IF EXIST "%INSTALL_DIR%\downloads\" DEL /F /Q "%INSTALL_DIR%\downloads\"
+IF EXIST "%DOWNLOAD_DIR%" DEL /F /Q "%DOWNLOAD_DIR%"
 ENDLOCAL
 PAUSE
 ECHO You may now close this window
