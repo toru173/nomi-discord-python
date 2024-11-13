@@ -94,10 +94,10 @@ def do_render_housekeeping(render_external_url: str) -> None:
             self.end_headers()
 
     class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
-        def do_GET(self):
-            # Respond to the heartbeat check with 200 ('OK')
-            self.send_response(200)
-            self.end_headers()
+        # def do_GET(self):
+        #     # Respond to the heartbeat check with 200 ('OK')
+        #     self.send_response(200)
+        #     self.end_headers()
 
         def do_PUT(self):
             # Respond to the heartbeat check with 200 ('OK')
