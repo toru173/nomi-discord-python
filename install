@@ -263,7 +263,8 @@ ECHO:
 ECHO The installation completed succesfully.
 ECHO:
 
-ECHO: > "%INSTALL_DIR%\.nomi_setup_done"
+ECHO:> "%INSTALL_DIR%\.nomi_setup_done"
+ATTRIB +H "%INSTALL_DIR%\.nomi_setup_done"
 
 ECHO You can set up a Nomi's Docker container by running the setup script.
 
@@ -277,7 +278,7 @@ IF /I "!OPEN_FOLDER!" == "Y" (
 :cleanup
 :: In case we received an error between downloading and extracting
 :: the install files, delete them here
-IF EXIST "%INSTALL_DIR%\.downloads\" DEL /F /Q "%INSTALL_DIR%\.downloads\"
+IF EXIST "%INSTALL_DIR%\downloads\" DEL /F /Q "%INSTALL_DIR%\downloads\"
 ENDLOCAL
 PAUSE
 ECHO You may now close this window
