@@ -109,11 +109,13 @@ def do_render_housekeeping(render_external_url: str) -> None:
         #     return
 
     def start_health_handler(render_external_url):
+        print("Starting health handler")
         HealthHandler.render_external_url = render_external_url
         server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
         server.serve_forever()
 
     def start_heartbeat_handler():
+        print("Starting heartbeat handler")
         server = http.server.HTTPServer(("0.0.0.0", 80), HeartbeatHandler)
         server.serve_forever()
 
@@ -141,7 +143,7 @@ if __name__ == "__main__":
                 "DM_MESSAGE_PREFIX",
                 "REACT_TRIGGER_PHRASE",
                 "RENDER_EXTERNAL_URL"
-    ]
+            ]
 
     for variable in ENV_VARS:
         globals()[variable.lower()] = os.getenv(variable) or None
