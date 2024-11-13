@@ -72,7 +72,7 @@ class HealthHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         # Use this as a timing mechanism to keep our app alive
         conn = http.client.HTTPSConnection(self.render_external_url)
-        conn.request("GET", "/")
+        conn.request("GET", "/heartbeat")
         status = conn.getresponse().status
         os.sys.stderr.write(str(f"Status: {status}\n"))
         # Respond to the health check with 200 ('OK')
@@ -98,7 +98,7 @@ class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
     #     return
 
 
-def start_health_handler(render_external_url):
+def start_health_handler():
     port = int(os.getenv("PORT") or -1)
     render_external_url = os.getenv("RENDER_EXTERNAL_URL" or None)
 
