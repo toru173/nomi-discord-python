@@ -38,8 +38,6 @@ ENDLOCAL
 EXIT /B
 END_WIN
 
-set -x
-
 # This is the macOS/Linux part of the script. We have to do
 # The same steps here, but in a way that works for Bash.
 
@@ -69,8 +67,6 @@ trap "cleanup" EXIT INT
 # Cleanup function
 function cleanup() {
     EXIT_CODE=$?
-    # Clean up the output folder
-    rm -f "$LATEST_INSTALL_SCRIPT"
     exit $EXIT_CODE
 }
 
