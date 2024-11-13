@@ -13,9 +13,9 @@ ECHO ===========================================================================
 ECHO =============================== Nomi Setup ================================
 ECHO ===========================================================================
 ECHO:
-ECHO This setup utility will create a script that can be used to start running a Nomi
-ECHO in a Docker container. It needs to be run whenever you want to make changes
-ECHO to your Nomi's configuration.
+ECHO This setup utility will create a script that can be used to start running a
+ECHO Nomi in a Docker container. It needs to be run whenever you want to make
+ECHO changes to your Nomi's configuration.
 ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
@@ -199,9 +199,9 @@ echo "==========================================================================
 echo "=============================== Nomi Setup ================================"
 echo "==========================================================================="
 echo
-echo "This setup utility will create a script that can be used to start running a Nomi"
-echo "in a Docker container. It needs to be run whenever you want to make changes"
-echo "to your Nomi's configuration."
+echo "This setup utility will create a script that can be used to start running a"
+echo "Nomi in a Docker container. It needs to be run whenever you want to make"
+echo "changes to your Nomi's configuration."
 echo
 echo "If you ever want to quit the script, simply press CTRL+C together."
 echo
