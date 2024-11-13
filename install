@@ -255,7 +255,10 @@ IF /I "!OPEN_FOLDER!" == "Y" (
 :cleanup
 :: In case we received an error between downloading and extracting
 :: the install files, delete them here
-RMDIR /S /Q %DOWNLOAD_DIR%
+IF EXIST "%INSTALL_DIR%.download" (
+    ATTRIB -H %DOWNLOAD_DIR%
+    RMDIR /S /Q %DOWNLOAD_DIR%
+)
 ENDLOCAL
 PAUSE
 ECHO You may now close this window
