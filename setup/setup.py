@@ -47,7 +47,7 @@ def prompt_user(required_keys: List, current_values: Dict) -> dict:
         existing_value = current_values.get(key, "")
         if key == "MAX_MESSAGE_LENGTH":
             prompt = f"Are you a paying user? We need to know to set the message length"
-            response = input(f"{prompt} (y/n): ").strip().lower()
+            response = input(f"{prompt} [y/N]: ").strip().lower()
             while True:
                 if response in ("yes", "y"):
                     value = 600
@@ -56,7 +56,7 @@ def prompt_user(required_keys: List, current_values: Dict) -> dict:
                     value = 400
                     break
                 prompt = f"Please answer yes or no. Are you a paying user?"
-                response = input(f"{prompt} (y/n): ").strip().lower()
+                response = input(f"{prompt} [y/N]: ").strip().lower()
         else:
             prompt = f"{key} [{existing_value}]: " if existing_value else f"{key}: "
             value = input(prompt)
@@ -86,7 +86,6 @@ def main() -> None:
     placeholder_nomi_name_key = "NOMI_NAME"
     placeholder_docker_image_name = "DOCKER_IMAGE_NAME"
 
-    # Define file paths
     conf_template_path = Path(f"{input_dir}nomi.conf")
     start_nomi_path = Path(f"{input_dir}start_nomi")
 

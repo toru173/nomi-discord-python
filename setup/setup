@@ -287,6 +287,7 @@ chmod +x "$SCRIPT_ROOT/nomis/$OUTPUT_FILE"
 
 echo "Start script created. You can start your new Nomi by running $OUTPUT_FILE"
 echo "You may now close this window"
+echo
 
 # All done! Let's exit from the macOS/Linux part of the script
 exit 0
