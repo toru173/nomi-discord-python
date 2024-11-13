@@ -108,7 +108,7 @@ def do_render_housekeeping(render_external_url: str) -> None:
         # def log_message(self, format, *args):
         #     return
 
-    def start_health_handler(render_external_url):
+    def start_health_handler():
         print("Starting health handler")
         HealthHandler.render_external_url = render_external_url
         server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
