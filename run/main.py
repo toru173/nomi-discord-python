@@ -91,6 +91,12 @@ class HealthHandler(http.server.BaseHTTPRequestHandler):
     # def log_message(self, format, *args):
     #     return
 
+class ThreadingHealthServer(http.server.ThreadingHTTPServer):
+    pass
+
+class ThreadingHeartbeatServer(http.server.ThreadingHTTPServer):
+    pass
+
 
 # We need to be world-reachable and have something
 # interact with the app every 15 minutes
@@ -132,14 +138,14 @@ def start_health_handler():
 
     HealthHandler.render_external_url = render_external_url
 
-    with http.server.ThreadingHTTPServer(('', port), HealthHandler) as server:
+    with ThreadingHealthServer(('', port), HealthHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down health handler\n")
 
 
 def start_heartbeat_handler():
     os.sys.stderr.write("Starting heartbeat handler\n")
-    with http.server.ThreadingHTTPServer(('', 443), HeartbeatHandler) as server:
+    with ThreadingHeartbeatServer(('', 443), HeartbeatHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
