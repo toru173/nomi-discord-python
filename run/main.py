@@ -105,6 +105,10 @@ def start_health_handler():
     if port < 0 or render_external_url is None:
         return
 
+    os.sys.stderr.write("Starting health handler\n")
+    os.sys.stderr.write(f"Port: {port}\n")
+    os.sys.stderr.write(f"External URL: {render_external_url}\n")
+
     # Strip leading protocol indicator
     render_external_url = render_external_url.replace('https://', '')
     render_external_url = render_external_url.replace('http://', '')
@@ -116,6 +120,7 @@ def start_health_handler():
 
 
 def start_heartbeat_handler():
+    os.sys.stderr.write("Starting heartbeat handler\n")
     server = http.server.HTTPServer(("0.0.0.0", 443), HeartbeatHandler)
     server.serve_forever()
 
