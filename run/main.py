@@ -82,8 +82,8 @@ def do_render_housekeeping(render_external_url: str) -> None:
             self.end_headers()
 
         # Suppress logging the health check
-        def log_message(self, format, *args):
-            return
+        # def log_message(self, format, *args):
+        #     return
 
     def start_health_handler(render_external_url):
         server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
