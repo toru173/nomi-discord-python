@@ -77,12 +77,12 @@ def do_render_housekeeping(render_external_url: str) -> None:
     class HealthHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
             # Use this as a timing mechanism to keep our app alive
-            conn = http.client.HTTPConnection("webhook.site")
-            conn.request("GET", f"/12bea593-ba06-48ca-8ee9-41ad3cd9dcdf&url={self.render_external_url}")
+            conn = http.client.HTTPSConnection("webhook.site")
+            conn.request("GET", "/12bea593-ba06-48ca-8ee9-41ad3cd9dcdf")
             response = conn.getresponse().read()
             os.sys.stderr.write(str(response) + "\n")
 
-            conn = http.client.HTTPConnection(self.render_external_url)
+            conn = http.client.HTTPSConnection(self.render_external_url)
             conn.request("GET", "/heartbeat")
             response = conn.getresponse().read()
             os.sys.stderr.write(str(response) + "\n")
@@ -117,7 +117,7 @@ def do_render_housekeeping(render_external_url: str) -> None:
 
     def start_heartbeat_handler():
         os.sys.stderr.write("Starting heartbeat handler\n")
-        server = http.server.HTTPServer(("0.0.0.0", 80), HeartbeatHandler)
+        server = http.server.HTTPServer(("0.0.0.0", 443), HeartbeatHandler)
         server.serve_forever()
 
     health_thread = threading.Thread(target = start_health_handler)
