@@ -23,6 +23,7 @@ IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord
 SETLOCAL ENABLEDELAYEDEXPANSION
 SET INSTALL_FOLDER=nomi-discord-python
 SET HOME_DIR=%USERPROFILE%
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
 
 :: Perform a basic sanity check
 IF NOT "%OS%" == "Windows_NT" (
@@ -31,9 +32,8 @@ IF NOT "%OS%" == "Windows_NT" (
 )
 
 if "%1"=="--skip-checks" (
-    GOTO do_update
+    GOTO do_install
 )
-
 
 ECHO ===========================================================================
 ECHO ============================ Easy Installer ===============================
@@ -117,6 +117,7 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
     GOTO cleanup
 )
 
+:do_install
 
 :: Now we know know we have Docker and tar we check with the user if
 :: installing in our default location (%USERPROFILE%\%INSTALL_FOLDER%)
@@ -125,20 +126,19 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
 SET "DEFAULT_INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 SET "INSTALL_DIR=%DEFAULT_INSTALL_DIR%"
 
-:do_update
-FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
-
 :: Check if .nomi_setup_done exists in the script's current directory
 :: If it does, assume the user chose this directory last time
 if EXIST "%SCRIPT_ROOT%.nomi_setup_done" (
     SET "INSTALL_DIR=%SCRIPT_ROOT%"
-    GOTO prompt_update_dir
+    ECHO This will update nomi-discord-python in the current directory
+    ECHO:
+    GOTO confirm_install_dir
 )
 
 ECHO:
 ECHO Where would you like to install nomi-discord-python?
 
-:prompt_install_dir
+:confirm_install_dir
 ECHO Install Location: %INSTALL_DIR%
 SET /P "USER_INPUT=Press Enter to accept, or choose a new location: "
 
@@ -146,32 +146,12 @@ IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
 
 :: Display the chosen directory and ask for confirmation
 ECHO:
-ECHO Install location: %INSTALL_DIR%
 SET /P "CONTINUE=Are you sure? [y/N]: "
 
 IF /I NOT "!CONTINUE!" == "Y" (
-    GOTO prompt_install_dir
+    GOTO confirm_install_dir
 )
 
-GOTO do_install
-
-:prompt_update_dir
-ECHO This will update nomi-discord-python in the current directory
-
-SET /P "USER_INPUT=Press Enter to accept, or enter a choose location: "
-
-IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
-
-:: Display the chosen directory and ask for confirmation
-ECHO:
-ECHO Install location: %INSTALL_DIR%
-SET /P "CONTINUE=Are you sure? [y/N]: "
-
-IF /I NOT "!CONTINUE!" == "Y" (
-    GOTO prompt_update_dir
-)
-
-:do_install
 ECHO:
 ECHO Proceeding with installation in: %INSTALL_DIR%
 
