@@ -39,24 +39,7 @@ from nomi import Session, Nomi
 from nomi_bot import NomiBot
 
 # Utility Functions
-def read_variable_from_file(variable_name: str, filename: str) -> Optional[str]:
-    try:
-        with open(filename, 'r') as file:
-            for line in file:
-                # Strip leading/trailing whitespace and newline characters
-                line = line.strip()
-                # Check if the line starts with the variable name followed by '='
-                if line.startswith(f"{variable_name}="):
-                    # Return the part after "VARIABLE_NAME="
-                    return line[len(f"{variable_name}="):]
-        # If the variable is not found, return None
-        return None
-    except (FileNotFoundError, IOError):
-        # Return None if the file cannot be found or read
-        return None
-
-
-def strip_outer_quotation_marks(s: str) -> str:
+def strip_outer_quotation_marks(quoted_string: str) -> str:
     # Define a set of unicode-compatible quotation marks to remove
     quote_pairs = {
         '"': '"',
@@ -70,40 +53,75 @@ def strip_outer_quotation_marks(s: str) -> str:
     }
 
     # Check if the string has at least two characters and the first and last form a valid pair
-    if len(s) >= 2 and s[0] in quote_pairs and s[-1] == quote_pairs[s[0]]:
-        return s[1:-1]
+    if len(quoted_string) >= 2 and quoted_string[0] in quote_pairs and quoted_string[-1] == quote_pairs[quoted_string[0]]:
+        return quoted_string[1:-1]
 
-    return s
+    return quoted_string
+
+def do_render_housekeeping(render_external_url: str) -> None:
+    import http.server
+    import http.client
+    import threading
+
+    port = os.getenv("PORT")
+    port = int(port)
+
+    # We just need to return a '200' on any request to prove
+    # we're healthty. Absolutely minimal setup here, but
+    # we also use this as an opportunity to make a request to
+    # ourselves to stop Render spinning the app down
+    class HealthHandler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            # Use this as a timing mechanism to keep our app alive
+            http.client.HTTPSConnection(render_external_url).request("GET", "/")
+            # Respond to the health check with 200 ('OK')
+            self.send_response(200)
+            self.end_headers()
+
+        # Suppress logging the health check
+        def log_message(self, format, *args):
+            return
+
+    def start_health_handler(render_external_url):
+        server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
+        server.serve_forever()
+
+    health_thread = threading.Thread(target = start_health_handler, args = render_external_url)
+    health_thread.daemon = True
+    health_thread.start()
+
+    return None
 
 
 if __name__ == "__main__":
 
     # Read variables from env
-    CONFIG_VARIABLES = ["DISCORD_API_KEY",
-                        "NOMI_API_KEY",
-                        "NOMI_ID",
-                        "MAX_MESSAGE_LENGTH",
-                        "DEFAULT_MESSAGE_PREFIX",
-                        "DEFAULT_MESSAGE_SUFFIX",
-                        "CHANNEL_MESSAGE_PREFIX",
-                        "DM_MESSAGE_PREFIX",
-                        "REACT_TRIGGER_PHRASE",
-                        "ON_RENDER"
+    ENV_VARS = ["DISCORD_API_KEY",
+                "NOMI_API_KEY",
+                "NOMI_ID",
+                "MAX_MESSAGE_LENGTH",
+                "DEFAULT_MESSAGE_PREFIX",
+                "DEFAULT_MESSAGE_SUFFIX",
+                "CHANNEL_MESSAGE_PREFIX",
+                "DM_MESSAGE_PREFIX",
+                "REACT_TRIGGER_PHRASE",
+                "RENDER_EXTERNAL_URL"
     ]
 
-    for variable in CONFIG_VARIABLES:
+    for variable in ENV_VARS:
         globals()[variable.lower()] = os.getenv(variable) or None
 
+
     if discord_api_key is None:
-        logging.error("DISCORD_API_KEY was not found in the configuration file, or the file was not found")
+        logging.error("DISCORD_API_KEY was not found in the environment variables")
         exit(1)
 
     if nomi_api_key is None:
-        logging.error("NOMI_API_KEY was not found in the configuration file, or the file was not found")
+        logging.error("NOMI_API_KEY was not found in the environment variables")
         exit(1)
 
     if nomi_id is None:
-        logging.error("NOMI_ID was not found in the configuration file, or the file was not found")
+        logging.error("NOMI_ID was not found in the environment variables")
         exit(1)
 
     message_modifiers = {
@@ -131,51 +149,11 @@ if __name__ == "__main__":
                    intents = intents
                 )
 
-    logging.info("Checking if we're on Render...")
 
-    try:
-        if on_render is not None:
-            logging.info("Running on Render")
-            logging.info("Starting Health Service and Heartbeat")
-
-            import http.server
-            import time
-            import threading
-
-
-            port = os.getenv("PORT")
-            port = int(port)
-
-            # We just need to return a '200' on any request. Absolutely
-            # minimal setup here, returns 200 to request
-            class HealthHandler(http.server.BaseHTTPRequestHandler):
-                def do_GET(self):
-                    self.send_response(200)
-                    self.end_headers()
-
-                # Suppress logging the health check
-                def log_message(self, format, *args):
-                    return
-
-            def start_health_handler():
-                server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
-                logging.info(f"Render health check running on port {port}")
-                server.serve_forever()
-
-            def start_heartbeat():
-                while True:
-                    heartbeat = Session(api_key = nomi_api_key)
-                    time.sleep(870) # Sleep 14.5 minutes
-
-            health_thread = threading.Thread(target = start_health_handler)
-            health_thread.daemon = True
-            health_thread.start()
-
-            heartbeat_thread = threading.Thread(target = start_heartbeat)
-            heartbeat_thread.daemon = True
-            heartbeat_thread.start()
-    except NameError:
-        logging.info("Not running on Render")
-
+    # Check if we're running on Render. We need to do
+    # some housekeeping if we are, including responding
+    # to health checks and keeping the service running.
+    if render_external_url is not None:
+        do_render_housekeeping(render_external_url)
 
     nomi.run(token = discord_api_key, root_logger = True)
