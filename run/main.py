@@ -87,8 +87,8 @@ def do_render_housekeeping(render_external_url: str) -> None:
             self.end_headers()
 
         # Suppress logging the health check
-        def log_message(self, format, *args):
-            return
+        # def log_message(self, format, *args):
+        #     return
 
     class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
