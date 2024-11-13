@@ -114,7 +114,6 @@ if __name__ == "__main__":
     for variable in ENV_VARS:
         globals()[variable.lower()] = os.getenv(variable) or None
 
-
     if discord_api_key is None:
         logging.error("DISCORD_API_KEY was not found in the environment variables")
         exit(1)
@@ -151,7 +150,6 @@ if __name__ == "__main__":
                    message_modifiers = message_modifiers,
                    intents = intents
                 )
-
 
     # Check if we're running on Render. We need to do
     # some housekeeping if we are, including responding
