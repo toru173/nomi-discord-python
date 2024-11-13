@@ -96,6 +96,9 @@ class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
             # Respond to the heartbeat check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
+        else:
+            self.send_response(451)
+            self.end_headers()
 
     # Suppress logging the heartbeat check
     # def log_message(self, format, *args):
