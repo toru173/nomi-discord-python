@@ -122,12 +122,15 @@ def start_health_handler():
 
     server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
     server.serve_forever()
+    os.sys.stderr.write("Shutting down health handler\n")
+
 
 
 def start_heartbeat_handler():
     os.sys.stderr.write("Starting heartbeat handler\n")
     server = http.server.HTTPServer(("0.0.0.0", 443), HeartbeatHandler)
     server.serve_forever()
+    os.sys.stderr.write("Shutting down heartbeat handler\n")
 
 
 if __name__ == "__main__":
