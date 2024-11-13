@@ -81,7 +81,13 @@ def do_render_housekeeping(render_external_url: str) -> None:
             self.send_response(200)
             self.end_headers()
 
-        # Suppress logging the health check
+    class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            # Respond to the heartbeat check with 200 ('OK')
+            self.send_response(200)
+            self.end_headers()
+
+        # Suppress logging the heartbeat check
         # def log_message(self, format, *args):
         #     return
 
@@ -89,7 +95,15 @@ def do_render_housekeeping(render_external_url: str) -> None:
         server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
         server.serve_forever()
 
+    def start_heartbeat_handler():
+        server = http.server.HTTPServer(("0.0.0.0", 80), HeartbeatHandler)
+        server.serve_forever()
+
     health_thread = threading.Thread(target = start_health_handler, args = (render_external_url,))
+    health_thread.daemon = True
+    health_thread.start()
+
+    health_thread = threading.Thread(target = start_heartbeat_handler)
     health_thread.daemon = True
     health_thread.start()
 
