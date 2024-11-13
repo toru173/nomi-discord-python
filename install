@@ -225,7 +225,7 @@ IF EXIST "%INSTALL_DIR%\update\update" (
     IF EXIST "%INSTALL_DIR%\update.bat" DEL /F /Q "%INSTALL_DIR%\update.bat"
     COPY /Y "%INSTALL_DIR%\update\update" "%INSTALL_DIR%\update.bat" >NUL
 ) ELSE (
-    ECHO Error: udpate script not found in %INSTALL_DIR%\update
+    ECHO Error: update script not found in %INSTALL_DIR%\update
 )
 
 :: Check if the Nomi setup script exists (it should). Copy and rename it to
@@ -466,12 +466,10 @@ fi
 # Check if .nomi_setup_done exists in the script's current directory
 # If it does, assume the user chose this directory last time
 if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
-    echo
     echo "Where would you like to install nomi-discord-python?"
 
     INSTALL_DIR="$DEFAULT_INSTALL_DIR"
 else
-    echo
     echo "This will update nomi-discord-python in the current directory"
     INSTALL_DIR="$SCRIPT_ROOT"
 fi
