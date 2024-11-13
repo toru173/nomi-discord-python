@@ -86,7 +86,7 @@ def do_render_housekeeping(render_external_url: str) -> None:
         server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
         server.serve_forever()
 
-    health_thread = threading.Thread(target = start_health_handler, args = render_external_url)
+    health_thread = threading.Thread(target = start_health_handler, args = (render_external_url,))
     health_thread.daemon = True
     health_thread.start()
 
