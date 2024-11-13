@@ -474,7 +474,7 @@ else
 fi
 
 while true; do
-    # Prompt the user for the installation directory
+    # Prompt the user to confirm the installation directory
     echo
     echo "Install Location: $INSTALL_DIR"
     read -p "Press Enter to accept, or choose a new location: " INSTALL_DIR </dev/tty
