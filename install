@@ -183,11 +183,11 @@ IF NOT EXIST "%INSTALL_DIR%" (
 )
 
 :: Generate a random file name using the %RANDOM% environment variable
-SET "DOWNLOAD_DIR=%INSTALL_DIR%\download"
+SET "DOWNLOAD_DIR=%INSTALL_DIR%download"
 
 :: Check we have write access to the location the user has provided.
 :: We'll try to create a test directory to check write access.
-MKDIR %DOWNLOAD_DIR% >NUL
+MKDIR %DOWNLOAD_DIR% 2>NUL
 IF ERRORLEVEL 1 (
     ECHO It looks like we can't write to the folder: %INSTALL_DIR%.
     ECHO Please make sure you have permission to write to this directory and try again.
