@@ -77,27 +77,22 @@ def do_render_housekeeping(render_external_url: str) -> None:
     class HealthHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
             # Use this as a timing mechanism to keep our app alive
-            conn = http.client.HTTPSConnection(self.render_external_url)
-            conn.request("GET", "/heartbeat")
-            status = conn.getresponse().status
-            os.sys.stderr.write(str(status) + "\n")
-
+            http.client.HTTPSConnection(self.render_external_url).request("GET", "/")
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
 
-        def log_message(self, format, *args):
-            os.sys.stderr.write(f"{self.render_external_url}\n")
+        # def log_message(self, format, *args):
+        #     os.sys.stderr.write(f"{self.render_external_url}\n")
 
     class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
+        def do_HEAD(self):
+            self.send_response(200)
+            self.end_headers()
+
         def do_GET(self):
             # Respond to the heartbeat check with 200 ('OK')
             self.send_response(451)
-            self.end_headers()
-
-        def do_PUT(self):
-            # Respond to the heartbeat check with 200 ('OK')
-            self.send_response(200)
             self.end_headers()
 
         # Suppress logging the heartbeat check
