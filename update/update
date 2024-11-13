@@ -18,7 +18,6 @@ ECHO to the current install location. You will have the opportunity to install
 ECHO to a different location if you wish.
 ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together.
-ECHO:
 
 :: Get the absolute path to the script's directory
 FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
@@ -32,7 +31,7 @@ START /WAIT /B CMD /Q /K %LATEST_INSTALL_SCRIPT% --skip-checks
 :: All done! Let's exit from the Windows part of the script
 :cleanup
 :: Clean up the output folder
-DEL /F /Q "%LATEST_INSTALL_SCRIPT%"
+DEL /F /Q %LATEST_INSTALL_SCRIPT%
 ENDLOCAL
 EXIT /B
 END_WIN
