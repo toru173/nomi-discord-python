@@ -80,21 +80,19 @@ def do_render_housekeeping(render_external_url: str) -> None:
             conn = http.client.HTTPConnection("webhook.site")
             conn.request("GET", f"/12bea593-ba06-48ca-8ee9-41ad3cd9dcdf&url={self.render_external_url}")
             response = conn.getresponse()
-            print(response)
+            os.sys.stderr.write(str(response) + "\n")
 
             print(f"URL: {self.render_external_url}")
             conn = http.client.HTTPConnection(self.render_external_url)
             conn.request("GET", "/heartbeat")
             response = conn.getresponse()
-            print(response)
-            print(conn)
-            time.sleep(5)
+            os.sys.stderr.write(str(response) + "\n")
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
 
         def log_message(self, format, *args):
-            os.sys.stderr.write(self.render_external_url)
+            os.sys.stderr.write(f"{self.render_external_url}\n")
 
     class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
         # def do_GET(self):
@@ -112,13 +110,13 @@ def do_render_housekeeping(render_external_url: str) -> None:
         #     return
 
     def start_health_handler():
-        print("Starting health handler")
+        os.sys.stderr.write("Starting health handler\n")
         HealthHandler.render_external_url = render_external_url
         server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
         server.serve_forever()
 
     def start_heartbeat_handler():
-        print("Starting heartbeat handler")
+        os.sys.stderr.write("Starting heartbeat handler\n")
         server = http.server.HTTPServer(("0.0.0.0", 80), HeartbeatHandler)
         server.serve_forever()
 
