@@ -78,7 +78,10 @@ def do_render_housekeeping(render_external_url: str) -> None:
     class HealthHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
             # Use this as a timing mechanism to keep our app alive
-            http.client.HTTPSConnection(self.render_external_url).request("GET", "/")
+            conn = http.client.HTTPSConnection(self.render_external_url)
+            conn.request("GET", "/")
+            status = conn.getresponse().status
+            os.sys.stderr.write(str(f"Status: {status}\n"))
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
