@@ -339,8 +339,6 @@ function check_dependancies() {
         TAR_INSTALLED=0
     fi
 
-    echo
-
     # Display installation statuses
     if [ "$DOCKER_INSTALLED" -eq 1 ]; then
         echo "[x] Docker is installed"
@@ -455,6 +453,7 @@ if [ ! $1 == "--skip-checks" ]; then
     echo "version of nomi-python-discord."
     echo
     echo "If you ever want to quit the script, simply press CTRL+C together"
+    echo
 
     check_dependancies
 
@@ -470,36 +469,25 @@ if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
     echo
     echo "Where would you like to install nomi-discord-python?"
 
-    while true; do
-        # Prompt the user for the installation directory
-        echo "Install Location: $DEFAULT_INSTALL_DIR"
-        read -p "Press Enter to accept, or enter a new location: " INSTALL_DIR </dev/tty
-        INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
-
-        # Display the chosen directory and ask for confirmation
-        echo
-        echo "Install Location: $INSTALL_DIR"
-        if prompt_confirm "Are you sure?"; then
-            break
-        fi
-    done
+    INSTALL_DIR="$DEFAULT_INSTALL_DIR"
 else
-    DEFAULT_INSTALL_DIR="$SCRIPT_ROOT"
     echo
     echo "This will update nomi-discord-python in the current directory"
-    while true; do
-        # Prompt the user for the installation directory
-        read -p "Press Enter to accept, or choose a new location: " INSTALL_DIR </dev/tty
-        INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
-
-        # Display the chosen directory and ask for confirmation
-        echo
-        echo "Install Location: $INSTALL_DIR"
-        if prompt_confirm "Are you sure?"; then
-            break
-        fi
-    done
+    INSTALL_DIR="$SCRIPT_ROOT"
 fi
+
+while true; do
+    # Prompt the user for the installation directory
+    read -p "Press Enter to accept, or choose a new location: " INSTALL_DIR </dev/tty
+    INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
+
+    # Display the chosen directory and ask for confirmation
+    echo
+    echo "Install Location: $INSTALL_DIR"
+    if prompt_confirm "Are you sure?"; then
+        break
+    fi
+done
 
 echo
 echo "Proceeding with installation in: $INSTALL_DIR"
@@ -614,7 +602,6 @@ fi
 
 echo
 echo "The installation completed successfully."
-echo
 
 touch "$INSTALL_DIR/.nomi_setup_done"
 
@@ -630,9 +617,10 @@ else
     echo "Error: Unsupported operating system '$(uname -s)'."
     exit 1
 fi
-
+echo
 echo "You can set up a Nomi's Docker container by running the setup script."
 
+echo
 if prompt_confirm "Would you like to open the installation folder in a file browser?"; then
     if command -v xdg-open >/dev/null 2>&1; then
         # Linux (xdg-open is available)
