@@ -93,10 +93,13 @@ class HealthHandler(http.server.BaseHTTPRequestHandler):
 class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/heartbeat":
+
+            os.sys.stderr.write("Received heartbeat check-in\n")
             # Respond to the heartbeat check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
         else:
+            os.sys.stderr.write("Received non-heartbeat check-in\n")
             self.send_response(451)
             self.end_headers()
 
