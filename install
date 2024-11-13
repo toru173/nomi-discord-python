@@ -125,13 +125,14 @@ IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
 SET "DEFAULT_INSTALL_DIR=%USERPROFILE%\%INSTALL_FOLDER%"
 SET "INSTALL_DIR=%DEFAULT_INSTALL_DIR%"
 
+:do_update
 FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
 
 :: Check if .nomi_setup_done exists in the script's current directory
 :: If it does, assume the user chose this directory last time
 if EXIST "%SCRIPT_ROOT%.nomi_setup_done" (
     SET "INSTALL_DIR=%SCRIPT_ROOT%"
-    GOTO do_update
+    GOTO prompt_update_dir
 )
 
 ECHO:
@@ -154,11 +155,9 @@ IF /I NOT "!CONTINUE!" == "Y" (
 
 GOTO do_install
 
-:do_update
-ECHO:
+:prompt_update_dir
 ECHO This will update nomi-discord-python in the current directory
 
-:prompt_update_dir
 SET /P "USER_INPUT=Press Enter to accept, or enter a choose location: "
 
 IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
@@ -173,7 +172,6 @@ IF /I NOT "!CONTINUE!" == "Y" (
 )
 
 :do_install
-
 ECHO:
 ECHO Proceeding with installation in: %INSTALL_DIR%
 
@@ -182,8 +180,7 @@ IF NOT EXIST "%INSTALL_DIR%" (
     MKDIR "%INSTALL_DIR%"
 )
 
-:: Generate a random file name using the %RANDOM% environment variable
-SET "DOWNLOAD_DIR=%INSTALL_DIR%download"
+SET "DOWNLOAD_DIR=%INSTALL_DIR%.download"
 
 :: Check we have write access to the location the user has provided.
 :: We'll try to create a test directory to check write access.
@@ -263,7 +260,7 @@ ECHO:
 ECHO The installation completed succesfully.
 ECHO:
 
-ECHO:> "%INSTALL_DIR%\.nomi_setup_done"
+ECHO:> "%INSTALL_DIR%\.nomi_setup_done" 2>NUL
 ATTRIB +H "%INSTALL_DIR%\.nomi_setup_done"
 
 ECHO You can set up a Nomi's Docker container by running the setup script.
