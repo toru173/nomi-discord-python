@@ -96,6 +96,7 @@ class HealthHandler(http.server.BaseHTTPRequestHandler):
 # interact with the app every 15 minutes
 class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
+        os.sys.stderr.write("Received a check-in on 443\n")
         if self.path == "/heartbeat":
 
             os.sys.stderr.write("Received heartbeat check-in\n")
@@ -131,14 +132,16 @@ def start_health_handler():
     HealthHandler.render_external_url = render_external_url
 
     with http.server.ThreadingHTTPServer(('', port), HealthHandler) as server:
-        server.serve_forever()
+        while True:
+            server.handle_request()
     os.sys.stderr.write("Shutting down health handler\n")
 
 
 def start_heartbeat_handler():
     os.sys.stderr.write("Starting heartbeat handler\n")
     with http.server.ThreadingHTTPServer(('', 443), HeartbeatHandler) as server:
-        server.serve_forever()
+        while True:
+            server.handle_request()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
 
