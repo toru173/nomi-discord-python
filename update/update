@@ -89,7 +89,7 @@ SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LATEST_INSTALL_SCRIPT="$SCRIPT_ROOT/latest_installer.sh"
 
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o "$LATEST_INSTALL_SCRIPT"
-bash "$LATEST_INSTALL_SCRIPT" --skip-checks
+bash -s "$LATEST_INSTALL_SCRIPT" --skip-checks
 
 # All done! Let's exit from the macOS/Linux part of the script
 exit $?
