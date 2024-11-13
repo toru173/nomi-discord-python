@@ -62,6 +62,7 @@ def do_render_housekeeping(render_external_url: str) -> None:
     import http.server
     import http.client
     import threading
+    import time
 
     port = int(os.getenv("PORT"))
 
@@ -76,13 +77,13 @@ def do_render_housekeeping(render_external_url: str) -> None:
     class HealthHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
             # Use this as a timing mechanism to keep our app alive
-            conn = http.client.HTTPSConnection("webhook.site")
+            conn = http.client.HTTPConnection("webhook.site")
             conn.request("GET", f"/12bea593-ba06-48ca-8ee9-41ad3cd9dcdf&url={self.render_external_url}")
-            logging.error(str(conn))
-            logging.error(str(self.render_external_url))
-            conn = http.client.HTTPSConnection(self.render_external_url)
+            print(conn)
+            conn = http.client.HTTPConnection(self.render_external_url)
             conn.request("GET", "/")
-            logging.error(str(conn))
+            print(conn)
+            time.sleep(3)
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
@@ -108,7 +109,7 @@ def do_render_housekeeping(render_external_url: str) -> None:
         server.serve_forever()
 
     def start_heartbeat_handler():
-        server = http.server.HTTPServer(("0.0.0.0", 443), HeartbeatHandler)
+        server = http.server.HTTPServer(("0.0.0.0", 80), HeartbeatHandler)
         server.serve_forever()
 
     health_thread = threading.Thread(target = start_health_handler, args = (render_external_url,))
