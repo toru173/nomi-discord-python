@@ -83,6 +83,10 @@ class HealthHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
 
+    def do_HEAD(self):
+        self.send_response(200)
+        self.end_headers()
+
     # Suppress logging the health check
     # def log_message(self, format, *args):
     #     return
@@ -126,15 +130,15 @@ def start_health_handler():
 
     HealthHandler.render_external_url = render_external_url
 
-    server = http.server.HTTPServer(("0.0.0.0", port), HealthHandler)
-    server.serve_forever()
+    with http.server.ThreadingHTTPServer(('', port), HealthHandler) as server:
+        server.serve_forever()
     os.sys.stderr.write("Shutting down health handler\n")
 
 
 def start_heartbeat_handler():
     os.sys.stderr.write("Starting heartbeat handler\n")
-    server = http.server.HTTPServer(("0.0.0.0", 443), HeartbeatHandler)
-    server.serve_forever()
+    with http.server.ThreadingHTTPServer(('', 443), HeartbeatHandler) as server:
+        server.serve_forever()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
 
