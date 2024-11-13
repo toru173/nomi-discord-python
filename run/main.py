@@ -63,11 +63,11 @@ def do_render_housekeeping(render_external_url: str) -> None:
     import http.client
     import threading
 
-    port = os.getenv("PORT")
-    port = int(port)
+    port = int(os.getenv("PORT"))
 
-    render_external_url.replace('https://', '')
-    render_external_url.replace('http://', '')
+    # Strip leading protocol indicator
+    render_external_url = render_external_url.replace('https://', '')
+    render_external_url = render_external_url.replace('http://', '')
 
     # We just need to return a '200' on any request to prove
     # we're healthty. Absolutely minimal setup here, but
