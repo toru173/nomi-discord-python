@@ -189,7 +189,7 @@ SET "DOWNLOAD_DIR=%INSTALL_DIR%download"
 :: We'll try to create a test directory to check write access.
 MKDIR %DOWNLOAD_DIR% 2>NUL
 IF ERRORLEVEL 1 (
-    ECHO It looks like we can't write to the folder: %INSTALL_DIR%.
+    ECHO It looks like we can't write to the folder: %INSTALL_DIR%
     ECHO Please make sure you have permission to write to this directory and try again.
     GOTO cleanup
 ) ELSE (
@@ -227,7 +227,7 @@ IF /I NOT "!CONTINUE!" == "Y" (
 :: After that, get the install script, the license and everything inside
 :: the 'app' subdirectory
 ECHO Extracting installation files...
-tar -xvf "%DOWNLOAD_DIR%\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\run" --include="*\setup" --include="*\update"
+tar -xvf "%DOWNLOAD_DIR%\install.zip" -C %INSTALL_DIR% --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\run" --include="*\setup" --include="*\update"
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
@@ -278,7 +278,7 @@ IF /I "!OPEN_FOLDER!" == "Y" (
 :cleanup
 :: In case we received an error between downloading and extracting
 :: the install files, delete them here
-IF EXIST "%DOWNLOAD_DIR%" DEL /F /Q "%DOWNLOAD_DIR%"
+RMDIR /S /Q %DOWNLOAD_DIR%
 ENDLOCAL
 PAUSE
 ECHO You may now close this window
@@ -534,7 +534,7 @@ WRITE_TEST="${INSTALL_DIR}/.downloads"
 # Check we have write access to the location the user has provided.
 # We'll try to create a test directory to check write access.
 if ! mkdir "$WRITE_TEST" 2>/dev/null; then
-    echo "It looks like we can't write to the folder: $INSTALL_DIR."
+    echo "It looks like we can't write to the folder: $INSTALL_DIR"
     echo "Please make sure you have permission to write to this directory and try again."
     exit 1
 fi
