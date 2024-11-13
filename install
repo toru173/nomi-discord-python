@@ -183,21 +183,23 @@ IF NOT EXIST "%INSTALL_DIR%" (
 )
 
 :: Generate a random file name using the %RANDOM% environment variable
-SET "WRITE_TEST=%INSTALL_DIR%\.downloads"
+SET "DOWNLOAD_DIR=%INSTALL_DIR%\download"
 
 :: Check we have write access to the location the user has provided.
 :: We'll try to create a test directory to check write access.
-MKDIR "%WRITE_TEST%"
+MKDIR %DOWNLOAD_DIR%
 IF ERRORLEVEL 1 (
     ECHO It looks like we can't write to the folder: %INSTALL_DIR%.
     ECHO Please make sure you have permission to write to this directory and try again.
     GOTO cleanup
+) ELSE (
+    ATTRIB +H %DOWNLOAD_DIR%
 )
 
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub...
-curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%INSTALL_DIR%\.downloads\install.zip" --progress-bar --remove-on-error
-IF NOT EXIST "%INSTALL_DIR%\.downloads\install.zip" (
+curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%DOWNLOAD_DIR%\install.zip" --progress-bar --remove-on-error
+IF NOT EXIST "%DOWNLOAD_DIR%\install.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO cleanup
 )
@@ -225,7 +227,7 @@ IF /I NOT "!CONTINUE!" == "Y" (
 :: After that, get the install script, the license and everything inside
 :: the 'app' subdirectory
 ECHO Extracting installation files...
-tar -xvf "%INSTALL_DIR%\.downloads\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\run" --include="*\setup" --include="*\update"
+tar -xvf "%DOWNLOAD_DIR%\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\run" --include="*\setup" --include="*\update"
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup

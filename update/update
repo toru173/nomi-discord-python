@@ -23,9 +23,10 @@ ECHO:
 :: Get the absolute path to the script's directory
 FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
 
-SET "LATEST_INSTALL_SCRIPT=%SCRIPT_ROOT%\latest_install.bat"
+SET "LATEST_INSTALL_SCRIPT=%SCRIPT_ROOT%latest_install.bat"
 
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %LATEST_INSTALL_SCRIPT%
+ATTRIB +H %LATEST_INSTALL_SCRIPT%
 START /B "" %LATEST_INSTALL_SCRIPT% --skip-checks
 
 :: All done! Let's exit from the Windows part of the script
