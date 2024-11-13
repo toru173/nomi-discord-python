@@ -238,11 +238,12 @@ IF EXIST "%INSTALL_DIR%\setup\setup" (
 
 ECHO:
 ECHO The installation completed succesfully.
-ECHO:
 
-ECHO:> "%INSTALL_DIR%\.nomi_setup_done" 2>NUL
+ATTRIB -H "%INSTALL_DIR%\.nomi_setup_done" 2>/NUL
+ECHO:> "%INSTALL_DIR%\.nomi_setup_done"
 ATTRIB +H "%INSTALL_DIR%\.nomi_setup_done"
 
+ECHO:
 ECHO You can set up a Nomi's Docker container by running the setup script.
 
 ECHO:
