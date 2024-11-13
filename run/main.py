@@ -78,10 +78,11 @@ def do_render_housekeeping(render_external_url: str) -> None:
             # Use this as a timing mechanism to keep our app alive
             conn = http.client.HTTPSConnection("webhook.site")
             conn.request("GET", f"/12bea593-ba06-48ca-8ee9-41ad3cd9dcdf&url={self.render_external_url}")
-            print(conn)
+            logging.error(str(conn))
+            logging.error(str(self.render_external_url))
             conn = http.client.HTTPSConnection(self.render_external_url)
             conn.request("GET", "/")
-            print(conn)
+            logging.error(str(conn))
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
