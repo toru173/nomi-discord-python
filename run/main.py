@@ -64,8 +64,8 @@ def strip_outer_quotation_marks(quoted_string: str) -> str:
 
 # Functions for dealing with Render
 
-# We just need to return a '200' on any request to prove
-# we're healthty. Absolutely minimal setup here, but
+# We just need to return a '200' on any request to PORT to
+# prove we're healthy. Absolutely minimal setup here, but
 # we also use this as an opportunity to make a request to
 # ourselves to stop Render spinning the app down
 class HealthHandler(http.server.BaseHTTPRequestHandler):
@@ -107,6 +107,7 @@ class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
             os.sys.stderr.write("Received non-heartbeat check-in\n")
             self.send_response(451)
             self.end_headers()
+            self.close_connection
 
     # Suppress logging the heartbeat check
     # def log_message(self, format, *args):
@@ -133,7 +134,7 @@ def start_health_handler():
 
     with http.server.ThreadingHTTPServer(('', port), HealthHandler) as server:
         while True:
-            server.handle_request()
+            server.handle_one_request()
     os.sys.stderr.write("Shutting down health handler\n")
 
 
@@ -141,7 +142,7 @@ def start_heartbeat_handler():
     os.sys.stderr.write("Starting heartbeat handler\n")
     with http.server.ThreadingHTTPServer(('', 443), HeartbeatHandler) as server:
         while True:
-            server.handle_request()
+            server.handle_one_request()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
 
