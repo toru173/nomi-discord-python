@@ -125,7 +125,6 @@ def start_health_handler():
     os.sys.stderr.write("Shutting down health handler\n")
 
 
-
 def start_heartbeat_handler():
     os.sys.stderr.write("Starting heartbeat handler\n")
     server = http.server.HTTPServer(("0.0.0.0", 443), HeartbeatHandler)
