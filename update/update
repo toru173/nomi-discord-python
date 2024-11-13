@@ -1,0 +1,126 @@
+: << END_WIN
+@ECHO OFF
+::
+:: ============================================================================
+:: === The LICENSE for this script can be found at the bottom of this file ====
+:: ============================================================================
+::
+:: This is the Windows part of the script.
+
+SETLOCAL ENABLEDELAYEDEXPANSION
+
+ECHO ===========================================================================
+ECHO ============================= Easy Updater ================================
+ECHO ===========================================================================
+ECHO:
+ECHO This will download the latest version of nomi-discord-python, and install
+ECHO it to the current install location. You will have the opportunity to
+ECHO install to a different location if you wish.
+ECHO:
+ECHO If you ever want to quit the script, simply press CTRL+C together.
+ECHO:
+
+:: Get the absolute path to the script's directory
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
+
+SET "LATEST_INSTALL_SCRIPT=%SCRIPT_ROOT%\latest_install.bat"
+
+curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %LATEST_INSTALL_SCRIPT%
+START /B "" %LATEST_INSTALL_SCRIPT% --skip-checks
+
+:: All done! Let's exit from the Windows part of the script
+:cleanup
+:: Clean up the output folder
+DEL /Q "%LATEST_INSTALL_SCRIPT%"
+ENDLOCAL
+EXIT /B
+END_WIN
+
+# This is the macOS/Linux part of the script. We have to do
+# The same steps here, but in a way that works for Bash.
+
+# Perform some basic sanity checks, then continue execution
+if [ -z "${BASH_VERSION:-}" ]; then
+    # Attempt to find Bash
+    if command -v bash >/dev/null 2>&1; then
+        # Re-execute the script with Bash by reading it from stdin if necessary
+        if [ -t 0 ]; then
+            # If the script is not being piped, re-execute the file with bash
+            bash "$0" "$@"
+        else
+            # If the script is being piped (non-interactive), re-execute from stdin
+            bash -s "$@" < /dev/stdin
+            exit $?
+        fi
+    else
+        # Unable to find Bash. Exit with an error
+        echo "Bash is required to run this script." >&2
+        exit 1
+    fi
+fi
+
+# Trap to function when we exit
+trap "cleanup" EXIT INT
+
+# Cleanup function
+function cleanup() {
+    EXIT_CODE=$?
+    # Clean up the output folder
+    rm -f "$LATEST_INSTALL_SCRIPT"
+    exit $EXIT_CODE
+}
+
+
+echo "==========================================================================="
+echo "============================= Easy Updater ================================"
+echo "==========================================================================="
+echo
+echo "This will download the latest version of nomi-discord-python, and install"
+echo "it to the current install location. You will have the opportunity to"
+echo "install to a different location if you wish."
+echo
+echo "If you ever want to quit the script, simply press CTRL+C together."
+echo
+
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LATEST_INSTALL_SCRIPT="$SCRIPT_ROOT/latest_install_script.sh"
+
+curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o "$LATEST_INSTALL_SCRIPT"
+bash "$LATEST_INSTALL_SCRIPT" --skip-checks
+
+# All done! Let's exit from the macOS/Linux part of the script
+exit $?
+
+===============================================================================
+================================== LICENSE ====================================
+===============================================================================
+
+LICENSE
+
+Copyright (c) 2024-present toru173 and contributors
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the disclaimer
+below) provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+* Neither the name of the copyright holder nor the names of the contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY
+THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

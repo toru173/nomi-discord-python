@@ -30,6 +30,11 @@ IF NOT "%OS%" == "Windows_NT" (
     GOTO cleanup
 )
 
+if "%1"=="--skip-checks" (
+    GOTO do_update
+)
+
+
 ECHO ===========================================================================
 ECHO ============================ Easy Installer ===============================
 ECHO ===========================================================================
@@ -40,10 +45,6 @@ ECHO version of nomi-python-discord.
 ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together
 ECHO:
-
-if "%1"=="skip-checks" (
-    GOTO do_update
-)
 
 :: First, check for required dependencies. We need Docker for
 :: this project to run, so check we have that installed. If
@@ -144,7 +145,7 @@ IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
 
 :: Display the chosen directory and ask for confirmation
 ECHO:
-ECHO Your choice: %INSTALL_DIR%
+ECHO Install location: %INSTALL_DIR%
 SET /P "CONTINUE=Are you sure? [y/N]: "
 
 IF /I NOT "!CONTINUE!" == "Y" (
@@ -164,7 +165,7 @@ IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
 
 :: Display the chosen directory and ask for confirmation
 ECHO:
-ECHO Your choice: %INSTALL_DIR%
+ECHO Install location: %INSTALL_DIR%
 SET /P "CONTINUE=Are you sure? [y/N]: "
 
 IF /I NOT "!CONTINUE!" == "Y" (
@@ -224,7 +225,7 @@ IF /I NOT "!CONTINUE!" == "Y" (
 :: After that, get the install script, the license and everything inside
 :: the 'app' subdirectory
 ECHO Extracting installation files...
-tar -xvf "%INSTALL_DIR%\.downloads\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\run" --include="*\setup"
+tar -xvf "%INSTALL_DIR%\.downloads\install.zip" -C "%INSTALL_DIR%" --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\run" --include="*\setup" --include="*\update"
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO cleanup
@@ -235,16 +236,25 @@ IF ERRORLEVEL 1 (
 IF EXIST "%INSTALL_DIR%\install" (
     IF EXIST "%INSTALL_DIR%\install.bat" DEL /F /Q "%INSTALL_DIR%\install.bat"
     REN "%INSTALL_DIR%\install" "install.bat"
+) ELSE (
+    ECHO Error: install script not found in %INSTALL_DIR%
 )
 
-:: Copy the install script to update.extension to make it easier
-:: for users to update
-COPY /Y "%INSTALL_DIR%\install.bat" "%INSTALL_DIR%\update.bat" >NUL
+:: Check if the update script exists (it should). Copy and rename it to
+:: update.bat to make running it from the command line easier later
+IF EXIST "%INSTALL_DIR%\update\update" (
+    IF EXIST "%INSTALL_DIR%\update.bat" DEL /F /Q "%INSTALL_DIR%\update.bat"
+    COPY /Y "%INSTALL_DIR%\update\update" "%INSTALL_DIR%\update.bat" >NUL
+) ELSE (
+    ECHO Error: udpate script not found in %INSTALL_DIR%\update
+)
 
 :: Check if the Nomi setup script exists (it should). Copy and rename it to
 :: setup.bat to make running it from the command line easier later
 IF EXIST "%INSTALL_DIR%\setup\setup" (
     COPY /Y "%INSTALL_DIR%\setup\setup" "%INSTALL_DIR%\setup.bat" >NUL
+) ELSE (
+    ECHO Error: setup script not found in %INSTALL_DIR%\setup
 )
 
 ECHO:
@@ -304,11 +314,11 @@ trap "cleanup" EXIT INT
 
 # Cleanup function
 function cleanup() {
-    exit_code=$?
+    EXIT_CODE=$?
     if [ -n "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/.downloads/install.zip" ]; then
         rm -rf "$INSTALL_DIR/.downloads/"
     fi
-    exit $exit_code
+    exit $EXIT_CODE
 }
 
 # Prompt for and confirm user input
@@ -422,46 +432,48 @@ function check_dependancies() {
 }
 
 function get_script() {
-    local source_file="$1"
-    local destination_dir="$2"
+    local SOURCE_FILE="$1"
+    local DESTINATION_FILE="$2"
 
     # Check if the source file exists
-    if [ ! -f "$source_file" ]; then
-        echo "Error: Source file '$source_file' not found!"
+    if [ ! -f "$SOURCE_FILE" ]; then
+        echo "Error: Source file '$SOURCE_FILE' not found!"
         return 1
     fi
 
-    local base_filename="$(basename $source_file)"
+    local BASE_FILENAME="$(basename $SOURCE_FILE)"
 
     # Determine the destination file based on the OS
     if [ "$(uname -s)" == "Darwin" ]; then
-        destination_file="${destination_dir}/${base_filename}.command"
+        DESTINATION_FILE="${DESTINATION_FILE}/${BASE_FILENAME}.command"
     elif [ "$(uname -s)" == "Linux" ]; then
-        destination_file="${destination_dir}/${base_filename}.sh"
+        DESTINATION_FILE="${DESTINATION_FILE}/${BASE_FILENAME}.sh"
     else
         echo "Error: Unsupported operating system '$(uname -s)'."
         return 1
     fi
-    echo "#!/usr/bin/env bash" > "$destination_file"
-    cat "$source_file" >> "$destination_file"
-    chmod +x "$destination_file"
+    echo "#!/usr/bin/env bash" > "$DESTINATION_FILE"
+    cat "$SOURCE_FILE" >> "$DESTINATION_FILE"
+    chmod +x "$DESTINATION_FILE"
 }
-
-echo "==========================================================================="
-echo "============================ Easy Installer ==============================="
-echo "==========================================================================="
-echo
-echo "Welcome to the easy installer for nomi-discord-python. We're going to check"
-echo "that your system has a few things installed already, then install the latest"
-echo "version of nomi-python-discord."
-echo
-echo "If you ever want to quit the script, simply press CTRL+C together"
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEFAULT_INSTALL_DIR="$HOME/$INSTALL_FOLDER"
 
-if [ ! $1 == "skip-checks" ]; then
+if [ ! $1 == "--skip-checks" ]; then
+
+    echo "==========================================================================="
+    echo "============================ Easy Installer ==============================="
+    echo "==========================================================================="
+    echo
+    echo "Welcome to the easy installer for nomi-discord-python. We're going to check"
+    echo "that your system has a few things installed already, then install the latest"
+    echo "version of nomi-python-discord."
+    echo
+    echo "If you ever want to quit the script, simply press CTRL+C together"
+
     check_dependancies
+
 fi
 
 # Now we know we have Docker and tar we check with the user if
@@ -560,10 +572,10 @@ fi
 echo "Extracting installation files..."
 if tar --version 2>&1 | grep -q "GNU tar"; then
     tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
-        --wildcards --no-anchored '*/install' '*/LICENSE' '*/run' '*/setup'
+        --wildcards --no-anchored '*/install' '*/LICENSE' '*/run' '*/setup' '*/update'
 elif tar --version 2>&1 | grep -qi "bsdtar"; then
     tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
-        --include="*/install" --include="*/LICENSE" --include="*/run" --include="*/setup"
+        --include="*/install" --include="*/LICENSE" --include="*/run" --include="*/setup" --include="*/update"
 else
     echo "Error: Unsupported version of tar detected."
     exit 1
@@ -582,7 +594,7 @@ if [ -f "$INSTALL_DIR/install" ]; then
     get_script "$INSTALL_DIR/install" "$INSTALL_DIR/"
     rm "$INSTALL_DIR/install"
 else
-    echo "Error: install script not found in $INSTALL_DIR."
+    echo "Error: install script not found in $INSTALL_DIR"
 fi
 
 # Copy the install script to update.extension to make it easier
@@ -598,7 +610,14 @@ else
     exit 1
 fi
 
-cp "$INSTALL_SCRIPT" "$UPDATE_SCRIPT"
+# Check if the Nomi update script exists (it should). Copy it
+# from the /update directory into our install directory and make it
+# executable too
+if [ -f "$INSTALL_DIR/update/update" ]; then
+    get_script "$INSTALL_DIR/update/update" "$INSTALL_DIR"
+else
+    echo "Error: update script not found in $INSTALL_DIR/update"
+fi
 
 # Check if the Nomi setup script exists (it should). Copy it
 # from the /setup directory into our install directory and make it
@@ -606,7 +625,7 @@ cp "$INSTALL_SCRIPT" "$UPDATE_SCRIPT"
 if [ -f "$INSTALL_DIR/setup/setup" ]; then
     get_script "$INSTALL_DIR/setup/setup" "$INSTALL_DIR"
 else
-    echo "Error: setup script not found in $INSTALL_DIR/setup."
+    echo "Error: setup script not found in $INSTALL_DIR/setupx"
 fi
 
 echo

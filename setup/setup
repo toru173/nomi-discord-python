@@ -123,8 +123,6 @@ END_WIN
 # This is the macOS/Linux part of the script. We have to do
 # The same steps here, but in a way that works for Bash.
 
-echo $(pwd)
-
 # Perform some basic sanity checks, then continue execution
 if [ -z "${BASH_VERSION:-}" ]; then
     # Attempt to find Bash
@@ -150,10 +148,10 @@ trap "cleanup" EXIT INT
 
 # Cleanup function
 function cleanup() {
+    EXIT_CODE=$?
     # Clean up the output folder
     rm -f "$SETUP_DIR/output/"*
-    exit_code=$?
-    exit $exit_code
+    exit $EXIT_CODE
 }
 
 # Prompt for and confirm user input
@@ -170,29 +168,29 @@ function prompt_confirm() {
 }
 
 function get_script() {
-    local source_file="$1"
-    local destination_dir="$2"
+    local SOURCE_FILE="$1"
+    local DESTINATION_FILE="$2"
 
     # Check if the source file exists
-    if [ ! -f "$source_file" ]; then
-        echo "Error: Source file '$source_file' not found!"
+    if [ ! -f "$SOURCE_FILE" ]; then
+        echo "Error: Source file '$SOURCE_FILE' not found!"
         return 1
     fi
 
-    local base_filename="$(basename $source_file)"
+    local BASE_FILENAME="$(basename $SOURCE_FILE)"
 
     # Determine the destination file based on the OS
     if [ "$(uname -s)" == "Darwin" ]; then
-        destination_file="${destination_dir}/${base_filename}.command"
+        DESTINATION_FILE="${DESTINATION_FILE}/${BASE_FILENAME}.command"
     elif [ "$(uname -s)" == "Linux" ]; then
-        destination_file="${destination_dir}/${base_filename}.sh"
+        DESTINATION_FILE="${DESTINATION_FILE}/${BASE_FILENAME}.sh"
     else
         echo "Error: Unsupported operating system '$(uname -s)'."
         return 1
     fi
-    echo "#!/usr/bin/env bash" > "$destination_file"
-    cat "$source_file" >> "$destination_file"
-    chmod +x "$destination_file"
+    echo "#!/usr/bin/env bash" > "$DESTINATION_FILE"
+    cat "$SOURCE_FILE" >> "$DESTINATION_FILE"
+    chmod +x "$DESTINATION_FILE"
 }
 
 echo "==========================================================================="
