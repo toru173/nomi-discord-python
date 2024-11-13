@@ -239,8 +239,8 @@ IF EXIST "%INSTALL_DIR%\setup\setup" (
 ECHO:
 ECHO The installation completed succesfully.
 
-ATTRIB -H "%INSTALL_DIR%\.nomi_setup_done" 2>/NUL
-ECHO:> "%INSTALL_DIR%\.nomi_setup_done"
+ATTRIB -H "%INSTALL_DIR%\.nomi_setup_done" 2>NUL
+TYPE NUL > "%INSTALL_DIR%\.nomi_setup_done"
 ATTRIB +H "%INSTALL_DIR%\.nomi_setup_done"
 
 ECHO:
