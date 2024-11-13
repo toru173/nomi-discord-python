@@ -80,10 +80,11 @@ def do_render_housekeeping(render_external_url: str) -> None:
             conn = http.client.HTTPConnection("webhook.site")
             conn.request("GET", f"/12bea593-ba06-48ca-8ee9-41ad3cd9dcdf&url={self.render_external_url}")
             print(conn)
+            print(f"URL: {self.render_external_url}")
             conn = http.client.HTTPConnection(self.render_external_url)
             conn.request("GET", "/")
             print(conn)
-            time.sleep(3)
+            time.sleep(10)
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
@@ -112,7 +113,7 @@ def do_render_housekeeping(render_external_url: str) -> None:
         server = http.server.HTTPServer(("0.0.0.0", 80), HeartbeatHandler)
         server.serve_forever()
 
-    health_thread = threading.Thread(target = start_health_handler, args = (render_external_url,))
+    health_thread = threading.Thread(target = start_health_handler)
     health_thread.daemon = True
     health_thread.start()
 
