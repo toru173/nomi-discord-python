@@ -103,7 +103,7 @@ class NomiBot(commands.Bot):
 
 
     async def on_ready(self):
-        logging.info(f"{self.user.display_name} is now online. Happy chatting!")
+        logging.info(f"{self.nomi.name} is now online. Happy chatting!")
 
 
     async def on_message(self, discord_message):
