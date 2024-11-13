@@ -23,7 +23,7 @@ ECHO:
 :: Get the absolute path to the script's directory
 FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
 
-SET "LATEST_INSTALL_SCRIPT=%SCRIPT_ROOT%latest_install.bat"
+SET "LATEST_INSTALL_SCRIPT=%SCRIPT_ROOT%latest_installer.bat"
 
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %LATEST_INSTALL_SCRIPT%
 ATTRIB +H %LATEST_INSTALL_SCRIPT%
@@ -85,7 +85,7 @@ echo "If you ever want to quit the script, simply press CTRL+C together."
 echo
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LATEST_INSTALL_SCRIPT="$SCRIPT_ROOT/latest_install_script.sh"
+LATEST_INSTALL_SCRIPT="$SCRIPT_ROOT/latest_installer.sh"
 
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o "$LATEST_INSTALL_SCRIPT"
 bash "$LATEST_INSTALL_SCRIPT" --skip-checks
