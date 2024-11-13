@@ -38,6 +38,8 @@ ENDLOCAL
 EXIT /B
 END_WIN
 
+set -x
+
 # This is the macOS/Linux part of the script. We have to do
 # The same steps here, but in a way that works for Bash.
 
