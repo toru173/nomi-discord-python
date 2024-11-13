@@ -88,9 +88,10 @@ class HealthHandler(http.server.BaseHTTPRequestHandler):
 # interact with the app every 15 minutes
 class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
-        # Respond to the heartbeat check with 200 ('OK')
-        self.send_response(200)
-        self.end_headers()
+        if self.path == "/heartbeat":
+            # Respond to the heartbeat check with 200 ('OK')
+            self.send_response(200)
+            self.end_headers()
 
     # Suppress logging the heartbeat check
     # def log_message(self, format, *args):
