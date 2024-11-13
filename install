@@ -466,16 +466,16 @@ fi
 # Check if .nomi_setup_done exists in the script's current directory
 # If it does, assume the user chose this directory last time
 if [ ! -f "$SCRIPT_ROOT/.nomi_setup_done" ]; then
-    echo "Where would you like to install nomi-discord-python?"
-
     INSTALL_DIR="$DEFAULT_INSTALL_DIR"
+    echo "Where would you like to install nomi-discord-python?"
 else
-    echo "This will update nomi-discord-python in the current directory"
     INSTALL_DIR="$SCRIPT_ROOT"
+    echo "This will update nomi-discord-python in the current directory"
 fi
 
 while true; do
     # Prompt the user for the installation directory
+    echo
     echo "Install Location: $INSTALL_DIR"
     read -p "Press Enter to accept, or choose a new location: " INSTALL_DIR </dev/tty
     INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
