@@ -62,6 +62,26 @@ def strip_outer_quotation_marks(quoted_string: str) -> str:
     return quoted_string
 
 
+def get_env_vars() -> dict:
+    # Read variables from env
+    REQUIRED_ENV_VARS = ["DISCORD_API_KEY",
+                            "NOMI_API_KEY",
+                            "NOMI_ID",
+                            "MAX_MESSAGE_LENGTH",
+                            "DEFAULT_MESSAGE_PREFIX",
+                            "DEFAULT_MESSAGE_SUFFIX",
+                            "CHANNEL_MESSAGE_PREFIX",
+                            "DM_MESSAGE_PREFIX",
+                            "REACT_TRIGGER_PHRASE",
+                            "RENDER_EXTERNAL_URL"
+                    ]
+    env = {}
+    for var in REQUIRED_ENV_VARS:
+        env[var.lower()] = os.getenv(var) or None
+
+    return env
+
+
 # Functions for dealing with Render
 def start_health_handler():
     # We just need to return a '200' on any request to PORT to
@@ -135,29 +155,14 @@ def start_heartbeat_handler():
         #     return
 
     os.sys.stderr.write("Starting heartbeat handler\n")
-    with http.server.ThreadingHTTPServer(('', 443), HeartbeatHandler) as server:
+    with http.server.HTTPServer(('', 443), HeartbeatHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
 
 def main() -> None:
-    # Read variables from env
-    REQUIRED_ENV_VARS = ["DISCORD_API_KEY",
-                         "NOMI_API_KEY",
-                         "NOMI_ID",
-                         "MAX_MESSAGE_LENGTH",
-                         "DEFAULT_MESSAGE_PREFIX",
-                         "DEFAULT_MESSAGE_SUFFIX",
-                         "CHANNEL_MESSAGE_PREFIX",
-                         "DM_MESSAGE_PREFIX",
-                         "REACT_TRIGGER_PHRASE",
-                         "RENDER_EXTERNAL_URL"
-                    ]
 
-    env = {}
-
-    for var in REQUIRED_ENV_VARS:
-        env[var.lower()] = os.getenv(var) or None
+    env = get_env_vars()
 
     if env["discord_api_key"] is None:
         os.sys.stderr.write("DISCORD_API_KEY was not found in the environment variables\n")
