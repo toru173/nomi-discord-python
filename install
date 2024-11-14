@@ -84,6 +84,8 @@ IF "%TAR_INSTALLED%" == "1" (
 )
 
 IF "%DOCKER_INSTALLED%" == "0" ECHO Docker not installed
+IF "%TAR_INSTALLED%" == "0" ECHO TAR not installed
+
 
 :: If both are installed, continue
 IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
