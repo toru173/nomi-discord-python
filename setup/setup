@@ -8,6 +8,7 @@
 :: This is the Windows part of the script.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
+ON BREAK GOTO cleanup
 
 ECHO ===========================================================================
 ECHO =============================== Nomi Setup ================================

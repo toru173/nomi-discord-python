@@ -21,6 +21,8 @@ IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord
 :: This is the Windows part of the script.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
+ON BREAK GOTO cleanup
+
 SET INSTALL_FOLDER=nomi-discord-python
 SET HOME_DIR=%USERPROFILE%
 FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
@@ -244,7 +246,9 @@ IF EXIST "%INSTALL_DIR%\setup\setup" (
 ECHO:
 ECHO The installation completed succesfully.
 
-ATTRIB -H "%INSTALL_DIR%\.nomi_setup_done" 2>NUL
+IF EXIST "%INSTALL_DIR%\.nomi_setup_done" (
+    ATTRIB -H "%INSTALL_DIR%\.nomi_setup_done" 2>NUL
+)
 TYPE NUL > "%INSTALL_DIR%\.nomi_setup_done"
 ATTRIB +H "%INSTALL_DIR%\.nomi_setup_done"
 

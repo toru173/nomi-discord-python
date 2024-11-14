@@ -153,9 +153,10 @@ def heartbeat() -> None:
 
     try:
         os.sys.stderr.write("Checking heartbeat 🩺\n")
-        conn = http.client.HTTPSConnection(render_external_url).request("GET", "/heartbeat")
-        body = conn.getresponse().read()
-        status = conn.getresponse().status
+        conn = http.client.HTTPSConnection(render_external_url)
+        request = conn.request("GET", "/heartbeat")
+        body = request.getresponse().read()
+        status = request.getresponse().status
         if status == 200:
             os.sys.stderr.write(f"We have a heartbeat ♥️\n")
         else:
