@@ -13,7 +13,7 @@ services:
     plan: free
     rootDir: run
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /
+    healthCheckPath: /health
     envVars:
       - fromGroup: nomi-discord-python
 
