@@ -83,26 +83,14 @@ def get_env_vars() -> dict:
 
 
 # Functions for dealing with Render
-def start_health_handler():
+def health_handler() -> None:
     # We just need to return a '200' on any request to PORT to
     # prove we're healthy. Absolutely minimal setup here, but
     # we also use this as an opportunity to make a request to
     # ourselves to stop Render spinning the app down
     class HealthHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
-
             os.sys.stderr.write("Received health check-in 💊\n")
-            # os.sys.stderr.write("Checking heartbeat endpoint\n")
-
-            # Use this as a timing mechanism to keep our app alive
-            conn = http.client.HTTPSConnection(self.render_external_url)
-            conn.request("GET", "/heartbeat")
-            status = conn.getresponse().status
-            body = conn.getresponse().read()
-            os.sys.stderr.write(str(f"Status: {status}\n"))
-            os.sys.stderr.write(str(f"Body:\n{body}\n"))
-            if status == 200:
-                os.sys.stderr.write(str(f"We have a heartbeat ♥️\n"))
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
@@ -116,43 +104,29 @@ def start_health_handler():
             return
 
     port = int(os.getenv("PORT") or -1)
-    render_external_url = os.getenv("RENDER_EXTERNAL_URL" or None)
-
-    if port < 0 or render_external_url is None:
-        return
-
-    os.sys.stderr.write("Starting health handler\n")
-
-    # Strip leading protocol indicator
-    render_external_url = render_external_url.replace('https://', '')
-    render_external_url = render_external_url.replace('http://', '')
-
-    HealthHandler.render_external_url = render_external_url
+    if port < 0: return
 
     with http.server.HTTPServer(('0.0.0.0', port), HealthHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down health handler\n")
 
 
-def start_heartbeat_handler():
+def heartbeat_handler() -> None:
     # We need to be world-reachable and have something
     # interact with the app every 15 minutes
     class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
-            os.sys.stderr.write("Received a check-in on 443\n")
             if self.path == "/heartbeat":
-
-                os.sys.stderr.write("Received heartbeat check-in\n")
+                os.sys.stderr.write("Received heartbeat check-in ♥️\n")
                 # Respond to the heartbeat check with 200 ('OK')
                 self.send_response(200)
                 self.end_headers()
-            else:
-                os.sys.stderr.write("Received non-heartbeat check-in\n")
-                self.send_response(451)
-                self.end_headers()
-                self.close_connection
 
-        # Suppress logging the heartbeat check
+        def do_HEAD(self):
+            self.send_response(200)
+            self.end_headers()
+
+        # Suppress logging the health check
         def log_message(self, format, *args):
             return
 
@@ -160,6 +134,29 @@ def start_heartbeat_handler():
     with http.server.HTTPServer(('0.0.0.0', 443), HeartbeatHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
+
+
+def heartbeat() -> None:
+    threading.Timer(5, heartbeat).start()
+
+    render_external_url = os.getenv("RENDER_EXTERNAL_URL" or None)
+    if render_external_url is None: return
+
+    os.sys.stderr.write("Starting heartbeat service\n")
+
+    # Strip leading protocol indicator
+    render_external_url = render_external_url.replace('https://', '')
+    render_external_url = render_external_url.replace('http://', '')
+
+    try:
+        os.sys.stderr.write("Checking heartbeat 🩺\n")
+        conn = http.client.HTTPSConnection(render_external_url)
+        conn.request("GET", "/heartbeat")
+        status = conn.getresponse().status
+        os.sys.stderr.write(f"Status: {status}\n")
+        conn.close()
+    except Exception as e:
+        print(f"Unable to check for heartbeat: {e}")
 
 
 def main() -> None:
@@ -208,12 +205,16 @@ def main() -> None:
     # to health checks and keeping the service running.
     if env["render_external_url"] is not None:
         os.sys.stderr.write("Running on Render. Starting health and heartbeat handlers...\n")
-        health_thread = threading.Thread(target = start_health_handler)
-        health_thread.daemon = True
-        health_thread.start()
+        health_handler_thread = threading.Thread(target = health_handler)
+        heartbeat_handler_thread = threading.Thread(target = heartbeat_handler)
+        heartbeat_thread = threading.Thread(target = heartbeat)
 
-        heartbeat_thread = threading.Thread(target = start_heartbeat_handler)
+        health_handler_thread.daemon = True
+        heartbeat_handler_thread.daemon = True
         heartbeat_thread.daemon = True
+
+        health_handler_thread.start()
+        heartbeat_handler_thread.start()
         heartbeat_thread.start()
 
     nomi.run(token = env["discord_api_key"], root_logger = True)
