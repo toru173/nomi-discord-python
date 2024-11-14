@@ -103,7 +103,7 @@ def start_health_handler():
             #     os.sys.stderr.write(str(f"We have a heartbeat ♥️\n"))
             # Respond to the health check with 200 ('OK')
             self.send_response(302)
-            self.send_response("Location", render_external_url)
+            self.send_header("Location", render_external_url)
             self.end_headers()
 
         def do_HEAD(self):
