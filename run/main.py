@@ -31,7 +31,6 @@
 from typing import Optional
 
 from sys import stderr
-import logging
 import os
 
 import http.server
@@ -62,65 +61,35 @@ def strip_outer_quotation_marks(quoted_string: str) -> str:
 
     return quoted_string
 
+
 # Functions for dealing with Render
+def start_health_handler():
+    # We just need to return a '200' on any request to PORT to
+    # prove we're healthy. Absolutely minimal setup here, but
+    # we also use this as an opportunity to make a request to
+    # ourselves to stop Render spinning the app down
+    class HealthHandler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
 
-# We just need to return a '200' on any request to PORT to
-# prove we're healthy. Absolutely minimal setup here, but
-# we also use this as an opportunity to make a request to
-# ourselves to stop Render spinning the app down
-class HealthHandler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
+            os.sys.stderr.write("Received health check-in\n")
+            os.sys.stderr.write("Checking heartbeat endpoint\n")
 
-        os.sys.stderr.write("Received health check-in\n")
-        os.sys.stderr.write("Checking heartbeat endpoint\n")
-
-        # Use this as a timing mechanism to keep our app alive
-        conn = http.client.HTTPSConnection(self.render_external_url)
-        conn.request("GET", "/heartbeat")
-        status = conn.getresponse().status
-        os.sys.stderr.write(str(f"Status: {status}\n"))
-        # Respond to the health check with 200 ('OK')
-        self.send_response(200)
-        self.end_headers()
-
-    def do_HEAD(self):
-        self.send_response(200)
-        self.end_headers()
-
-    # Suppress logging the health check
-    # def log_message(self, format, *args):
-    #     return
-
-class ThreadingHealthServer(http.server.ThreadingHTTPServer):
-    pass
-
-class ThreadingHeartbeatServer(http.server.ThreadingHTTPServer):
-    pass
-
-
-# We need to be world-reachable and have something
-# interact with the app every 15 minutes
-class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        os.sys.stderr.write("Received a check-in on 443\n")
-        if self.path == "/heartbeat":
-
-            os.sys.stderr.write("Received heartbeat check-in\n")
-            # Respond to the heartbeat check with 200 ('OK')
+            # Use this as a timing mechanism to keep our app alive
+            conn = http.client.HTTPSConnection(self.render_external_url)
+            conn.request("GET", "/heartbeat")
+            status = conn.getresponse().status
+            os.sys.stderr.write(str(f"Status: {status}\n"))
+            # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
-        else:
-            os.sys.stderr.write("Received non-heartbeat check-in\n")
-            self.send_response(451)
+
+        def do_HEAD(self):
+            self.send_response(200)
             self.end_headers()
-            self.close_connection
 
-    # Suppress logging the heartbeat check
-    # def log_message(self, format, *args):
-    #     return
-
-
-def start_health_handler():
+        # Suppress logging the health check
+        # def log_message(self, format, *args):
+        #     return
     port = int(os.getenv("PORT") or -1)
     render_external_url = os.getenv("RENDER_EXTERNAL_URL" or None)
 
@@ -138,69 +107,91 @@ def start_health_handler():
 
     HealthHandler.render_external_url = render_external_url
 
-    with ThreadingHealthServer(('', port), HealthHandler) as server:
+    with http.server.ThreadingHTTPServer(('', port), HealthHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down health handler\n")
 
 
 def start_heartbeat_handler():
+    # We need to be world-reachable and have something
+    # interact with the app every 15 minutes
+    class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            os.sys.stderr.write("Received a check-in on 443\n")
+            if self.path == "/heartbeat":
+
+                os.sys.stderr.write("Received heartbeat check-in\n")
+                # Respond to the heartbeat check with 200 ('OK')
+                self.send_response(200)
+                self.end_headers()
+            else:
+                os.sys.stderr.write("Received non-heartbeat check-in\n")
+                self.send_response(451)
+                self.end_headers()
+                self.close_connection
+
+        # Suppress logging the heartbeat check
+        # def log_message(self, format, *args):
+        #     return
+
     os.sys.stderr.write("Starting heartbeat handler\n")
-    with ThreadingHeartbeatServer(('', 443), HeartbeatHandler) as server:
+    with http.server.ThreadingHTTPServer(('', 443), HeartbeatHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
 
-if __name__ == "__main__":
-
+def main() -> None:
     # Read variables from env
-    ENV_VARS = ["DISCORD_API_KEY",
-                "NOMI_API_KEY",
-                "NOMI_ID",
-                "MAX_MESSAGE_LENGTH",
-                "DEFAULT_MESSAGE_PREFIX",
-                "DEFAULT_MESSAGE_SUFFIX",
-                "CHANNEL_MESSAGE_PREFIX",
-                "DM_MESSAGE_PREFIX",
-                "REACT_TRIGGER_PHRASE",
-                "RENDER_EXTERNAL_URL"
-            ]
+    REQUIRED_ENV_VARS = ["DISCORD_API_KEY",
+                         "NOMI_API_KEY",
+                         "NOMI_ID",
+                         "MAX_MESSAGE_LENGTH",
+                         "DEFAULT_MESSAGE_PREFIX",
+                         "DEFAULT_MESSAGE_SUFFIX",
+                         "CHANNEL_MESSAGE_PREFIX",
+                         "DM_MESSAGE_PREFIX",
+                         "REACT_TRIGGER_PHRASE",
+                         "RENDER_EXTERNAL_URL"
+                    ]
 
-    for variable in ENV_VARS:
-        globals()[variable.lower()] = os.getenv(variable) or None
+    env = {}
 
-    if discord_api_key is None:
-        logging.error("DISCORD_API_KEY was not found in the environment variables")
+    for var in REQUIRED_ENV_VARS:
+        env[var.lower()] = os.getenv(var) or None
+
+    if env["discord_api_key"] is None:
+        os.sys.stderr.write("DISCORD_API_KEY was not found in the environment variables\n")
         exit(1)
 
-    if nomi_api_key is None:
-        logging.error("NOMI_API_KEY was not found in the environment variables")
+    if env["nomi_api_key"] is None:
+        os.sys.stderr.write("NOMI_API_KEY was not found in the environment variables\n")
         exit(1)
 
-    if nomi_id is None:
-        logging.error("NOMI_ID was not found in the environment variables")
+    if env["nomi_id"] is None:
+        os.sys.stderr.write("NOMI_ID was not found in the environment variables\n")
         exit(1)
 
     message_modifiers = {
-        "default_message_prefix" : default_message_prefix,
-        "default_message_suffix" : default_message_suffix,
-        "channel_message_prefix" : channel_message_prefix,
-        "dm_message_prefix" : dm_message_prefix,
-        "react_trigger_phrase" : react_trigger_phrase,
+        "default_message_prefix" : env["default_message_prefix"],
+        "default_message_suffix" : env["default_message_suffix"],
+        "channel_message_prefix" : env["channel_message_prefix"],
+        "dm_message_prefix" : env["dm_message_prefix"],
+        "react_trigger_phrase" : env["react_trigger_phrase"],
     }
 
     for modifier, value in message_modifiers.items():
         if value is not None:
             message_modifiers[modifier] = strip_outer_quotation_marks(value)
 
-    nomi_session = Session(api_key = nomi_api_key)
-    nomi = Nomi.from_uuid(session = nomi_session, uuid = nomi_id)
+    nomi_session = Session(api_key = env["nomi_api_key"])
+    nomi = Nomi.from_uuid(session = nomi_session, uuid = env["nomi_id"])
 
     intents = discord.Intents.default()
     intents.messages = True
     intents.members = True
 
     nomi = NomiBot(nomi = nomi,
-                   max_message_length = max_message_length,
+                   max_message_length = env["max_message_length"],
                    message_modifiers = message_modifiers,
                    intents = intents
                 )
@@ -208,7 +199,7 @@ if __name__ == "__main__":
     # Check if we're running on Render. We need to do
     # some housekeeping if we are, including responding
     # to health checks and keeping the service running.
-    if render_external_url is not None:
+    if env["render_external_url"] is not None:
         os.sys.stderr.write("Running on Render. Starting health and heartbeat handlers...\n")
         health_thread = threading.Thread(target = start_health_handler)
         health_thread.daemon = True
@@ -218,4 +209,8 @@ if __name__ == "__main__":
         heartbeat_thread.daemon = True
         heartbeat_thread.start()
 
-    nomi.run(token = discord_api_key, root_logger = True)
+    nomi.run(token = env["discord_api_key"], root_logger = True)
+
+
+if __name__ == "__main__":
+    main()
