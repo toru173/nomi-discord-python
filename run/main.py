@@ -98,7 +98,9 @@ def start_health_handler():
             conn = http.client.HTTPSConnection(self.render_external_url)
             conn.request("GET", "/heartbeat")
             status = conn.getresponse().status
+            body = conn.getresponse().read()
             os.sys.stderr.write(str(f"Status: {status}\n"))
+            os.sys.stderr.write(str(f"Body:\n{body}\n"))
             if status == 200:
                 os.sys.stderr.write(str(f"We have a heartbeat ♥️\n"))
             # Respond to the health check with 200 ('OK')
