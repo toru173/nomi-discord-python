@@ -83,43 +83,46 @@ IF "%TAR_INSTALLED%" == "1" (
     ECHO [ ] tar is not installed
 )
 
-IF "%DOCKER_INSTALLED%" == "0" ECHO Docker not installed
-IF "%TAR_INSTALLED%" == "0" ECHO TAR not installed
-
+IF "%DOCKER_INSTALLED%" == "0" GOTO install_dependencies
+IF "%TAR_INSTALLED%" == "0" GOTO install_dependencies
 
 :: If both are installed, continue
-IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
-    ECHO:
-    ECHO All required software is installed.
-) ELSE (
+ECHO:
+ECHO All required software is installed.
 
-    :: We're missing some necessary software. Let's fix it.
-    ECHO:
-    ECHO Please install the missing software and re-run the installer.
+GOTO do_install
 
-    SET /P "INSTALL_HELP=Would you like help installing the missing software? [y/N]: "
-    IF /I "!INSTALL_HELP!" == "Y" (
-        IF "%DOCKER_INSTALLED%" == "0" (
-            ECHO:
-            ECHO Docker is required but not installed.
-            SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? [y/N]: "
-            IF /I "!OPEN_BROWSER!" == "Y" (
-                START https://www.docker.com/products/docker-desktop/
-            )
-        )
-        IF "%TAR_INSTALLED%" == "0" (
-            ECHO:
-            ECHO tar is required but not installed. It was integrated into Windows 10 in 2018. Do you need to update?
-            ECHO Alternatively tar can be installed by downloading the latest version of libarchive.
-            SET /P "OPEN_BROWSER=Would you like to open the libarchive download page now? [y/N]: "
-            IF /I "!OPEN_BROWSER!" == "Y" (
-                START https://github.com/libarchive/libarchive/releases
-            )
+:install_dependencies
+
+:: We're missing some necessary software. Let's fix it.
+ECHO:
+ECHO Please install the missing software and re-run the installer.
+
+SET /P "INSTALL_HELP=Would you like help installing the missing software? [y/N]: "
+IF /I "!INSTALL_HELP!" == "Y" (
+    IF "%DOCKER_INSTALLED%" == "0" (
+        ECHO:
+        ECHO Docker is required but not installed.
+        SET /P "OPEN_BROWSER=Would you like to open the Docker download page now? [y/N]: "
+        IF /I "!OPEN_BROWSER!" == "Y" (
+            START https://www.docker.com/products/docker-desktop/
         )
     )
-    ECHO Some required software is missing. Please install the missing software and re-run the installer
-    GOTO cleanup
+    IF "%TAR_INSTALLED%" == "0" (
+        ECHO:
+        ECHO tar is required but not installed. It was integrated into Windows 10
+        ECHO in 2018. Do you need to update? Alternatively tar can be installed by
+        ECHO downloading the latest version of libarchive.
+        SET /P "OPEN_BROWSER=Would you like to open the libarchive download page now? [y/N]: "
+        IF /I "!OPEN_BROWSER!" == "Y" (
+            START https://github.com/libarchive/libarchive/releases
+        )
+    )
 )
+
+ECHO:
+ECHO Some required software is missing. Please install the missing software and re-run the installer
+GOTO cleanup
 
 :do_install
 
