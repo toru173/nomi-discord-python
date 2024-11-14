@@ -138,14 +138,12 @@ def heartbeat_handler() -> None:
 
 
 def heartbeat() -> None:
-    os.sys.stderr.write("Starting heartbeat\n")
     # Here we set a timer to check our heartbeat
-    threading.Timer(5, heartbeat).start()
+    os.sys.stderr.write("Starting heartbeat service\n")
+    threading.Timer(10, heartbeat).start()
 
     render_external_url = os.getenv("RENDER_EXTERNAL_URL" or None)
     if render_external_url is None: return
-
-    os.sys.stderr.write("Starting heartbeat service\n")
 
     # Strip leading protocol indicator
     render_external_url = render_external_url.replace('https://', '')
