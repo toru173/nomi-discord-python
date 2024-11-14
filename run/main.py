@@ -95,12 +95,12 @@ def start_health_handler():
             # os.sys.stderr.write("Checking heartbeat endpoint\n")
 
             # Use this as a timing mechanism to keep our app alive
-            # conn = http.client.HTTPConnection(self.render_external_url)
-            # conn.request("GET", "/heartbeat")
-            # status = conn.getresponse().status
-            # os.sys.stderr.write(str(f"Status: {status}\n"))
-            # if status == 200:
-            #     os.sys.stderr.write(str(f"We have a heartbeat ♥️\n"))
+            conn = http.client.HTTPSConnection(self.render_external_url)
+            conn.request("GET", "/heartbeat")
+            status = conn.getresponse().status
+            os.sys.stderr.write(str(f"Status: {status}\n"))
+            if status == 200:
+                os.sys.stderr.write(str(f"We have a heartbeat ♥️\n"))
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
@@ -127,7 +127,7 @@ def start_health_handler():
 
     HealthHandler.render_external_url = render_external_url
 
-    with http.server.HTTPServer(('', port), HealthHandler) as server:
+    with http.server.HTTPServer(('0.0.0.0', port), HealthHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down health handler\n")
 
@@ -155,7 +155,7 @@ def start_heartbeat_handler():
             return
 
     os.sys.stderr.write("Starting heartbeat handler\n")
-    with http.server.HTTPServer(('', 443), HeartbeatHandler) as server:
+    with http.server.HTTPServer(('0.0.0.0', 443), HeartbeatHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
