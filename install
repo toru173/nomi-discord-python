@@ -92,12 +92,9 @@ ECHO All required software is installed.
 
 GOTO do_install
 
+:: We're missing some necessary software. Let's fix that.
 :install_dependencies
-
-:: We're missing some necessary software. Let's fix it.
 ECHO:
-ECHO Please install the missing software and re-run the installer.
-
 SET /P "INSTALL_HELP=Would you like help installing the missing software? [y/N]: "
 IF /I "!INSTALL_HELP!" == "Y" (
     IF "%DOCKER_INSTALLED%" == "0" (
@@ -121,7 +118,8 @@ IF /I "!INSTALL_HELP!" == "Y" (
 )
 
 ECHO:
-ECHO Some required software is missing. Please install the missing software and re-run the installer
+ECHO Some required software is missing. Please install the missing software
+ECHO and re-run the installer.
 GOTO cleanup
 
 :do_install
@@ -364,11 +362,9 @@ function check_dependancies() {
         echo
         echo "All required software is installed."
     else
-        # We're missing some necessary software. Let's fix it.
-        echo
-        echo "Please install the missing software and re-run the installer."
-
+        # We're missing some necessary software. Let's fix that.
         # Prompt user for help installing the missing software
+        echo
         if prompt_confirm "Would you like help installing the missing software?"; then
             # If Docker is not installed, prompt to open the Docker download page
             if [ "$DOCKER_INSTALLED" -eq 0 ]; then
@@ -416,6 +412,8 @@ function check_dependancies() {
                 fi
             fi
         fi
+        echo "Some required software is missing. Please install the missing software"
+        echo "and re-run the installer."
         exit 1
     fi
 }
