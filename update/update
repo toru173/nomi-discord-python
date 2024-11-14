@@ -27,7 +27,7 @@ SET "LATEST_INSTALL_SCRIPT=%SCRIPT_ROOT%latest_installer.bat"
 
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o %LATEST_INSTALL_SCRIPT%
 ATTRIB +H %LATEST_INSTALL_SCRIPT%
-START /WAIT /B CMD /Q /C %LATEST_INSTALL_SCRIPT% --skip-checks
+START /I /WAIT CMD /Q /C %LATEST_INSTALL_SCRIPT% --skip-checks
 
 :: All done! Let's exit from the Windows part of the script
 :cleanup
