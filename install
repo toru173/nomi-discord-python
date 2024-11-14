@@ -83,6 +83,9 @@ IF "%TAR_INSTALLED%" == "1" (
     ECHO [ ] tar is not installed
 )
 
+ECHO %DOCKER_INSTALLED%
+ECHO %TAR_INSTALLED%
+
 :: If both are installed, continue
 IF "%DOCKER_INSTALLED%" == "1" IF "%TAR_INSTALLED%" == "1" (
     ECHO:
