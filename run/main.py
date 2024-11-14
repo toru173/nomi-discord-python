@@ -85,17 +85,15 @@ def get_env_vars() -> dict:
 # Functions for dealing with Render
 def health_handler() -> None:
     # We just need to return a '200' on any request to PORT to
-    # prove we're healthy. Absolutely minimal setup here, but
-    # we also use this as an opportunity to make a request to
-    # ourselves to stop Render spinning the app down
+    # prove we're healthy. Absolutely minimal setup here.
     class HealthHandler(http.server.BaseHTTPRequestHandler):
-        def do_GET(self):
+        def do_GET(self) -> None:
             os.sys.stderr.write("Received health check-in 💊\n")
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
 
-        def do_HEAD(self):
+        def do_HEAD(self) -> None:
             self.send_response(200)
             self.end_headers()
 
@@ -106,23 +104,25 @@ def health_handler() -> None:
     port = int(os.getenv("PORT") or -1)
     if port < 0: return
 
-    with http.server.HTTPServer(('0.0.0.0', port), HealthHandler) as server:
+    os.sys.stderr.write("Starting health handler\n")
+    with http.server.ThreadingHTTPServer(('0.0.0.0', port), HealthHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down health handler\n")
 
 
 def heartbeat_handler() -> None:
     # We need to be world-reachable and have something
-    # interact with the app every 15 minutes
+    # interact with the app every 15 minutes otherwise
+    # we get spun down
     class HeartbeatHandler(http.server.BaseHTTPRequestHandler):
-        def do_GET(self):
+        def do_GET(self) -> None:
             if self.path == "/heartbeat":
                 os.sys.stderr.write("Received heartbeat check-in ♥️\n")
                 # Respond to the heartbeat check with 200 ('OK')
                 self.send_response(200)
                 self.end_headers()
 
-        def do_HEAD(self):
+        def do_HEAD(self) -> None:
             self.send_response(200)
             self.end_headers()
 
@@ -131,12 +131,14 @@ def heartbeat_handler() -> None:
             return
 
     os.sys.stderr.write("Starting heartbeat handler\n")
-    with http.server.HTTPServer(('0.0.0.0', 443), HeartbeatHandler) as server:
+    with http.server.ThreadingHTTPServer(('0.0.0.0', 443), HeartbeatHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
 
 def heartbeat() -> None:
+    os.sys.stderr.write("Starting heartbeat\n")
+    # Here we set a timer to check our heartbeat
     threading.Timer(5, heartbeat).start()
 
     render_external_url = os.getenv("RENDER_EXTERNAL_URL" or None)
