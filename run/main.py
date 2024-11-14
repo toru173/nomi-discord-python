@@ -91,16 +91,16 @@ def start_health_handler():
     class HealthHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
 
-            os.sys.stderr.write("Received health check-in\n")
+            os.sys.stderr.write("Received health check-in 🩺\n")
             os.sys.stderr.write("Checking heartbeat endpoint\n")
 
             # Use this as a timing mechanism to keep our app alive
-            conn = http.client.HTTPSConnection(self.render_external_url)
-            conn.request("GET", "/heartbeat")
-            status = conn.getresponse().status
-            os.sys.stderr.write(str(f"Status: {status}\n"))
-            if status == 200:
-                os.sys.stderr.write(str(f"We have a heartbeat ♥️\n"))
+            # conn = http.client.HTTPConnection(self.render_external_url)
+            # conn.request("GET", "/heartbeat")
+            # status = conn.getresponse().status
+            # os.sys.stderr.write(str(f"Status: {status}\n"))
+            # if status == 200:
+            #     os.sys.stderr.write(str(f"We have a heartbeat ♥️\n"))
             # Respond to the health check with 200 ('OK')
             self.send_response(200)
             self.end_headers()
