@@ -143,7 +143,9 @@ def heartbeat() -> None:
     threading.Timer(10, heartbeat).start()
 
     render_external_url = os.getenv("RENDER_EXTERNAL_URL" or None)
-    if render_external_url is None: return
+    if render_external_url is None:
+        os.sys.stderr.write("Could not get URL of Render Service\n")
+        return
 
     # Strip leading protocol indicator
     render_external_url = render_external_url.replace('https://', '')
