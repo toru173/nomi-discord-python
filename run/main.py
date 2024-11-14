@@ -88,10 +88,11 @@ def health_handler() -> None:
     # prove we're healthy. Absolutely minimal setup here.
     class HealthHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self) -> None:
-            os.sys.stderr.write("Received health check-in 💊\n")
-            # Respond to the health check with 200 ('OK')
-            self.send_response(200)
-            self.end_headers()
+            if self.path == "/health":
+                os.sys.stderr.write("Received health check-in 💊\n")
+                # Respond to the health check with 200 ('OK')
+                self.send_response(200)
+                self.end_headers()
 
         def do_HEAD(self) -> None:
             self.send_response(200)
@@ -152,11 +153,11 @@ def heartbeat() -> None:
 
     try:
         os.sys.stderr.write("Checking heartbeat 🩺\n")
-        conn = http.client.HTTPSConnection(render_external_url)
-        conn.request("GET", "/heartbeat")
-        status = conn.getresponse().status
-        os.sys.stderr.write(f"Status: {status}\n")
-        conn.close()
+        status = http.client.HTTPSConnection(render_external_url).request("GET", "/heartbeat").getresponse().status
+        if status == 200:
+            os.sys.stderr.write(f"We have a heartbeat ♥️\n")
+        else:
+            os.sys.stderr.write(f"Could not get heartbeat 😰\n")
     except Exception as e:
         print(f"Unable to check for heartbeat: {e}")
 
