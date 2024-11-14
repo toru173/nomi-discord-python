@@ -106,7 +106,7 @@ def health_handler() -> None:
     if port < 0: return
 
     os.sys.stderr.write("Starting health handler\n")
-    with http.server.ThreadingHTTPServer(('0.0.0.0', port), HealthHandler) as server:
+    with http.server.HTTPServer(('0.0.0.0', port), HealthHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down health handler\n")
 
@@ -132,7 +132,7 @@ def heartbeat_handler() -> None:
             return
 
     os.sys.stderr.write("Starting heartbeat handler\n")
-    with http.server.ThreadingHTTPServer(('0.0.0.0', 443), HeartbeatHandler) as server:
+    with http.server.HTTPServer(('0.0.0.0', 443), HeartbeatHandler) as server:
         server.serve_forever()
     os.sys.stderr.write("Shutting down heartbeat handler\n")
 
