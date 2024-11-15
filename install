@@ -84,8 +84,8 @@ IF "%TAR_INSTALLED%" == "1" (
     ECHO [ ] tar is not installed
 )
 
-IF "%DOCKER_INSTALLED%" == "0" GOTO install_dependencies
-IF "%TAR_INSTALLED%" == "0" GOTO install_dependencies
+IF "%DOCKER_INSTALLED%" == "0" GOTO INSTALL_DEPENDENCIES
+IF "%TAR_INSTALLED%" == "0" GOTO INSTALL_DEPENDENCIES
 
 :: If both are installed, continue
 ECHO:
@@ -94,7 +94,7 @@ ECHO All required software is installed.
 GOTO DO_INSTALL
 
 :: We're missing some necessary software. Let's fix that.
-:install_dependencies
+:INSTALL_DEPENDENCIES
 ECHO:
 SET /P "INSTALL_HELP=Would you like help installing the missing software? [y/N]: "
 IF /I "!INSTALL_HELP!" == "Y" (
