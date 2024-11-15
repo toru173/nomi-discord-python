@@ -8,7 +8,6 @@
 :: This is the Windows part of the script.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
-ON BREAK GOTO cleanup
 
 ECHO ===========================================================================
 ECHO =============================== Nomi Setup ================================
@@ -22,7 +21,7 @@ ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
 
 :: Get the absolute path to the 'setup' directory
-FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI"
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=%SCRIPT_ROOT:~0,-1%"
 SET "SETUP_DIR=%SCRIPT_ROOT%\setup"
 
 SET "DOCKER_IMAGE_NAME=nomi-config-setup"
@@ -96,7 +95,7 @@ FOR %%F IN ("%SETUP_DIR%\output\*.bat") DO SET "OUTPUT_FILE=%%~nxF"
 
 FOR %%F IN ("%SETUP_DIR%\*") DO (
     SET "FILENAME=%%~nxF"
-    SET "DESTINATION=%SCRIPT_ROOT%\nomis\%%~nxF"
+    SET "DESTINATION=%SCRIPT_ROOT%nomis\%%~nxF"
 
     IF EXIST "%DESTINATION%" (
         SET /P CONFIRM="File %FILENAME% already exists. Overwrite? (y/n): "

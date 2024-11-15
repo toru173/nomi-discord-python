@@ -21,7 +21,6 @@ IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord
 :: This is the Windows part of the script.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
-ON BREAK GOTO cleanup
 
 SET INSTALL_FOLDER=nomi-discord-python
 SET "HOME_DIR=%USERPROFILE%"
