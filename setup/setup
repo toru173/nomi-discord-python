@@ -36,7 +36,8 @@ IF ERRORLEVEL 1 (
 :: Check if Docker daemon is running
 docker info >NUL 2>&1
 IF ERRORLEVEL 1 (
-    ECHO Docker is installed but the Docker daemon is not running. Please start Docker before continuing.
+    ECHO Docker is installed but the Docker daemon is not running.
+    ECHO Please start Docker before continuing.
     GOTO cleanup
 )
 
@@ -217,7 +218,8 @@ fi
 
 # Check if the Docker daemon is running
 if ! docker info > /dev/null 2>&1; then
-    echo "Docker is installed but the Docker daemon is not running. Please start Docker before continuing."
+    echo "Docker is installed but the Docker daemon is not running."
+    echo "Please start Docker before continuing."
     exit 1
 fi
 
