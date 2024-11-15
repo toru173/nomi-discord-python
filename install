@@ -12,7 +12,7 @@ IF ERRORLEVEL 1 (curl -sL https://raw.githubusercontent.com/toru173/nomi-discord
 :: TIMEOUT because it behaves differently when being piped.
 :: We try to run it as a way to check that the script is
 :: running from a pipe, but then use ping with a timeout
-:: when we actually need to wait (https://stackoverflow.com/a/735294)
+:: if we actually need to wait (https://stackoverflow.com/a/735294)
 ::
 :: ============================================================================
 :: === The LICENSE for this script can be found at the bottom of this file ====
@@ -24,7 +24,7 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 
 SET INSTALL_FOLDER=nomi-discord-python
 SET "HOME_DIR=%USERPROFILE%"
-FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=%SCRIPT_ROOT:~0,-1%"
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=!SCRIPT_ROOT:~0,-1!"
 
 :: Perform a basic sanity check
 IF NOT "%OS%" == "Windows_NT" (
@@ -134,8 +134,8 @@ SET "INSTALL_DIR=%DEFAULT_INSTALL_DIR%"
 
 :: Check if .nomi_setup_done exists in the script's current directory
 :: If it does, assume the user chose this directory last time
-if EXIST "%SCRIPT_ROOT%\.nomi_setup_done" (
-    SET "INSTALL_DIR=%SCRIPT_ROOT%"
+if EXIST "!SCRIPT_ROOT!\.nomi_setup_done" (
+    SET "INSTALL_DIR=!SCRIPT_ROOT!"
     ECHO This will update nomi-discord-python in the current directory
     ECHO:
     GOTO confirm_install_dir

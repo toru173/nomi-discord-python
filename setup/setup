@@ -21,8 +21,8 @@ ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
 
 :: Get the absolute path to the 'setup' directory
-FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=%SCRIPT_ROOT:~0,-1%"
-SET "SETUP_DIR=%SCRIPT_ROOT%\setup"
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=!SCRIPT_ROOT:~0,-1!"
+SET "SETUP_DIR=!SCRIPT_ROOT!\setup"
 
 SET "DOCKER_IMAGE_NAME=nomi-config-setup"
 
@@ -44,11 +44,11 @@ IF ERRORLEVEL 1 (
 FOR /F "DELIMS=" %%I IN ('docker images -q %DOCKER_IMAGE_NAME%') DO SET IMAGE_ID=%%I
 IF NOT DEFINED IMAGE_ID (
     ECHO Setup Docker image (%DOCKER_IMAGE_NAME%) not found. Building the image...
-    @REM FOR /F "TOKENS=*" %%I IN ('docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" 2^>^&1') DO SET "DOCKER_BUILD_OUTPUT=%%I"
-    @REM IF ERRORLEVEL 1 (
-    @REM     ECHO Error when building container: %DOCKER_BUILD_OUTPUT%
-    @REM     GOTO cleanup
-    @REM )
+    FOR /F "TOKENS=*" %%I IN ('docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" 2^>^&1') DO SET "DOCKER_BUILD_OUTPUT=%%I"
+    IF ERRORLEVEL 1 (
+        ECHO Error when building container: !DOCKER_BUILD_OUTPUT!
+        GOTO cleanup
+    )
     GOTO cleanup
 )
 
@@ -72,7 +72,7 @@ ECHO Running %DOCKER_IMAGE_NAME% with Docker
 ECHO:
 
 :: Run the Docker image with a mounted volume for output
-docker run -it --name %DOCKER_IMAGE_NAME% -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %DOCKER_IMAGE_NAME% 2> NUL
+docker run -it --name %DOCKER_IMAGE_NAME% -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %DOCKER_IMAGE_NAME%
 IF %ERRORLEVEL% NEQ 0 (
     ECHO Error when running container: %ERRORLEVEL%
     EXIT /B 1
@@ -95,7 +95,7 @@ FOR %%F IN ("%SETUP_DIR%\output\*.bat") DO SET "OUTPUT_FILE=%%~nxF"
 
 FOR %%F IN ("%SETUP_DIR%\*") DO (
     SET "FILENAME=%%~nxF"
-    SET "DESTINATION=%SCRIPT_ROOT%nomis\%%~nxF"
+    SET "DESTINATION=!SCRIPT_ROOT!\nomis\%%~nxF"
 
     IF EXIST "%DESTINATION%" (
         SET /P CONFIRM="File %FILENAME% already exists. Overwrite? (y/n): "

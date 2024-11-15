@@ -21,9 +21,9 @@ ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
 
 :: Get the absolute path to the script's directory
-FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=%SCRIPT_ROOT:~0,-1%"
+FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=!SCRIPT_ROOT:~0,-1!"
 
-SET "LATEST_INSTALLER=%SCRIPT_ROOT%\latest_installer.bat"
+SET "LATEST_INSTALLER=!SCRIPT_ROOT!\latest_installer.bat"
 
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o "%LATEST_INSTALLER%"
 ATTRIB +H %LATEST_INSTALLER%
