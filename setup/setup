@@ -94,7 +94,8 @@ IF NOT EXIST "!SCRIPT_ROOT!\nomis" (
 :: Get the script's name
 FOR %%F IN ("%SETUP_DIR%\output\*.bat") DO SET "OUTPUT_FILE=%%~nxF"
 
-FOR %%F IN ("%SETUP_DIR%\*") DO (
+:: Copy to the \nomis directory
+FOR %%F IN ("%SETUP_DIR%\output*") DO (
     SET "FILENAME=%%~nxF"
     SET "DESTINATION=!SCRIPT_ROOT!\nomis\%%~nxF"
 
