@@ -218,8 +218,8 @@ IF ERRORLEVEL 1 (
 )
 
 :: Check if the install script exists (it should). Rename it to
-:: install.bat to make running it from the command line easier later
-IF EXIST "%INSTALL_DIR%\install" (
+:: install.bat to make running it from the command line easier, and make
+:: it double-clickableIF EXIST "%INSTALL_DIR%\install" (
     IF EXIST "%INSTALL_DIR%\install.bat" DEL /F /Q "%INSTALL_DIR%\install.bat"
     REN "%INSTALL_DIR%\install" "install.bat"
 ) ELSE (
@@ -227,7 +227,8 @@ IF EXIST "%INSTALL_DIR%\install" (
 )
 
 :: Check if the update script exists (it should). Copy and rename it to
-:: update.bat to make running it from the command line easier later
+:: update.bat to make running it from the command line easier, and make
+:: it double-clickable
 IF EXIST "%INSTALL_DIR%\update\update" (
     IF EXIST "%INSTALL_DIR%\update.bat" DEL /F /Q "%INSTALL_DIR%\update.bat"
     COPY /Y "%INSTALL_DIR%\update\update" "%INSTALL_DIR%\update.bat" >NUL
@@ -236,7 +237,8 @@ IF EXIST "%INSTALL_DIR%\update\update" (
 )
 
 :: Check if the Nomi setup script exists (it should). Copy and rename it to
-:: setup.bat to make running it from the command line easier later
+:: setup.bat to make running it from the command line easier, and make
+:: it double-clickable
 IF EXIST "%INSTALL_DIR%\setup\setup" (
     COPY /Y "%INSTALL_DIR%\setup\setup" "%INSTALL_DIR%\setup.bat" >NUL
 ) ELSE (
@@ -577,7 +579,9 @@ else
     echo "Error: install script not found in $INSTALL_DIR"
 fi
 
-# Copy the install script to update.extension to make it easier
+# Check if the Nomi install script exists (it should). Copy it to our install
+# dir and make it executable to make running it from the command line easier,
+# and make it double-clickable
 # for users to update
 if [ "$(uname -s)" == "Darwin" ]; then
     INSTALL_SCRIPT="$INSTALL_DIR/install.command"
@@ -590,18 +594,18 @@ else
     exit 1
 fi
 
-# Check if the Nomi update script exists (it should). Copy it
-# from the /update directory into our install directory and make it
-# executable too
+# Check if the Nomi update script exists (it should). Copy it to our install
+# dir and make it executable to make running it from the command line easier,
+# and make it double-clickable
 if [ -f "$INSTALL_DIR/update/update" ]; then
     get_script "$INSTALL_DIR/update/update" "$INSTALL_DIR"
 else
     echo "Error: update script not found in $INSTALL_DIR/update"
 fi
 
-# Check if the Nomi setup script exists (it should). Copy it
-# from the /setup directory into our install directory and make it
-# executable too
+# Check if the Nomi setup script exists (it should). Copy it to our install
+# dir and make it executable to make running it from the command line easier,
+# and make it double-clickable
 if [ -f "$INSTALL_DIR/setup/setup" ]; then
     get_script "$INSTALL_DIR/setup/setup" "$INSTALL_DIR"
 else
