@@ -98,18 +98,17 @@ FOR %%F IN ("%SETUP_DIR%\*") DO (
     SET "FILENAME=%%~nxF"
     SET "DESTINATION=!SCRIPT_ROOT!\nomis\%%~nxF"
 
-    IF EXIST "%DESTINATION%" (
-        SET /P CONFIRM="File %FILENAME% already exists. Overwrite? [y/N]: "
-        IF /I NOT "%CONFIRM%"=="y" (
-            ECHO Skipping %FILENAME%
-            GOTO :CONTINUE
+    IF EXIST "!DESTINATION!" (
+        SET /P CONFIRM="File !FILENAME! already exists. Overwrite? [y/N]: "
+        IF /I NOT "!CONFIRM!"=="y" (
+            ECHO Skipping !FILENAME!
+        ) ELSE (
+            COPY /Y "%%F" "!DESTINATION!" >NUL
         )
+    ) ELSE (
+        COPY /Y "%%F" "!DESTINATION!" >NUL
     )
-
-    COPY /Y "%%F" "%DESTINATION%" >NUL
-    :CONTINUE
 )
-
 ECHO Start script created. You can start your new Nomi by running %OUTPUT_FILE%
 
 :: All done! Let's exit from the Windows part of the script
