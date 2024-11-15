@@ -162,8 +162,8 @@ ECHO:
 ECHO Proceeding with installation in: %INSTALL_DIR%
 
 :: Create the folder if it doesn't exist.
-IF NOT EXIST %INSTALL_DIR% (
-    MKDIR %INSTALL_DIR%
+IF NOT EXIST "%INSTALL_DIR%" (
+    MKDIR "%INSTALL_DIR%"
 )
 
 SET "DOWNLOAD_DIR=%INSTALL_DIR%\.download"
@@ -219,7 +219,8 @@ IF ERRORLEVEL 1 (
 
 :: Check if the install script exists (it should). Rename it to
 :: install.bat to make running it from the command line easier, and make
-:: it double-clickableIF EXIST "%INSTALL_DIR%\install" (
+:: it double-clickable
+IF EXIST "%INSTALL_DIR%\install" (
     IF EXIST "%INSTALL_DIR%\install.bat" DEL /F /Q "%INSTALL_DIR%\install.bat"
     REN "%INSTALL_DIR%\install" "install.bat"
 ) ELSE (
