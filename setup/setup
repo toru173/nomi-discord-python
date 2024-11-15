@@ -30,7 +30,7 @@ SET "DOCKER_IMAGE_NAME=nomi-config-setup"
 docker --version >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Could not find Docker. Please re-run the installation script.
-    GOTO cleanup
+    GOTO CLEANUP
 )
 
 :: Check if Docker daemon is running
@@ -38,7 +38,7 @@ docker info >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Docker is installed but the Docker daemon is not running.
     ECHO Please start Docker before continuing.
-    GOTO cleanup
+    GOTO CLEANUP
 )
 
 :: Check if the Docker image exists
@@ -48,9 +48,9 @@ IF NOT DEFINED IMAGE_ID (
     FOR /F "TOKENS=*" %%I IN ('docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" 2^>^&1') DO SET "DOCKER_BUILD_OUTPUT=%%I"
     IF ERRORLEVEL 1 (
         ECHO Error when building container: !DOCKER_BUILD_OUTPUT!
-        GOTO cleanup
+        GOTO CLEANUP
     )
-    GOTO cleanup
+    GOTO CLEANUP
 )
 
 :: Create the output folder if it doesn't exist
@@ -65,7 +65,7 @@ IF NOT ERRORLEVEL 1 (
     docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
     IF ERRORLEVEL 1 (
         ECHO Error when removing container.
-        GOTO cleanup
+        GOTO CLEANUP
     )
 )
 
@@ -76,19 +76,19 @@ ECHO:
 docker run -it --name %DOCKER_IMAGE_NAME% -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %DOCKER_IMAGE_NAME%
 IF %ERRORLEVEL% NEQ 0 (
     ECHO Error when running container: %ERRORLEVEL%
-    EXIT /B 1
+    GOTO CLEANUP
 )
 
 :: Remove container once we're done to avoid confusion
 docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Error when removing container.
-    GOTO cleanup
+    GOTO CLEANUP
 )
 
 :: Create the nomis folder if it doesn't exist
-IF NOT EXIST "%SETUP_DIR%\nomis" (
-    MKDIR "%SETUP_DIR%\nomis"
+IF NOT EXIST "!SCRIPT_ROOT!\nomis" (
+    MKDIR "!SCRIPT_ROOT!\nomis"
 )
 
 :: Get the script's name
@@ -99,7 +99,7 @@ FOR %%F IN ("%SETUP_DIR%\*") DO (
     SET "DESTINATION=!SCRIPT_ROOT!\nomis\%%~nxF"
 
     IF EXIST "%DESTINATION%" (
-        SET /P CONFIRM="File %FILENAME% already exists. Overwrite? (y/n): "
+        SET /P CONFIRM="File %FILENAME% already exists. Overwrite? [y/N]: "
         IF /I NOT "%CONFIRM%"=="y" (
             ECHO Skipping %FILENAME%
             GOTO :CONTINUE
@@ -113,7 +113,7 @@ FOR %%F IN ("%SETUP_DIR%\*") DO (
 ECHO Start script created. You can start your new Nomi by running %OUTPUT_FILE%
 
 :: All done! Let's exit from the Windows part of the script
-:cleanup
+:CLEANUP
 :: Clean up the output folder
 DEL /F /Q "%SETUP_DIR%\output\*" 2>NUL
 ENDLOCAL

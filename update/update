@@ -30,7 +30,7 @@ ATTRIB +H "%LATEST_INSTALLER%"
 CALL "%LATEST_INSTALLER%" --skip-checks
 
 :: All done! Let's exit from the Windows part of the script
-:cleanup
+:CLEANUP
 :: Clean up the output folder
 ATTRIB -H "%LATEST_INSTALLER%"
 DEL /F /Q "%LATEST_INSTALLER%"

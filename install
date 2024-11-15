@@ -29,11 +29,11 @@ FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=!SCRIPT_ROOT:
 :: Perform a basic sanity check
 IF NOT "%OS%" == "Windows_NT" (
     ECHO Windows NT is required
-    GOTO cleanup
+    GOTO CLEANUP
 )
 
 if "%1"=="--skip-checks" (
-    GOTO do_install
+    GOTO DO_INSTALL
 )
 
 ECHO ===========================================================================
@@ -91,7 +91,7 @@ IF "%TAR_INSTALLED%" == "0" GOTO install_dependencies
 ECHO:
 ECHO All required software is installed.
 
-GOTO do_install
+GOTO DO_INSTALL
 
 :: We're missing some necessary software. Let's fix that.
 :install_dependencies
@@ -121,9 +121,9 @@ IF /I "!INSTALL_HELP!" == "Y" (
 ECHO:
 ECHO Some required software is missing. Please install the missing software
 ECHO and re-run the installer.
-GOTO cleanup
+GOTO CLEANUP
 
-:do_install
+:DO_INSTALL
 
 :: Now we know know we have Docker and tar we check with the user if
 :: installing in our default location (%USERPROFILE%\%INSTALL_FOLDER%)
@@ -138,13 +138,13 @@ if EXIST "!SCRIPT_ROOT!\.nomi_setup_done" (
     SET "INSTALL_DIR=!SCRIPT_ROOT!"
     ECHO This will update nomi-discord-python in the current directory
     ECHO:
-    GOTO confirm_install_dir
+    GOTO CONFIRM_INSTALL_DIR
 )
 
 ECHO:
 ECHO Where would you like to install nomi-discord-python?
 
-:confirm_install_dir
+:CONFIRM_INSTALL_DIR
 ECHO Install Location: %INSTALL_DIR%
 SET /P "USER_INPUT=Press Enter to accept, or choose a new location: "
 
@@ -155,7 +155,7 @@ ECHO:
 SET /P "CONTINUE=Are you sure? [y/N]: "
 
 IF /I NOT "!CONTINUE!" == "Y" (
-    GOTO confirm_install_dir
+    GOTO CONFIRM_INSTALL_DIR
 )
 
 ECHO:
@@ -182,7 +182,7 @@ MKDIR "%DOWNLOAD_DIR%" 2>NUL
 IF ERRORLEVEL 1 (
     ECHO It looks like we can't write to the folder: %INSTALL_DIR%
     ECHO Please make sure you have permission to write to this directory and try again.
-    GOTO cleanup
+    GOTO CLEANUP
 ) ELSE (
     ATTRIB +H "%DOWNLOAD_DIR%"
 )
@@ -192,7 +192,7 @@ ECHO Downloading the latest version from GitHub...
 curl -L https://github.com/toru173/nomi-discord-python/archive/refs/heads/main.zip -o "%DOWNLOAD_DIR%\install.zip" --progress-bar --remove-on-error
 IF NOT EXIST "%DOWNLOAD_DIR%\install.zip" (
     ECHO Something went wrong during the download. Please try again.
-    GOTO cleanup
+    GOTO CLEANUP
 )
 
 :: Warn the user that existing files will be overwritten. No going back now!
@@ -209,7 +209,7 @@ ECHO:
 SET /P CONTINUE="Are you sure you want to proceed with the installation? [y/N]: "
 IF /I NOT "!CONTINUE!" == "Y" (
     ECHO Extraction canceled. No changes were made.
-    GOTO cleanup
+    GOTO CLEANUP
 )
 
 :: Proceed with unzipping the file using tar and overwrite existing files.
@@ -222,7 +222,7 @@ ECHO Extracting installation files...
 tar -xvf "%DOWNLOAD_DIR%\install.zip" -C %INSTALL_DIR% --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\run" --include="*\setup" --include="*\update"
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
-    GOTO cleanup
+    GOTO CLEANUP
 )
 
 :: Check if the install script exists (it should). Rename it to
@@ -273,7 +273,7 @@ IF /I "!OPEN_FOLDER!" == "Y" (
 )
 
 :: All done! Let's exit from the Windows part of the script
-:cleanup
+:CLEANUP
 :: In case we received an error between downloading and extracting
 :: the install files, delete them here
 IF EXIST "%INSTALL_DIR%\.download" (
