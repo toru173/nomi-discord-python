@@ -39,6 +39,24 @@ def normalise_name(name: str) -> str:
     normalised = normalised.lower().replace(" ", "_")
     return normalised
 
+def safe_input(prompt: str) -> str:
+    while True:
+        try:
+            return input(prompt)
+        except KeyboardInterrupt:
+            while True:
+                try:
+                    response = input("\nSetup is not complete. Do you really want to quit? [y/N]: ").strip().lower()
+                    if response in ('y', 'yes'):
+                        exit(0)
+                    elif response in ('n', 'no', ''):
+                        break
+                    else:
+                        print("Please enter 'y' or 'n'.")
+                except KeyboardInterrupt:
+                    # User must really want to quit. Let them
+                    exit(0)
+
 def prompt_user(required_keys: List, current_values: Dict) -> dict:
     user_inputs = {}
     print("Please provide the information needed to configure your Nomi:\n")
@@ -47,7 +65,7 @@ def prompt_user(required_keys: List, current_values: Dict) -> dict:
         existing_value = current_values.get(key, "")
         if key == "MAX_MESSAGE_LENGTH":
             prompt = f"Are you a paying user? We need to know to set the message length"
-            response = input(f"{prompt} [y/N]: ").strip().lower()
+            response = safe_input(f"{prompt} [y/N]: ").strip().lower()
             while True:
                 if response in ("yes", "y"):
                     value = 600
@@ -56,10 +74,10 @@ def prompt_user(required_keys: List, current_values: Dict) -> dict:
                     value = 400
                     break
                 prompt = f"Please answer yes or no. Are you a paying user?"
-                response = input(f"{prompt} [y/N]: ").strip().lower()
+                response = safe_input(f"{prompt} [y/N]: ").strip().lower()
         else:
             prompt = f"{key} [{existing_value}]: " if existing_value else f"{key}: "
-            value = input(prompt)
+            value = safe_input(prompt)
         user_inputs[key] = value if value else existing_value
 
     return user_inputs
