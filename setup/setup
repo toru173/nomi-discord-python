@@ -42,14 +42,15 @@ IF ERRORLEVEL 1 (
 )
 
 :: Check if the Docker image exists
-FOR /F "delims=" %%I IN ('docker images -q %DOCKER_IMAGE_NAME%') DO SET IMAGE_ID=%%I
+FOR /F "DELIMS=" %%I IN ('docker images -q %DOCKER_IMAGE_NAME%') DO SET IMAGE_ID=%%I
 IF NOT DEFINED IMAGE_ID (
     ECHO Setup Docker image (%DOCKER_IMAGE_NAME%) not found. Building the image...
-    FOR /F "tokens=*" %%I IN ('docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" 2^>^&1') DO SET "DOCKER_BUILD_OUTPUT=%%I"
-    IF ERRORLEVEL 1 (
-        ECHO Error when building container: %DOCKER_BUILD_OUTPUT%
-        EXIT /B 1
-    )
+    @REM FOR /F "TOKENS=*" %%I IN ('docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" 2^>^&1') DO SET "DOCKER_BUILD_OUTPUT=%%I"
+    @REM IF ERRORLEVEL 1 (
+    @REM     ECHO Error when building container: %DOCKER_BUILD_OUTPUT%
+    @REM     GOTO cleanup
+    @REM )
+    GOTO cleanup
 )
 
 :: Create the output folder if it doesn't exist
