@@ -114,7 +114,7 @@ ECHO Start script created. You can start your new Nomi by running %OUTPUT_FILE%
 :: All done! Let's exit from the Windows part of the script
 :cleanup
 :: Clean up the output folder
-DEL /F /Q "%SETUP_DIR%\output\*"
+DEL /F /Q "%SETUP_DIR%\output\*" 2>NUL
 ENDLOCAL
 PAUSE
 ECHO You may now close this window
