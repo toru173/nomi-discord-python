@@ -41,7 +41,7 @@ Alright, you should be up to speed! Let's move on to Installing Software
 This code uses Docker so that we can write code once and have it run on many different platforms. Docker requires a computer capable of virtualisation, but most are these days. If you haven't already installed it, you can [download](http://docker.com/products/docker-desktop/) it now.
 
 #### tar
-The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a really old version of Windows, in which case... please update it 🙏
+The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a really old version of Windows, in which case... please update 🙏
 
 ### Installation
 This application uses a simple installer script that checks for Docker and tar, then downloads and extracts the rest of the application.
@@ -57,7 +57,7 @@ On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching
 
 Copy the text below and paste it into CMD.exe and then press return to run it.
 
-`https://github.com/url | CMD`
+```https://github.com/url | CMD```
 
 </details>
 
@@ -70,7 +70,7 @@ On macOS, the installer uses Terminal to run. You can open Terminal by searching
 
 Copy the text below and paste it into Terminal and then press return to run it.
 
-`https://github.com/url | bash`
+```https://github.com/url | bash```
 
 </details>
 
@@ -79,7 +79,7 @@ Copy the text below and paste it into Terminal and then press return to run it.
 <summary>Linux</summary>
 On linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulater, then press return to run it.
 
-`https://github.com/url | bash`
+```https://github.com/url | bash```
 
 </details>
 
@@ -92,7 +92,7 @@ The installer will ask you where you want to install to and perform some basic c
 <summary>Updating the Application</summary>
 
 ### Updating nomi-discord-python
-If there is an update available, double click on the 'update' script in your installation folder. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files
+If there is an update available, double click on the 'update' script in your installation folder. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files.
 
 </details>
 
