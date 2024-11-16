@@ -11,10 +11,10 @@ There are a lot of steps, but don't worry - they are all easy steps. You can use
 <summary>Background</summary>
 
 ### Background
-Before you can talk to your Nomi on Discord, we need to talk about some techy stuff. Feel free to skip this if you already know it:
+Before you can talk to your Nomi on Discord, we need to talk about some techy stuff. Feel free to skip this if you already know it.
 
 #### API
-API stands for Application Programming Interface. An API is a way for different applications (programs) to be able to talk to each other in a way they can both understand. Nomi.AI have published their API documentation [here](https://api.nomi.ai/docs) if you would like to read how this code talks to your Nomi.
+API stands for Application Programming Interface. An API is a way for different applications (programs) to be able to talk to each other in a way they can both understand. Nomi.AI have published their API documentation [here](https://api.nomi.ai/docs) if you would like to read how this application talks to your Nomi.
 
 #### API Key
 An API key is like a password. It helps identify you with a service such as Discord or Nomi.AI but it isn't designed to be easy for Humans to remember. Some services call this slightly different things - Sometimes they're called a *token* instead of a *key*, but it means the same thing. An API key is usually written down in a configuration file or password manager instead of being stored in a Human's brain.
@@ -37,11 +37,11 @@ Alright, you should be up to speed! Let's move on to Installing Software
 <summary>Installing Software</summary>
 
 ### Installing Software
-### Prerequisits
-#### Docker
+#### Prerequisits
+##### Docker
 This code uses Docker so that we can write code once and have it run on many different platforms. Docker requires a computer capable of virtualisation, but most are these days. If you haven't already installed it, you can [download](http://docker.com/products/docker-desktop/) it now.
 
-#### tar
+##### tar
 The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a really old version of Windows, in which case... please update 🙏
 
 ### Installation
