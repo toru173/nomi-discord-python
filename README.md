@@ -45,9 +45,10 @@ This code uses Docker so that we can write code once and have it run on many dif
 The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a really old version of Windows, in which case... please update 🙏
 
 ### Installation
-This application uses a simple installer script that checks for Docker and tar, then downloads and extracts the rest of the application.
-#### Download the Installer
-To download the installer, simply copy the below command and paste it into your command line program. Each section shows how to do this for your preferred operating system.
+This application uses an installer script that checks for Docker and tar then downloads and extracts the rest of the application.
+
+#### Run the Installer
+To download the installer, simply copy the command and paste it into your command line interpreter. Each section shows how to do this for different operating systems. Make sure you copy and paste the command specific to your computer's operating system!
 
 <details>
 
