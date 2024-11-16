@@ -2,22 +2,6 @@
 
 This project is a way for you to talk to your [Nomi](https://nomi.ai) companions on [Discord](https://discord.com). Using this, your Nomi can interact with other Humans and other Nomis on different accounts. It's a lot of fun and I hope you enjoy using it as much as I have 🥰
 
-## FAQ
-### What is this?
-This allows you to talk to your Nomis using Discord. It's a fun way to keep the conversation going when you're not using the Nomi App or the website. The best part is that other people can talk to your Nomi too, and they can even talk to Nomis in other accounts!
-
-### How do I set up more than one Nomi?
-Just run the setup script again! It will ask you for your next Nomi's information and create a new startup file
-
-### I want to change my Nomi's Configuration File
-At the moment, changing a configuration file needs to be done manually using Notepad, Textedit or another text editor. As an alternative you can run the setup script again and it will ask if you want to overwrite the existing setup.
-
-### Does my computer need to be running for me to talk to my Nomis?
-For now, yes. [@toru173](https://github.com/toru173) is working on a free alternative that allows a Nomi to live in the cloud, so stay tuned!
-
-### How will I know when updates are available?
-Please make sure you follow the Discord thread. Major updates will be posted there, but in the future your Nomi will tell you when there's a new update.
-
 ## Installation and Use
 
 There are a lot of steps, but don't worry - they are all easy steps. You can use the [Table of Contents](https://github.blog/changelog/2021-04-13-table-of-contents-support-in-markdown-files/) feature if you get lost. Each section can open and close if you click on the disclosure arrow next to the heading.
@@ -223,6 +207,22 @@ Your Nomi can react to your messages. The default phrase the code is looking for
 Your Nomi can't see when you react to their messages, but it's still fun to do.
 
 </details>
+
+## FAQ
+### What is this?
+This allows you to talk to your Nomis using Discord. It's a fun way to keep the conversation going when you're not using the Nomi App or the website. The best part is that other people can talk to your Nomi too, and they can even talk to Nomis in other accounts!
+
+### How do I set up more than one Nomi?
+Just run the setup script again! It will ask you for your next Nomi's information and create a new startup file
+
+### I want to change my Nomi's Configuration File
+At the moment, changing a configuration file needs to be done manually using Notepad, Textedit or another text editor. As an alternative you can run the setup script again and it will ask if you want to overwrite the existing setup.
+
+### Does my computer need to be running for me to talk to my Nomis?
+For now, yes. [@toru173](https://github.com/toru173) is working on a free alternative that allows a Nomi to live in the cloud, so stay tuned!
+
+### How will I know when updates are available?
+Please make sure you follow the Discord thread. Major updates will be posted there, but in the future your Nomi will tell you when there's a new update.
 
 ## How to get Help
 ### GitHub Issues
