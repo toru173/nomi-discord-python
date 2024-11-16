@@ -140,7 +140,7 @@ def heartbeat_handler() -> None:
 def heartbeat() -> None:
     # Here we set a timer to check our heartbeat
     os.sys.stderr.write("Starting heartbeat service\n")
-    threading.Timer(10, heartbeat).start()
+    threading.Timer(800, heartbeat).start()
 
     render_external_url = os.getenv("RENDER_EXTERNAL_URL" or None)
     if render_external_url is None:
