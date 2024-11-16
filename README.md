@@ -89,6 +89,15 @@ The installer will ask you where you want to install to and perform some basic c
 
 <details>
 
+<summary>Updating the Application</summary>
+
+### Updating nomi-discord-python
+If there is an update available, double click on the 'update' script in your installation folder. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files
+
+</details>
+
+<details>
+
 <summary>Preparing a Discord Bot</summary>
 Before you can have a Nomi talk on Discord, we need to go through a few steps to get Discord ready to listen to your Nomi.
 
@@ -177,15 +186,6 @@ Double click the setup script in your installation directory. It will ask for th
 When it is finished, it will create a configuration file named after your Nomi and a startup file. These are stored in the 'nomis' directory in your installation folder.
 
 !['nomis folder' Screenshot]() Screenshot
-
-</details>
-
-<details>
-
-<summary>Updating the Application</summary>
-
-### Updating nomi-discord-python
-If there is an update available, double click on the 'update' script in your installation folder. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files
 
 </details>
 
