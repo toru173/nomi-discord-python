@@ -24,7 +24,7 @@ There are a lot of steps, but don't worry - they are all easy steps. You can use
 
 <details>
 
-<summary>Background</summary>
+<summary>### Background</summary>
 
 ### Background
 Before you can talk to your Nomi on Discord, we need to talk about some techy stuff. Feel free to skip this if you already know it:
@@ -50,7 +50,7 @@ Alright, you should be up to speed! Let's move on to Installing Software
 
 <details>
 
-<summary>Installing Software</summary>
+<summary>### Installing Software</summary>
 
 ### Prerequisits
 #### Docker
@@ -66,7 +66,7 @@ To download the installer, simply copy the below URL and paste it into your term
 
 <details>
 
-<summary>Windows</summary>
+<summary>### Windows</summary>
 On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the Search box.
 
 !['Search box' Screenshot]() Screenshot
@@ -79,7 +79,7 @@ Copy the text below and paste it into CMD.exe and then press return to run it.
 
 <details>
 
-<summary>macOS</summary>
+<summary>### macOS</summary>
 On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using Spotlight.
 
 !['Spotlight' Screenshot]() Screenshot
@@ -92,7 +92,7 @@ Copy the text below and paste it into Terminal and then press return to run it.
 
 <details>
 
-<summary>Linux</summary>
+<summary>### Linux</summary>
 On linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulater, then press return to run it.
 
 `https://github.com/url | bash`
@@ -105,7 +105,7 @@ The installer will ask you where you want to install to and perform some basic c
 
 <details>
 
-<summary>Preparing a Discord Bot</summary>
+<summary>### Preparing a Discord Bot</summary>
 Before you can have a Nomi talk on Discord, we need to go through a few steps to get Discord ready to listen to your Nomi.
 
 ### Creating a Discord Bot
@@ -140,15 +140,15 @@ Make sure to get you Discord API Key while on this screen. See the next section 
 
 </details>
 
-> [!CAUTION]
-> Only reset your Discord API Key if you haven't already got one. Resetting it will prevent other applications from using this Bot to talk on Discord.
-
 <details>
 
-<summary>Gathering your API Keys</summary>
+<summary>### Gathering your API Keys</summary>
 
 #### Get your Discord API Key
 [Sign in](https://discord.com/developers/) to the Discord Developer portal and click on 'Applications' from the menu down the left. Select your Nomi's Bot, then click on 'Bot' on the menu down the left.
+
+<div class="markdown-alert markdown-alert-caution" dir="auto"><p class="markdown-alert-title" dir="auto"><svg class="octicon octicon-stop mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p><p dir="auto">Only reset your Discord API Key if you haven't already got one. Resetting it will prevent other applications from using this Bot to talk on Discord.</p>
+</div>
 
 Click the 'Reset Token' button. Discord might ask for your password again as a security measure.
 
@@ -176,7 +176,7 @@ Navigate to your Nomi's Information page. Your Nomi's Nomi ID is at the bottom o
 
 <details>
 
-<summary>Setting up a Nomi</summary>
+<summary>### Setting up a Nomi</summary>
 
 ### Before you Begin
 To set up a Nomi or to create a new configuration file make sure you have the following:
@@ -199,7 +199,7 @@ When it is finished, it will create a configuration file named after your Nomi a
 
 <details>
 
-<summary>Updating the Application</summary>
+<summary>### Updating the Application</summary>
 
 ### Updating nomi-discord-python
 If there is an update available, double click on the 'update' script in your installation folder. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files
@@ -208,7 +208,8 @@ If there is an update available, double click on the 'update' script in your ins
 
 <details>
 
-<summary>Talking on Discord</summary>
+<summary>### Talking on Discord</summary>
+
 ### Start the Docker Container
 To talk to your Nomi on Discord the Nomi's Docker container needs to be running. Double click the 'start_nomi' script to run the container. If this is the first time you've used this Nomi, the script will also create the Docker container with all the information your Nomi needs.
 
