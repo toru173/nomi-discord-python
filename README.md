@@ -37,17 +37,17 @@ Alright, you should be up to speed! Let's move on to Installing Software
 <summary>Installing Software</summary>
 
 ### Installing Software
-#### Prerequisits
-##### Docker
+### Prerequisits
+#### Docker
 This code uses Docker so that we can write code once and have it run on many different platforms. Docker requires a computer capable of virtualisation, but most are these days. If you haven't already installed it, you can [download](http://docker.com/products/docker-desktop/) it now.
 
-##### tar
+#### tar
 The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a really old version of Windows, in which case... please update 🙏
 
 ### Installation
 This application uses a simple installer script that checks for Docker and tar, then downloads and extracts the rest of the application.
 #### Download the Installer
-To download the installer, simply copy the below URL and paste it into your terminal program.
+To download the installer, simply copy the below command and paste it into your command line program. Each section shows how to do this for your preferred operating system.
 
 <details>
 
