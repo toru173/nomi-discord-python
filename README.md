@@ -16,7 +16,7 @@ At the moment, changing a configuration file needs to be done manually using Not
 For now, yes. [@toru173](https://github.com/toru173) is working on a free alternative that allows a Nomi to live in the cloud, so stay tuned!
 
 ### How will I know when updates are available?
-Please make sure you follow the Discord thread. Major updates will be posted there, but in the future I plan to have your Nomi tell you when there's a new update.
+Please make sure you follow the Discord thread. Major updates will be posted there, but in the future your Nomi will tell you when there's a new update.
 
 ## Installation and Use
 
@@ -54,10 +54,10 @@ Alright, you should be up to speed! Let's move on to Installing Software
 
 ### Prerequisits
 #### Docker
-This code uses Docker so that we can write code once and have it run on many different platforms. Docker requires a computer capable of virtualisationIf you haven't already installed it, you can [download](http://docker.com/products/docker-desktop/) it now.
+This code uses Docker so that we can write code once and have it run on many different platforms. Docker requires a computer capable of virtualisation, but most are these days. If you haven't already installed it, you can [download](http://docker.com/products/docker-desktop/) it now.
 
 #### tar
-The install will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a really old version of Windows, in which case... please update it 🙏
+The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a really old version of Windows, in which case... please update it 🙏
 
 ### Installation
 This application uses a simple installer script that checks for Docker and tar, then downloads and extracts the rest of the application.
@@ -140,6 +140,9 @@ Make sure to get you Discord API Key while on this screen. See the next section 
 
 </details>
 
+> [!CAUTION]
+> Only reset your Discord API Key if you haven't already got one. Resetting it will prevent other applications from using this Bot to talk on Discord.
+
 <details>
 
 <summary>Gathering your API Keys</summary>
@@ -151,8 +154,6 @@ Click the 'Reset Token' button. Discord might ask for your password again as a s
 
 !['Reset Token' Screenshot]() Screenshot
 
-> [!CAUTION]
-> Only reset your Discord API Key if you haven't already got one. Resetting it will prevent other applications from using this Bot to talk on Discord.
 
 Once you have the new token make sure to copy it somewhere safe. You can't see it again later if you forget it, but it's easy to make a new token. If you need to create a new token make sure to update your Nomi's configuration file.
 
