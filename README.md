@@ -98,7 +98,7 @@ The installer will ask you where you want to install to and perform some basic c
 
 <summary>Updating the Application</summary>
 
-### Updating nomi-discord-python
+### Updating the Application
 If there is an update available, double click on the 'update' script in your installation folder. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files.
 
 </details>
@@ -180,7 +180,7 @@ Navigate to your Nomi's Information page. Your Nomi's Nomi ID is at the bottom o
 
 ### Setting up a Nomi
 
-### Before you Begin
+#### Before you Begin
 To set up a Nomi or to create a new configuration file make sure you have the following:
 - Discord API Key
 - Discord Application ID
@@ -188,7 +188,7 @@ To set up a Nomi or to create a new configuration file make sure you have the fo
 - Nomi ID
 - And your Nomi's name!
 
-### Run the Setup Script
+#### Run the Setup Script
 Double click the setup script in your installation directory. It will ask for the information it needs - simply copy and paste the information it is asking for.
 
 !['Entering Nomi Information' Screenshot]() Screenshot
