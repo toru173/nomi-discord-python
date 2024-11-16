@@ -100,7 +100,7 @@ def main() -> None:
     input_dir = "./"
     output_dir = f"{input_dir}output"
 
-    required_conf_keys = ["DISCORD_API_KEY", "NOMI_API_KEY", "NOMI_NAME", "NOMI_ID", "MAX_MESSAGE_LENGTH"]
+    required_conf_keys = ["DISCORD_API_KEY", "DISCORD_APPLICATION_ID", "NOMI_API_KEY", "NOMI_NAME", "NOMI_ID", "MAX_MESSAGE_LENGTH"]
     placeholder_nomi_name_key = "NOMI_NAME"
     placeholder_docker_image_name = "DOCKER_IMAGE_NAME"
 
