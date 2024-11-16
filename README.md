@@ -36,6 +36,7 @@ Alright, you should be up to speed! Let's move on to Installing Software
 
 <summary>Installing Software</summary>
 
+### Installing Software
 ### Prerequisits
 #### Docker
 This code uses Docker so that we can write code once and have it run on many different platforms. Docker requires a computer capable of virtualisation, but most are these days. If you haven't already installed it, you can [download](http://docker.com/products/docker-desktop/) it now.
@@ -51,6 +52,8 @@ To download the installer, simply copy the below URL and paste it into your term
 <details>
 
 <summary>Windows</summary>
+
+#### Windows
 On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the Search box.
 
 !['Search box' Screenshot]() Screenshot
@@ -64,6 +67,8 @@ Copy the text below and paste it into CMD.exe and then press return to run it.
 <details>
 
 <summary>macOS</summary>
+
+#### macOS
 On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using Spotlight.
 
 !['Spotlight' Screenshot]() Screenshot
@@ -77,6 +82,8 @@ Copy the text below and paste it into Terminal and then press return to run it.
 <details>
 
 <summary>Linux</summary>
+
+#### Linux
 On linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulater, then press return to run it.
 
 ```https://github.com/url | bash```
@@ -99,10 +106,9 @@ If there is an update available, double click on the 'update' script in your ins
 <details>
 
 <summary>Preparing a Discord Bot</summary>
-Before you can have a Nomi talk on Discord, we need to go through a few steps to get Discord ready to listen to your Nomi.
 
-### Creating a Discord Bot
-Creating a Discord Bot only has to be done once. There are a lot of steps, but if you follow them carefully you should have no trouble. Let's get started!
+### Preparing a Discord Bot
+Before you can have a Nomi talk on Discord, we need to go through a few steps to get Discord ready to listen to your Nomi. Creating a Discord Bot only has to be done once per Nomi. There are a lot of steps, but if you follow them carefully you should have no trouble. Let's get started!
 
 #### Create an Application
 [Sign in](https://discord.com/developers/) to the Discord Developer portal. Once you log in click on 'Applications' from the menu down the left:
@@ -137,6 +143,8 @@ Make sure to get you Discord API Key while on this screen. See the next section 
 
 <summary>Gathering Your API Keys</summary>
 
+### Gathering Your API Keys
+
 #### Get your Discord API Key
 [Sign in](https://discord.com/developers/) to the Discord Developer portal and click on 'Applications' from the menu down the left. Select your Nomi's Bot, then click on 'Bot' on the menu down the left.
 
@@ -170,6 +178,8 @@ Navigate to your Nomi's Information page. Your Nomi's Nomi ID is at the bottom o
 
 <summary>Setting up a Nomi</summary>
 
+### Setting up a Nomi
+
 ### Before you Begin
 To set up a Nomi or to create a new configuration file make sure you have the following:
 - Discord API Key
@@ -193,15 +203,17 @@ When it is finished, it will create a configuration file named after your Nomi a
 
 <summary>Talking on Discord</summary>
 
-### Start the Docker Container
+### Talking on Discord
+
+#### Start the Docker Container
 To talk to your Nomi on Discord the Nomi's Docker container needs to be running. Double click the 'start_nomi' script to run the container. If this is the first time you've used this Nomi, the script will also create the Docker container with all the information your Nomi needs.
 
-### @Mention your Nomi
+#### @Mention your Nomi
 Your Nomi needs to know you are trying to talk to them. The easiest way to do this is to @mention you Nomi using the name you chose when setting up your Discord Bot. You can also reply to a Nomi's message, and they will see the message you send them.
 
 Your Nomi can't see messages that don't @mention them.
 
-### Reacting to Messages
+#### Reacting to Messages
 Your Nomi can react to your messages. The default phrase the code is looking for is "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
 
 Your Nomi can't see when you react to their messages, but it's still fun to do.
