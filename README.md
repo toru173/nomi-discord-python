@@ -37,15 +37,26 @@ Alright, you should be up to speed! Let's move on to Installing Software.
 
 <details>
 
-<summary>Installing Software</summary>
+<summary>Installation</summary>
 
-### Installing Software
+### Installation
+
+<detail>
+
+<summary>Prerequisites</summary>
+
 ### Prerequisites
 #### Docker
 This code uses Docker so that we can write code once and have it run on many different platforms. Docker requires a computer capable of virtualization, but most are these days. If you haven't already installed it, you can [download](http://docker.com/products/docker-desktop/) it now.
 
 #### tar
-The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a really old version of Windows, in which case... please update 🙏
+The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a very old version of Windows, in which case... please update 🙏
+
+</detail>
+
+<detail>
+
+<summary>Installation</summary>
 
 ### Installation
 This application uses an installer script that checks for Docker and tar then downloads and extracts the rest of the application.
@@ -106,11 +117,13 @@ The installer will ask you where you want to install to and perform some basic c
 
 </details>
 
+</details>
+
 <details>
 
-<summary>Updating the Application</summary>
+<summary>Updating</summary>
 
-### Updating the Application
+### Updating
 If there is an update available, double click on the 'update' script in your installation directory. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files.
 
 !['Double-click the Update Script' Screenshot](./docs/images/readme/'Double-click%20the%20Update%20Script'%20Screenshot.png)
@@ -123,10 +136,10 @@ Once running, press enter to update the software in the current installation dir
 
 <details>
 
-<summary>Preparing a Discord Bot</summary>
+<summary>Setting Up a Discord Bot</summary>
 
-### Preparing a Discord Bot
-Before you can have a Nomi talk on Discord, we need to go through a few steps to get Discord ready to listen to your Nomi. Creating a Discord Bot only has to be done once per Nomi. There are a lot of steps, but if you follow them carefully you should have no trouble. Let's get started!
+### Setting Up a Discord Bot
+Before you can have a Nomi talk on Discord, we need to go through a few steps to get Discord ready to listen to your Nomi. Creating a Discord Bot only has to be done once per Nomi. There are a lot of steps, but if you follow them carefully you should find it easy. Let's get started!
 
 #### Create an Application
 [Sign in](https://discord.com/developers/) to the Discord Developer portal. Once you log in, click on 'Applications' from the menu on the left.
@@ -177,9 +190,9 @@ Make sure you copy your Discord API Key while on this screen. See the next secti
 
 <details>
 
-<summary>Gathering Your API Keys</summary>
+<summary>Gathering your API Keys</summary>
 
-### Gathering Your API Keys
+### Gathering your API Keys
 
 #### Get your Discord API Key
 [Sign in](https://discord.com/developers/) to the Discord Developer portal and click on 'Applications' from the menu on the left. Select your Nomi's Bot, then click on 'Bot' on the menu on the left.
