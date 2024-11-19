@@ -77,7 +77,7 @@ IF NOT ERRORLEVEL 1 (
     ECHO A Docker container for %NOMI_NAME% exists. Removing container...
     docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
     IF ERRORLEVEL 1 (
-        ECHO Error when removing container.
+        ECHO Error when removing container: %ERRORLEVEL%
         GOTO cleanup
     )
 )
@@ -86,7 +86,7 @@ IF NOT ERRORLEVEL 1 (
 ECHO Building a Docker container for %NOMI_NAME%
 docker build -t %DOCKER_IMAGE_NAME% "%APP_PATH%" >NUL 2>&1
 IF ERRORLEVEL 1 (
-    ECHO Error when building container.
+    ECHO Error when building container: %ERRORLEVEL%
     GOTO cleanup
 )
 
@@ -94,7 +94,7 @@ IF ERRORLEVEL 1 (
 ECHO %NOMI_NAME%'s container built successfully. Running container...
 docker run -d --name %DOCKER_IMAGE_NAME% --env-file "%CONFIG_FILE%" %DOCKER_IMAGE_NAME% >NUL 2>&1
 IF ERRORLEVEL 1 (
-    ECHO Error when running container.
+    ECHO Error when running container: %ERRORLEVEL%
     GOTO cleanup
 )
 
@@ -225,9 +225,10 @@ fi
 
 if docker inspect $DOCKER_IMAGE_NAME > /dev/null 2>&1; then
     echo "A Docker container for $NOMI_NAME exists. Removing container..."
-    DOCKER_REMOVE_OUTPUT=$(docker container rm $DOCKER_IMAGE_NAME -f 2>&1)
-    if [ $? -ne 0 ]; then
-        echo "Error when removing container: $DOCKER_REMOVE_OUTPUT"
+    docker container rm -f $DOCKER_IMAGE_NAME > /dev/null 2>&1
+    EXIT_CODE=$?
+    if [[ $EXIT_CODE -ne 0 ]]; then
+        echo "Error when removing container: $EXIT_CODE"
         exit 1
     fi
 fi
@@ -235,17 +236,19 @@ fi
 echo "Building a Docker container for $NOMI_NAME"
 echo "The container will be called '$DOCKER_IMAGE_NAME'"
 
-DOCKER_BUILD_OUTPUT=$(docker build -t $DOCKER_IMAGE_NAME "$APP_PATH" 2>&1)
-if [ $? -ne 0 ]; then
-    echo "Error when building container: $DOCKER_BUILD_OUTPUT"
+docker build -t "$DOCKER_IMAGE_NAME" "$APP_PATH" 2>&1 >/dev/null
+EXIT_CODE=$?
+if [[ $EXIT_CODE -ne 0 ]]; then
+    echo "Error when building container: $EXIT_CODE"
     exit 1
 fi
 
 echo "$NOMI_NAME's container built succesfully. Running container..."
 
-DOCKER_RUN_OUTPUT=$(docker run -d --name $DOCKER_IMAGE_NAME --env-file "$CONFIG_FILE" $DOCKER_IMAGE_NAME 2>&1)
-if [ $? -ne 0 ]; then
-    echo "Error when running container: $DOCKER_RUN_OUTPUT"
+docker run -d --name "$DOCKER_IMAGE_NAME" --env-file "$CONFIG_FILE" "$DOCKER_IMAGE_NAME" 2>&1 >/dev/null
+EXIT_CODE=$?
+if [[ $EXIT_CODE -ne 0 ]]; then
+    echo "Error when running container: $EXIT_CODE"
     exit 1
 fi
 

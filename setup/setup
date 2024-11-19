@@ -27,15 +27,15 @@ SET "SETUP_DIR=!SCRIPT_ROOT!\setup"
 SET "DOCKER_IMAGE_NAME=nomi-config-setup"
 
 :: Check if Docker is installed
-docker --version >NUL 2>&1
-IF %ERRORLEVEL% (
+docker --version 2>&1 >NUL
+IF ERRORLEVEL 1 (
     ECHO Could not find Docker. Please re-run the installation script.
     GOTO CLEANUP
 )
 
 :: Check if Docker daemon is running
-docker info >NUL 2>&1
-IF %ERRORLEVEL% (
+docker info 2>&1 >NUL
+IF ERRORLEVEL 1 (
     ECHO Docker is installed but the Docker daemon is not running.
     ECHO Please start Docker before continuing.
     GOTO CLEANUP
@@ -45,12 +45,11 @@ IF %ERRORLEVEL% (
 FOR /F "DELIMS=" %%I IN ('docker images -q %DOCKER_IMAGE_NAME%') DO SET IMAGE_ID=%%I
 IF NOT DEFINED IMAGE_ID (
     ECHO Setup Docker image ^(%DOCKER_IMAGE_NAME%^) not found. Building the image...
-    FOR /F "TOKENS=*" %%I IN ('docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" 2^>^&1') DO SET "DOCKER_BUILD_OUTPUT=%%I"
-    IF %ERRORLEVEL% (
-        ECHO Error when building container: !DOCKER_BUILD_OUTPUT!
+    docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" 2>&1 >NUL
+    IF ERRORLEVEL 1 (
+        ECHO Error when building container: %ERRORLEVEL%
         GOTO CLEANUP
     )
-    GOTO CLEANUP
 )
 
 :: Create the output folder if it doesn't exist
@@ -59,11 +58,11 @@ IF NOT EXIST "%SETUP_DIR%\output" (
 )
 
 :: Check if a Docker container already exists and remove it
-docker inspect --type=container %DOCKER_IMAGE_NAME% >NUL 2>&1
-IF NOT %ERRORLEVEL% (
+docker inspect --type=container "%DOCKER_IMAGE_NAME%" 2>&1 >NUL
+IF NOT ERRORLEVEL 1 (
     ECHO A Docker container for %NOMI_NAME% exists. Removing container...
-    docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
-    IF %ERRORLEVEL% (
+    docker container rm -f "%DOCKER_IMAGE_NAME%" 2>&1 >NUL
+    IF ERRORLEVEL 1 (
         ECHO Error when removing container.
         GOTO CLEANUP
     )
@@ -74,18 +73,19 @@ ECHO:
 
 :: Run the Docker image with a mounted volume for output
 docker run -it --name "%DOCKER_IMAGE_NAME%" -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% "%DOCKER_IMAGE_NAME%"
-IF %ERRORLEVEL% (
-    IF %ERRORLEVEL% EQ 255 (
+IF ERRORLEVEL 1 (
+    IF %ERRORLEVEL% EQU 255 (
         ECHO Setup cancelled.
         GOTO CLEANUP
     ) ELSE (
-    ECHO Error when running container: %ERRORLEVEL%
-    GOTO CLEANUP
+        ECHO Error when running container: %ERRORLEVEL%
+        GOTO CLEANUP
+    )
 )
 
 :: Remove container once we're done to avoid confusion
-docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
-IF %ERRORLEVEL% (
+docker container rm -f "%DOCKER_IMAGE_NAME%" 2>&1 >NUL
+IF ERRORLEVEL 1 (
     ECHO Error when removing container.
     GOTO CLEANUP
 )
@@ -232,8 +232,9 @@ fi
 # Check if the Docker image exists
 if [ -z "$(docker images -q $DOCKER_IMAGE_NAME)" ]; then
     echo "Setup Docker image ($DOCKER_IMAGE_NAME) not found. Building the image..."
-    DOCKER_BUILD_OUTPUT=$(docker build -t "$DOCKER_IMAGE_NAME" "$SETUP_DIR" 2>&1)
-    if [ $? -ne 0 ]; then
+    docker build -t "$DOCKER_IMAGE_NAME" "$SETUP_DIR" 2>&1 >/dev/null
+    EXIT_CODE=$?
+    if [[ $EXIT_CODE -ne 0 ]]; then
         echo "Error when building container: $DOCKER_BUILD_OUTPUT"
         exit 1
     fi
@@ -244,11 +245,12 @@ if [ ! -d "$SETUP_DIR/output" ]; then
     mkdir -p "$SETUP_DIR/output"
 fi
 
-if docker inspect --type=container $DOCKER_IMAGE_NAME > /dev/null 2>&1; then
+if docker inspect --type=container $DOCKER_IMAGE_NAME 2>&1 >/dev/null; then
     echo "A Docker container for $DOCKER_IMAGE_NAME exists. Removing container..."
-    DOCKER_REMOVE_OUTPUT=$(docker rm $DOCKER_IMAGE_NAME -f 2>&1)
-    if [ $? -ne 0 ]; then
-        echo "Error when removing container: $DOCKER_REMOVE_OUTPUT"
+    docker rm -f $DOCKER_IMAGE_NAME 2>&1 >/dev/null
+    EXIT_CODE=$?
+    if [[ $EXIT_CODE -ne 0 ]]; then
+        echo "Error when removing container: $EXIT_CODE"
         exit 1
     fi
 fi
@@ -257,7 +259,7 @@ echo "Running $DOCKER_IMAGE_NAME with Docker"
 echo
 
 # Run the Docker image with a mounted volume for output files
-docker run -it --name "$DOCKER_IMAGE_NAME" -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -s) "$DOCKER_IMAGE_NAME"
+docker run -it --name "$DOCKER_IMAGE_NAME" -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -s) "$DOCKER_IMAGE_NAME" 2>&1 >/dev/null
 EXIT_CODE=$?
 if [[ $EXIT_CODE -ne 0 ]]; then
     if [[ $EXIT_CODE -eq 255 ]]; then
