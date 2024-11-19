@@ -87,7 +87,7 @@ def prompt_user(required_keys: List, current_values: Dict) -> dict:
 
 def replace_placeholders(file_content: str, replacements: Dict[str, str]) -> str:
     for key, value in replacements.items():
-        # Replace KEY="VALUE - handles case where we might have a
+        # Replace KEY=VALUE. Handles case where we might have a
         # quote between the equals sign and the var. We need to do
         # things like this to handle the three different ways we can
         # assign vars:
