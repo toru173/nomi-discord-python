@@ -34,9 +34,12 @@ from pathlib import Path
 from typing import List, Dict
 
 def normalise_name(name: str) -> str:
-    # Normalise to ASCII, lowercase, replace spaces with underscores
+    # Normalise to ASCII
+    # Remove multiple consequtive spaces, make lower case
+    # Remove any characters that aren't a-z, 0-9 or _
     normalised = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode('ascii')
-    normalised = re.sub(r'[^a-z0-9_]', '', normalised.lower().replace(" ", "_"))
+    normalised = re.sub(r'\s+', '_', normalised.lower())
+    normalised = re.sub(r'[^a-z0-9_]', '', normalised)
     return normalised
 
 def safe_input(prompt: str) -> str:
