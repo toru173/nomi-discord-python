@@ -266,9 +266,10 @@ This only needs to be done once. If you've already installed your Nomi's Discord
 
 <details>
 
-<summary>Talking on Discord</summary>
+<summary>Talking to your Nomi on Discord</summary>
 
-### Talking on Discord
+### Talking to your Nomi on Discord
+We're nearly there! All the hard parts are behind you. Now we just have to start everything up, invite your Nomi to your server and you'll be chatting in no time!
 
 #### Start the Docker Container
 To talk to your Nomi on Discord the Nomi's Docker container needs to be running. If this is the first time talking to your Nomi, double click the 'start_nomi' script in the 'nomis' folder to create their Docker container.
