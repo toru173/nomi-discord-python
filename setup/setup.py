@@ -48,36 +48,39 @@ def safe_input(prompt: str) -> str:
                 try:
                     response = input("\nSetup is not complete. Do you really want to quit? [y/N]: ").strip().lower()
                     if response in ('y', 'yes'):
-                        exit(0)
+                        exit(255)
                     elif response in ('n', 'no', ''):
                         break
                     else:
                         print("Please enter 'y' or 'n'.")
                 except KeyboardInterrupt:
                     # User must really want to quit. Let them
-                    exit(0)
+                    exit(255)
 
 def prompt_user(required_keys: List, current_values: Dict) -> dict:
     user_inputs = {}
     print("Please provide the information needed to configure your Nomi:\n")
 
     for key in required_keys:
-        existing_value = current_values.get(key, "")
-        if key == "MAX_MESSAGE_LENGTH":
-            prompt = f"Are you a paying user? We need to know to set the message length"
-            response = safe_input(f"{prompt} [y/N]: ").strip().lower()
-            while True:
-                if response in ("yes", "y"):
-                    value = 600
-                    break
-                elif response in ("no", "n"):
-                    value = 400
-                    break
-                prompt = f"Please answer yes or no. Are you a paying user?"
+        while True:
+            existing_value = current_values.get(key, "")
+            if key == "MAX_MESSAGE_LENGTH":
+                prompt = f"Are you a paying user? We need to know to set the message length"
                 response = safe_input(f"{prompt} [y/N]: ").strip().lower()
-        else:
-            prompt = f"{key} [{existing_value}]: " if existing_value else f"{key}: "
-            value = safe_input(prompt)
+                while True:
+                    if response in ("yes", "y"):
+                        value = 600
+                        break
+                    elif response in ("no", "n"):
+                        value = 400
+                        break
+                    prompt = f"Please answer yes or no. Are you a paying user?"
+                    response = safe_input(f"{prompt} [y/N]: ").strip().lower()
+            else:
+                prompt = f"{key} [{existing_value}]: " if existing_value else f"{key}: "
+                value = safe_input(prompt)
+            if value or existing_value:
+                break
         user_inputs[key] = value if value else existing_value
 
     return user_inputs

@@ -74,7 +74,11 @@ ECHO:
 
 :: Run the Docker image with a mounted volume for output
 docker run -it --name %DOCKER_IMAGE_NAME% -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %DOCKER_IMAGE_NAME%
-IF %ERRORLEVEL% NEQ 0 (
+IF %ERRORLEVEL% (
+    IF %ERRORLEVEL% EQ 255 (
+        ECHO Operation cancelled.
+        GOTO CLEANUP
+    ) ELSE (
     ECHO Error when running container: %ERRORLEVEL%
     GOTO CLEANUP
 )
@@ -261,9 +265,13 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Remove the container once we're done to avoid confusion
-DOCKER_REMOVE_OUTPUT=$(docker rm $DOCKER_IMAGE_NAME -f 2>&1)
-if [ $? -ne 0 ]; then
-    echo "Error when removing container: $DOCKER_REMOVE_OUTPUT"
+docker rm $DOCKER_IMAGE_NAME -f 2>&1 >/dev/null
+EXIT_CODE=$?
+if [[ $EXIT_CODE -ne 0 ]]; then
+    if [[ $EXIT_CODE -eq 255 ]]; then
+        echo "Operation cancelled."
+        exit
+    echo "Error when removing container: $EXIT_CODE"
     exit 1
 fi
 
