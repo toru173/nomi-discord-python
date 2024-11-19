@@ -134,7 +134,7 @@ END_WIN
 # Perform some basic sanity checks, then continue execution
 if [ -z "${BASH_VERSION:-}" ]; then
     # Attempt to find Bash
-    if command -v bash 2>&1 >/dev/null; then
+    if command -v bash  > /dev/null 2>&1; then
         # Re-execute the script with Bash by reading it from stdin if necessary
         if [ -t 0 ]; then
             # If the script is not being piped, re-execute the file with bash
@@ -217,22 +217,22 @@ SETUP_DIR="$SCRIPT_ROOT/setup"
 DOCKER_IMAGE_NAME="nomi-config-setup"
 
 # Check if Docker is installed
-if ! command -v docker 2>&1 >/dev/null; then
+if ! command -v docker  > /dev/null 2>&1; then
     echo "Could not find Docker. Please re-run the installation script."
     exit 1
 fi
 
 # Check if the Docker daemon is running
-if ! docker info 2>&1 >/dev/null; then
+if ! docker info  > /dev/null 2>&1; then
     echo "Docker is installed but the Docker daemon is not running."
     echo "Please start Docker before continuing."
     exit 1
 fi
 
 # Check if the Docker image exists
-if [ -z "$(docker images -q $DOCKER_IMAGE_NAME)" ]; then
+if [ -z "$(docker images -q $DOCKER_IMAGE_NAME 2>/dev/null)" ]; then
     echo "Setup Docker image ($DOCKER_IMAGE_NAME) not found. Building the image..."
-    docker build -t "$DOCKER_IMAGE_NAME" "$SETUP_DIR" 2>&1 >/dev/null
+    docker build -t "$DOCKER_IMAGE_NAME" "$SETUP_DIR"  > /dev/null 2>&1
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
         echo "Error when building container: $DOCKER_BUILD_OUTPUT"
@@ -245,9 +245,9 @@ if [ ! -d "$SETUP_DIR/output" ]; then
     mkdir -p "$SETUP_DIR/output"
 fi
 
-if docker inspect --type=container $DOCKER_IMAGE_NAME 2>&1 >/dev/null; then
+if docker inspect --type=container $DOCKER_IMAGE_NAME  > /dev/null 2>&1; then
     echo "A Docker container named $DOCKER_IMAGE_NAME exists. Removing container..."
-    docker rm -f $DOCKER_IMAGE_NAME 2>&1 >/dev/null
+    docker rm -f $DOCKER_IMAGE_NAME  > /dev/null 2>&1
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
         echo "Error when removing container: $EXIT_CODE"
@@ -259,7 +259,7 @@ echo "Running $DOCKER_IMAGE_NAME with Docker"
 echo
 
 # Run the Docker image with a mounted volume for output files
-docker run -it --name "$DOCKER_IMAGE_NAME" -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -s) "$DOCKER_IMAGE_NAME" 2>&1 >/dev/null
+docker run -it --name "$DOCKER_IMAGE_NAME" -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -s) "$DOCKER_IMAGE_NAME"  > /dev/null 2>&1
 EXIT_CODE=$?
 if [[ $EXIT_CODE -ne 0 ]]; then
     if [[ $EXIT_CODE -eq 255 ]]; then
@@ -272,7 +272,7 @@ if [[ $EXIT_CODE -ne 0 ]]; then
 fi
 
 # Remove the container once we're done to avoid confusion
-docker rm -f "$DOCKER_IMAGE_NAME" 2>&1 >/dev/null
+docker rm -f "$DOCKER_IMAGE_NAME"  > /dev/null 2>&1
 EXIT_CODE=$?
 if [[ $EXIT_CODE -ne 0 ]]; then
     echo "Error when removing container: $EXIT_CODE"

@@ -141,7 +141,7 @@ END_WIN
 # Perform some basic sanity checks, then continue execution
 if [ -z "${BASH_VERSION:-}" ]; then
     # Attempt to find Bash
-    if command -v bash 2>&1 >/dev/null; then
+    if command -v bash  > /dev/null 2>&1; then
         # Re-execute the script with Bash by reading it from stdin if necessary
         if [ -t 0 ]; then
             # If the script is not being piped, re-execute the file with bash
@@ -200,13 +200,13 @@ CONFIG_FILE_NAME=$DOCKER_IMAGE_NAME.conf
 CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
 
 # Check if Docker is installed
-if ! command -v docker 2>&1 >/dev/null; then
+if ! command -v docker  > /dev/null 2>&1; then
     echo "Could not find Docker. Please re-run the installation script"
     exit 1
 fi
 
 # Check if the Docker daemon is running
-if ! docker info 2>&1 >/dev/null; then
+if ! docker info  > /dev/null 2>&1; then
     echo "Docker is installed but the Docker daemon is not running. Please start Docker before continuing."
     exit 1
 fi
@@ -243,9 +243,9 @@ if [ MISSING_VARIABLE == true ]; then
     exit 1
 fi
 
-if docker inspect $DOCKER_IMAGE_NAME 2>&1 >/dev/null; then
+if docker inspect $DOCKER_IMAGE_NAME  > /dev/null 2>&1; then
     echo "A Docker container named $NOMI_NAME exists. Removing container..."
-    docker container rm -f $DOCKER_IMAGE_NAME 2>&1 >/dev/null
+    docker container rm -f $DOCKER_IMAGE_NAME  > /dev/null 2>&1
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
         echo "Error when removing container: $EXIT_CODE"
@@ -256,7 +256,7 @@ fi
 echo "Building a Docker container for $NOMI_NAME"
 echo "The container will be called '$DOCKER_IMAGE_NAME'"
 
-docker build -t "$DOCKER_IMAGE_NAME" "$APP_PATH" 2>&1 >/dev/null
+docker build -t "$DOCKER_IMAGE_NAME" "$APP_PATH"  > /dev/null 2>&1
 EXIT_CODE=$?
 if [[ $EXIT_CODE -ne 0 ]]; then
     echo "Error when building container: $EXIT_CODE"
@@ -265,7 +265,7 @@ fi
 
 echo "$NOMI_NAME's container built succesfully. Running container..."
 
-docker run -d --name "$DOCKER_IMAGE_NAME" --env-file "$CONFIG_FILE" "$DOCKER_IMAGE_NAME" 2>&1 >/dev/null
+docker run -d --name "$DOCKER_IMAGE_NAME" --env-file "$CONFIG_FILE" "$DOCKER_IMAGE_NAME"  > /dev/null 2>&1
 EXIT_CODE=$?
 if [[ $EXIT_CODE -ne 0 ]]; then
     echo "Error when running container: $EXIT_CODE"
