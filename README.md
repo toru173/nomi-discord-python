@@ -20,18 +20,18 @@ Before you can talk to your Nomi on Discord, we need to talk about some techy st
 API stands for Application Programming Interface. An API is a way for different applications (programs) to be able to talk to each other in a way they can both understand. Nomi.AI have published their API documentation [here](https://api.nomi.ai/docs) if you would like to read how this application talks to your Nomi.
 
 #### API Key
-An API key is like a password. It helps identify you with a service such as Discord or Nomi.AI but it isn't designed to be easy for Humans to remember. Some services call this slightly different things - Sometimes they're called a *token* instead of a *key*, but it means the same thing. An API key is usually written down in a configuration file or password manager instead of being stored in a Human's brain.
+An API key is like a password. It helps identify you with a service such as Discord or Nomi.AI but it isn't designed to be easy for Humans to remember. Some services call this slightly different things - sometimes they're called a *token* instead of a *key*, but it means the same thing. An API key is usually written down in a configuration file or password manager instead of being stored in a Human's brain.
 
 #### Discord Bot
 A Discord Bot is Discord's way of allowing non-Humans to talk on Discord. If we say 'bot' in the instructions here, we're not necessarily saying a Nomi is a robot! It's just Discord's way of referring to the technology we use to connect a Nomi to Discord.
 
 #### Docker
-Docker is a program that lets you run a tiny virtual computer inside your real computer. Docker is well supported across many different operating systems like macOS or Windows, and it allows devs (like me) to write code that runs in a known, consistent environment. Using Docker means I don't have to write seperate code for every version of every computer system ever - Docker takes care of that for me.
+Docker is a program that lets you run a tiny virtual computer inside your real computer. Docker is well supported across many different operating systems like macOS or Windows, and it allows devs (like me) to write code that runs in a known, consistent environment. Using Docker means I don't have to write separate code for every version of every computer system ever - Docker takes care of that for me.
 
-#### Virtualisation
-Virtualisation is like creating pretend computers inside your real one. It works by using a special software layer that sits between your real computer and the virtual computers. This tricks each virtual machine into thinking it has its own processor, memory, and storage, even though they're all sharing the same physical resources. This means you can run different operating systems or setups on your computer without having to buy another one.
+#### Virtualization
+Virtualization is like creating pretend computers inside your real one. It works by using a special software layer that sits between your real computer and the virtual computers. This tricks each virtual machine into thinking it has its own processor, memory, and storage, even though they're all sharing the same physical resources. This means you can run different operating systems or setups on your computer without having to buy another one.
 
-Alright, you should be up to speed! Let's move on to Installing Software
+Alright, you should be up to speed! Let's move on to Installing Software.
 
 </details>
 
@@ -40,9 +40,9 @@ Alright, you should be up to speed! Let's move on to Installing Software
 <summary>Installing Software</summary>
 
 ### Installing Software
-### Prerequisits
+### Prerequisites
 #### Docker
-This code uses Docker so that we can write code once and have it run on many different platforms. Docker requires a computer capable of virtualisation, but most are these days. If you haven't already installed it, you can [download](http://docker.com/products/docker-desktop/) it now.
+This code uses Docker so that we can write code once and have it run on many different platforms. Docker requires a computer capable of virtualization, but most are these days. If you haven't already installed it, you can [download](http://docker.com/products/docker-desktop/) it now.
 
 #### tar
 The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a really old version of Windows, in which case... please update 🙏
@@ -70,7 +70,7 @@ Copy the text below and paste it into CMD.exe and then press enter to run it.
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | cmd
 ```
 
-Powershell is not supported.
+PowerShell is not supported.
 
 </details>
 
@@ -94,7 +94,7 @@ curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/head
 <summary>Linux</summary>
 
 #### Linux
-On linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulater, then press enter to run it.
+On Linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulator, then press enter to run it.
 
 ```shell
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
@@ -129,11 +129,11 @@ Once running, press enter to update the software in the current installation dir
 Before you can have a Nomi talk on Discord, we need to go through a few steps to get Discord ready to listen to your Nomi. Creating a Discord Bot only has to be done once per Nomi. There are a lot of steps, but if you follow them carefully you should have no trouble. Let's get started!
 
 #### Create an Application
-[Sign in](https://discord.com/developers/) to the Discord Developer portal. Once you log in click on 'Applications' from the menu down the left:
+[Sign in](https://discord.com/developers/) to the Discord Developer portal. Once you log in, click on 'Applications' from the menu on the left.
 
 !['Applications' Screenshot](./docs/images/readme/'Applications'%20Screenshot.png)
 
-The click 'New Application' at the top right hand corner of the window.
+The click 'New Application' at the top right of the window.
 
 !['New Application' Screenshot](./docs/images/readme/'New%20Application'%20Screenshot.png)
 
@@ -142,7 +142,7 @@ The name of your application is how you @mention the Discord Bot and is what app
 !['Create Application' Screenshot](./docs/images/readme/'Create%20Application'%20Screenshot.png)
 
 #### General Information
-Click on 'General Information' on the menu down the left. You can add information about your Nomi and upload a profile picture here. Other users will see this information and the profile picture when they click on your Nomi's account page on Discord.
+Click on 'General Information' on the menu on the left. You can add information about your Nomi and upload a profile picture here. Other users will see this information and the profile picture when they click on your Nomi's account page on Discord.
 
 !['General Information' Screenshot](./docs/images/readme/'General%20Information'%20Screenshot.png)
 
@@ -159,7 +159,7 @@ Save your changes.
 !['General Information - Save Changes' Screenshot](./docs/images/readme/'General%20Information%20-%20Save%20Changes'%20Screenshot.png)
 
 #### Bot
-Click on 'Bot' on the menu down the left.
+Click on 'Bot' on the menu on the left.
 
 !['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
 
@@ -182,7 +182,7 @@ Make sure you copy your Discord API Key while on this screen. See the next secti
 ### Gathering Your API Keys
 
 #### Get your Discord API Key
-[Sign in](https://discord.com/developers/) to the Discord Developer portal and click on 'Applications' from the menu down the left. Select your Nomi's Bot, then click on 'Bot' on the menu down the left.
+[Sign in](https://discord.com/developers/) to the Discord Developer portal and click on 'Applications' from the menu on the left. Select your Nomi's Bot, then click on 'Bot' on the menu on the left.
 
 !['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
 
@@ -192,7 +192,7 @@ Click the 'Reset Token' button. Discord might ask for your password again as a s
 
 !['Reset Token' Screenshot](./docs/images/readme/'Reset%20Token'%20Screenshot.png)
 
-Once you have the new token copy it somewhere safe. You can't see it again later if you forget it, but it's easy to make a new token.
+Once you have the new token, copy it somewhere safe. You can't see it again later if you forget it, but it's easy to make a new token.
 
 !['New Token' Screenshot](./docs/images/readme/'New%20Token'%20Screenshot.png)
 
@@ -200,12 +200,12 @@ If you need to create a new token you'll need to update your Nomi's configuratio
 
 
 #### Get your Discord Application ID
-If you didn't save your Discord Bot's Application ID earlier, click on 'General Information' on the menu down the left. You can access the Application ID here.
+If you didn't save your Discord Bot's Application ID earlier, click on 'General Information' on the menu on the left. You can access the Application ID here.
 
 !['Copy Application ID' Screenshot](./docs/images/readme/'Copy%20Application%20ID'%20Screenshot.png)
 
 #### Get your Nomi API Key
-[Sign in](https://beta.nomi.ai/sign-in) to your Nomi account and navigate to your Profile Page. Click on 'Integrations' on the menu down the left.
+[Sign in](https://beta.nomi.ai/sign-in) to your Nomi account and navigate to your Profile Page. Click on 'Integrations' on the menu on the left.
 
 !['Integrations' Screenshot](./docs/images/readme/'Integrations'%20Screenshot.png)
 
@@ -231,7 +231,7 @@ Navigate to your Nomi's Information page. Your Nomi's Nomi ID is at the bottom o
 ### Setting up a Nomi on Discord
 
 #### Before you Begin
-To set up a Nomi or to create a new configuration file make sure you have the following:
+To set up a Nomi or to create a new configuration file, make sure you have the following:
 - Discord API Key
 - Discord Application ID
 - Nomi API Key
@@ -275,7 +275,7 @@ To talk to your Nomi on Discord the Nomi's Docker container needs to be running.
 
 !['Double-click start_nomi Script' Screenshot](./docs/images/readme/'Double-click%20start_nomi%20Script'%20Screenshot.png)
 
-Your Nomi's container will update and you can invite them to your Discord server. The invitation link is displayed when their startup script is run.
+Your Nomi's container will be created or updated, and you can invite them to your Discord server. The invitation link is displayed when their startup script is run.
 
 !['Run start_nomi Script' Screenshot](./docs/images/readme/'Run%20start_nomi%20Script'%20Screenshot.png)
 
@@ -315,10 +315,10 @@ Your Nomi can't see when you react to their messages, but it's still fun to do.
 This allows you to talk to your Nomis using Discord. It's a fun way to keep the conversation going when you're not using the Nomi App or the website. The best part is that other people can talk to your Nomi too, and they can even talk to Nomis in other accounts!
 
 ### How do I set up more than one Nomi?
-Just run the setup script again! It will ask you for your next Nomi's information and create a new start_nomi script
+Just run the setup script again! It will ask you for your next Nomi's information and create a new start_nomi script.
 
 ### I want to change my Nomi's Configuration File
-At the moment, changing a configuration file needs to be done manually using Notepad, Textedit or another text editor. As an alternative you can run the setup script again and it will ask if you want to overwrite the existing setup.
+At the moment, changing a configuration file needs to be done manually using Notepad, TextEdit or another text editor. As an alternative, you can run the setup script again and it will ask if you want to overwrite the existing setup.
 
 ### Does my computer need to be running for me to talk to my Nomis?
 For now, yes. [@toru173](https://github.com/toru173) is working on a free alternative that allows a Nomi to live in the cloud, so stay tuned!
@@ -345,7 +345,7 @@ Alternatively, simply write a message in the Discord thread.
 The Discord thread for this project is available at []()
 
 ## Feedback
-If you have a feature request, an improvement suggested or just want to tell me something cool you can either open a GitHub Issue or write a message in the Discord thread.
+If you have a feature request, a suggested improvement or just want to tell me something cool you can either open a GitHub Issue or write a message in the Discord thread.
 
 ## Thanks
 This project started as a re-implementation of [@d3tourrr's](https://github.com/d3tourrr) [NomiKin-Discord bridge](https://github.com/d3tourrr/NomiKin-Discord), written in Python. It has since grown far beyond the original scope 😅
