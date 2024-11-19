@@ -270,9 +270,11 @@ EXIT_CODE=$?
 if [[ $EXIT_CODE -ne 0 ]]; then
     if [[ $EXIT_CODE -eq 255 ]]; then
         echo "Operation cancelled."
-        exit
-    echo "Error when removing container: $EXIT_CODE"
-    exit 1
+        exit 1
+    else
+        echo "Error when removing container: $EXIT_CODE"
+        exit 1
+    fi
 fi
 
 # Create the nomis folder if it doesn't exist.
