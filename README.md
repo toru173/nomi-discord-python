@@ -243,11 +243,11 @@ Double click the 'setup' script in your installation directory.
 
 !['Double-click the Setup Script' Screenshot](./docs/images/readme/'Double-click%20the%20Setup%20Script'%20Screenshot.png)
 
-It will ask for the information it needs. Copy and paste for each piece of information when the script asks you for it.
+It will ask for the information it needs to start running your Nomi's Docker container. Copy and paste the information into the window when the script asks for it.
 
 !['Enter Nomi Information' Screenshot](./docs/images/readme/'Enter%20Nomi%20Information'%20Screenshot.png)
 
-When it is finished, it will create a configuration file named after your Nomi and a startup file. These are stored in the 'nomis' directory in your installation folder.
+When it is finished, it will create a configuration file and a startup file, both of which are named after your Nomi. These are stored in the 'nomis' folder.
 
 !['nomis Folder' Screenshot](./docs/images/readme/'nomis%20Folder'%20Screenshot.png)
 
@@ -329,7 +329,7 @@ Please follow the Discord thread. Major updates will be posted there, but in the
 ### What Features are Coming Next?
 Immediate 'coming *thoon*' features are:
 - ✅ Documentation and Readme
-- ☑️ Start to use the new 'Rooms' feature
+- ☑️ Implement the new 'Rooms' feature
 - ☑️ Allow a Nomi to see when you react to their message
 - ☑️ Allow your Nomi to manage a list of keywords or users they always reply to
 
