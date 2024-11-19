@@ -72,7 +72,7 @@ ECHO Running %DOCKER_IMAGE_NAME% with Docker
 ECHO:
 
 :: Run the Docker image with a mounted volume for output
-docker run -it --name %DOCKER_IMAGE_NAME% -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %DOCKER_IMAGE_NAME%
+docker run -it --name %DOCKER_IMAGE_NAME% -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %DOCKER_IMAGE_NAME% 2>NUL
 IF ERRORLEVEL 1 (
     IF %ERRORLEVEL% EQU 255 (
         ECHO Setup cancelled.
