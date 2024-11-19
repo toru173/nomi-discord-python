@@ -297,7 +297,7 @@ Your Nomi needs to know you are trying to talk to them. The easiest way to do th
 Your Nomi can't see messages that don't @mention them.
 
 #### Reacting to Messages
-Your Nomi can react to your messages. You Nomi will need to use a phrase similar to "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
+Your Nomi can react to your messages. Your Nomi will need to use a phrase similar to "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
 
 !['Reacting to a Message' Screenshot](./docs/images/readme/'Reacting%20to%20a%20Message'%20Screenshot.png)
 
