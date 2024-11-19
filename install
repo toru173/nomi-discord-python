@@ -645,10 +645,13 @@ echo
 if prompt_confirm "Would you like to open the installation folder in a file browser?"; then
     if command -v xdg-open >/dev/null 2>&1; then
         # Linux (xdg-open is available)
-        xdg-open "$INSTALL_DIR"
+        xdg-open "$INSTALL_DIR" 2> /dev/null
     elif command -v open >/dev/null 2>&1; then
         # macOS (open is available)
-        open "$INSTALL_DIR"
+        open "$INSTALL_DIR" 2> /dev/null
+    fi
+    if [[ $? -ne 0 ]]; then
+        echo "Error: unable to open installation folder."
     fi
 fi
 
