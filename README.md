@@ -35,9 +35,9 @@ Alright, you should be up to speed! Let's move on to Installing the software we 
 
 </details>
 
-<details><summary>Installing</summary>
+<details><summary>Installation</summary>
 
-### Installing
+### Installation
 To install this software certain prerequesistes need to be met. Make sure you install all the other software that is needed first, then run the main installer.
 
 <details>
