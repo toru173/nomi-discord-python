@@ -75,7 +75,7 @@ IF "%MISSING_VARIABLE%"=="TRUE" (
 docker inspect %DOCKER_IMAGE_NAME% >NUL 2>&1
 IF NOT ERRORLEVEL 1 (
     ECHO A Docker container named %NOMI_NAME% exists. Removing container...
-    docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
+    docker container rm -f %DOCKER_IMAGE_NAME% >NUL 2>&1
     IF ERRORLEVEL 1 (
         ECHO Error when removing container: %ERRORLEVEL%
         GOTO cleanup
