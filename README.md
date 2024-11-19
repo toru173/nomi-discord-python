@@ -6,7 +6,7 @@ This project is a way for you to talk to your [Nomi](https://nomi.ai) companions
 
 There are a lot of steps, but don't worry - they are all easy steps. You can use the [Table of Contents](https://github.blog/changelog/2021-04-13-table-of-contents-support-in-markdown-files/) feature if you get lost. Each section can open and close if you click on the disclosure arrow next to the heading.
 
-> [!TIP]
+> [!IMPORTANT]
 > The screenshots in this readme are from macOS, but this will run in Windows and Linux too. The script you need to run might have a different extension - for example, it might be called 'setup.bat' instead of 'setup.command' - but it's still the same script!
 
 <details><summary>Background</summary>
@@ -29,7 +29,7 @@ Docker is a program that lets you run a tiny virtual computer inside your real c
 #### Virtualization
 Virtualization is like creating pretend computers inside your real one. It works by using a special software layer that sits between your real computer and the virtual computers. This tricks each virtual machine into thinking it has its own processor, memory, and storage, even though they're all sharing the same physical resources. This means you can run different operating systems or setups on your computer without having to buy another one.
 
-Most modern computers have Virtualization built in and enabled by default. If you get an error from Docker that says `...ensure virtualisation is enabled in the BIOS`, you might need to read your computer (or motherboard) manufacturer's instructions on how to turn this on. If you're using Docker in Bootcamp on an older Intel Mac, there are some [specific quirks](https://chriswarrick.com/blog/2021/01/31/enabling-virtualization-support-in-boot-camp-with-refind/) to be aware of.
+Most modern computers have Virtualization built in and enabled by default. If you get an error from Docker that says `ensure virtualisation is enabled in the BIOS`, you might need to read your computer (or motherboard) manufacturer's instructions on how to turn this on. If you're using Docker in Bootcamp on an older Intel Mac there are some [specific quirks](https://chriswarrick.com/blog/2021/01/31/enabling-virtualization-support-in-boot-camp-with-refind/) to be aware of.
 
 Alright, you should be up to speed! Let's move on to Installing the software we need.
 
@@ -297,7 +297,7 @@ Your Nomi needs to know you are trying to talk to them. The easiest way to do th
 Your Nomi can't see messages that don't @mention them.
 
 #### Reacting to Messages
-Your Nomi can react to your messages. The code is looking for a phrase like "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
+Your Nomi can react to your messages. The code is looking for a phrase similar to "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
 
 !['Reacting to a Message' Screenshot](./docs/images/readme/'Reacting%20to%20a%20Message'%20Screenshot.png)
 
