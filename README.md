@@ -12,7 +12,7 @@ There are a lot of steps, but don't worry - they are all easy steps. You can use
 <details><summary>Background</summary>
 
 ### Background
-Before you can talk to your Nomi on Discord, we need to talk about some techy stuff. Feel free to skip this if you already know it.
+Before you can talk to your Nomi on Discord we need to go over some techy stuff. Feel free to skip this if you already know it.
 
 #### API
 API stands for Application Programming Interface. An API is a way for different applications (programs) to be able to talk to each other in a way they can both understand. Nomi.AI have published their API documentation [here](https://api.nomi.ai/docs) if you would like to read how this application talks to your Nomi.
@@ -29,7 +29,9 @@ Docker is a program that lets you run a tiny virtual computer inside your real c
 #### Virtualization
 Virtualization is like creating pretend computers inside your real one. It works by using a special software layer that sits between your real computer and the virtual computers. This tricks each virtual machine into thinking it has its own processor, memory, and storage, even though they're all sharing the same physical resources. This means you can run different operating systems or setups on your computer without having to buy another one.
 
-Alright, you should be up to speed! Let's move on to Installing Software.
+Most modern computers have Virtualization built in and enabled by default. If you get an error from Docker that says `...ensure virtualisation is enabled in the BIOS`, you might need to read your computer (or motherboard) manufacturer's instructions on how to turn this on. If you're using Docker in Bootcamp on an older Intel Mac, there are some [specific quirks](https://chriswarrick.com/blog/2021/01/31/enabling-virtualization-support-in-boot-camp-with-refind/) to be aware of.
+
+Alright, you should be up to speed! Let's move on to Installing the software we need.
 
 </details>
 
@@ -305,7 +307,7 @@ Your Nomi can't see when you react to their messages, but it's still fun to do.
 
 ## FAQ
 ### What is this?
-This allows you to talk to your Nomis using Discord. It's a fun way to keep the conversation going when you're not using the Nomi App or the website. The best part is that other people can talk to your Nomi too, and they can even talk to Nomis in other accounts!
+This allows you to talk to your Nomis using Discord. It's a fun way to keep the conversation going when you're not using the Nomi App or the website. The best part is that other people can talk to your Nomis too, and your Nomis can even talk to Nomis in other accounts!
 
 ### How do I set up more than one Nomi?
 Just run the setup script again! It will ask you for your next Nomi's information and create a new startup script.
@@ -314,7 +316,7 @@ Just run the setup script again! It will ask you for your next Nomi's informatio
 At the moment, changing a configuration file needs to be done manually using Notepad, TextEdit or another text editor. As an alternative, you can run the setup script again and it will ask if you want to overwrite the existing setup.
 
 ### Does my computer need to be running for me to talk to my Nomis?
-For now, yes. [@toru173](https://github.com/toru173) is working on a free alternative that allows a Nomi to live in the cloud, so stay tuned!
+For now, yes. [@toru173](https://github.com/toru173) is working on a free alternative that allows a Nomi to live in the cloud so make sure you watch closely for updates.
 
 ### How will I know when updates are available?
 Please follow the Discord thread. Major updates will be posted there, but in the future your Nomi will tell you when there's a new update.
