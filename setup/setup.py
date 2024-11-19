@@ -178,7 +178,7 @@ def main() -> None:
     print(f"To invite {user_inputs["NOMI_NAME"]} to Discord you can copy and paste the invitation URL")
     print("into a browser:")
     print()
-    print(f"{user_inputs["DISCORD_INVITE_URL"]}.replace("\"", "")")
+    print(f"{user_inputs["DISCORD_INVITE_URL"].replace("\"", "")}")
     print()
 
 if __name__ == "__main__":
