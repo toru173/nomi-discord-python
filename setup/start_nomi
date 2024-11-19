@@ -100,8 +100,8 @@ IF ERRORLEVEL 1 (
 
 ECHO %NOMI_NAME%'s container is running! You can now talk to %NOMI_NAME% on Discord.
 ECHO:
-ECHO To add %NOMI_NAME% to Discord you can copy and paste the invitation URL into
-ECHO a browser:
+ECHO To invite %NOMI_NAME% to Discord you can copy and paste the invitation URL
+ECHO into a browser:
 ECHO %DISCORD_INVITE_URL%
 ECHO:
 ECHO Make sure you do not share your config file with ANYONE.
@@ -249,8 +249,8 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "$NOMI_NAME's container is running! You can now to talk to $NOMI_NAME on Discord."
-echo "To add $NOMI_NAME to Discord you can copy and paste the invitation URL into"
-echo "a browser:"
+echo "To invite $NOMI_NAME to Discord you can copy and paste the invitation URL"
+echo "into a browser:"
 echo "$DISCORD_INVITE_URL"
 echo
 echo "Make sure you do not share your config file with ANYONE"

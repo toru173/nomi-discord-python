@@ -126,7 +126,7 @@ def main() -> None:
     # Prompt user for values, showing current values if they exist
     user_inputs = prompt_user(required_conf_keys, current_values)
 
-    current_values["DISCORD_INVITE_URL"] = f"https://discord.com/oauth2/authorize?client_id={current_values["DISCORD_APPLICATION_ID"]}&permissions={BOT_PERMISSIONS}&integration_type=0&scope=bot"
+    user_inputs["DISCORD_INVITE_URL"] = f"https://discord.com/oauth2/authorize?client_id={user_inputs["DISCORD_APPLICATION_ID"]}&permissions={BOT_PERMISSIONS}&integration_type=0&scope=bot"
 
     # Normalise the name
     nomi_name = user_inputs["NOMI_NAME"]
@@ -166,6 +166,10 @@ def main() -> None:
         if "Windows_NT" not in os_type:
             start_output_file.write("#!/usr/bin/env bash\n")
         start_output_file.write(modified_start_content)
+
+    print(f"To invite {user_inputs["NOMI_NAME"]} to Discord you can copy and paste the invitation URL")
+    print("into a browser:")
+    print(f"{user_inputs["DISCORD_INVITE_URL"]}")
 
 if __name__ == "__main__":
     main()
