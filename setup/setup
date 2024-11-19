@@ -259,7 +259,7 @@ echo "Running $DOCKER_IMAGE_NAME with Docker"
 echo
 
 # Run the Docker image with a mounted volume for output files
-docker run -it --name "$DOCKER_IMAGE_NAME" -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -s) "$DOCKER_IMAGE_NAME"  > /dev/null 2>&1
+docker run -it --name "$DOCKER_IMAGE_NAME" -v "$SETUP_DIR/output:/app/output" -e HOST=$(uname -s) "$DOCKER_IMAGE_NAME" 2> /dev/null
 EXIT_CODE=$?
 if [[ $EXIT_CODE -ne 0 ]]; then
     if [[ $EXIT_CODE -eq 255 ]]; then
