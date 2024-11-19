@@ -226,9 +226,9 @@ Navigate to your Nomi's Information page. Your Nomi's Nomi ID is at the bottom o
 
 <details>
 
-<summary>Setting up a Nomi on Discord</summary>
+<summary>Setting Up your Nomi on Discord</summary>
 
-### Setting up a Nomi on Discord
+### Setting Up your Nomi on Discord
 
 #### Before you Begin
 To set up a Nomi or to create a new configuration file, make sure you have the following:
