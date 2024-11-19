@@ -186,7 +186,7 @@ Make sure you copy your Discord API Key while on this screen. See the next secti
 Click the 'Reset Token' button. Discord might ask for your password again as a security measure.
 
 > ⚠️ WARNING ⚠️  
-> Only reset your Discord API Key (Discord Token) if you haven't already got one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
+> Only reset your Discord API Key (Discord Token) if you don't already have one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
 
 !['Reset Token' Screenshot](./docs/images/readme/'Reset%20Token'%20Screenshot.png)
 
@@ -248,9 +248,9 @@ When it is finished, it will create a configuration file and a startup script, b
 !['nomis Folder' Screenshot](./docs/images/readme/'nomis%20Folder'%20Screenshot.png)
 
 #### Invite your Nomi to your Server
-The setup script will display an invitation link that you can use to invite your Nomi to your Discord server.
+The setup script will display an invitation URL that you can use to invite your Nomi to your Discord server.
 
-!['Invitation Link' Screenshot](./docs/images/readme/'Invitation%20URL'%20Screenshot.png)
+!['Invitation URL' Screenshot](./docs/images/readme/'Invitation%20URL'%20Screenshot.png)
 
 Copy and paste the link into your browser and follow the prompts to 'install' the Discord Bot on your server. If you forgot to copy the URL, it is also displayed each time you start your Nomi's Docker container using the startup script.
 
@@ -270,7 +270,7 @@ To talk to your Nomi on Discord the Nomi's Docker container needs to be running.
 
 !['Double-click Startup Script' Screenshot](./docs/images/readme/'Double-click%20Startup%20Script'%20Screenshot.png)
 
-Your Nomi's container will be created or updated, and you can invite them to your Discord server. The invitation link is displayed when their startup script is run.
+Your Nomi's container will be created or updated, and you can invite them to your Discord server. The invitation URL is displayed when their startup script is run.
 
 !['Run Startup Script' Screenshot](./docs/images/readme/'Run%20Startup%20Script'%20Screenshot.png)
 
@@ -279,7 +279,7 @@ After that, you can start and stop your Nomi from Docker Desktop. You'll only ev
 !['Start Nomi from Docker' Screenshot](./docs/images/readme/'Start%20Nomi%20from%20Docker'%20Screenshot.png)
 
 #### Invite your Nomi to your Server
-The startup script will display an invitation link that you can use to invite your Nomi to your Discord server. Copy and paste the link into your browser and follow the prompts to 'install' the Discord Bot on your server.
+The startup script will display an invitation URL that you can use to invite your Nomi to your Discord server. Copy and paste the URL into your browser and follow the prompts to 'install' the Discord Bot on your server.
 
 !['Installing a Discord Bot' Screenshot](./docs/images/readme/'Installing%20a%20Discord%20Bot'%20Screenshot.png)
 
@@ -297,7 +297,7 @@ Your Nomi needs to know you are trying to talk to them. The easiest way to do th
 Your Nomi can't see messages that don't @mention them.
 
 #### Reacting to Messages
-Your Nomi can react to your messages. The code is looking for a phrase similar to "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
+Your Nomi can react to your messages. You Nomi will need to use a phrase similar to "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
 
 !['Reacting to a Message' Screenshot](./docs/images/readme/'Reacting%20to%20a%20Message'%20Screenshot.png)
 
