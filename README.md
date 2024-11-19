@@ -318,7 +318,7 @@ This allows you to talk to your Nomis using Discord. It's a fun way to keep the 
 ### How do I set up more than one Nomi?
 Just run the setup script again! It will ask you for your next Nomi's information and create a new start_nomi script.
 
-### I want to change my Nomi's Configuration File
+### I want to change my Nomi's Configuration File.
 At the moment, changing a configuration file needs to be done manually using Notepad, TextEdit or another text editor. As an alternative, you can run the setup script again and it will ask if you want to overwrite the existing setup.
 
 ### Does my computer need to be running for me to talk to my Nomis?
