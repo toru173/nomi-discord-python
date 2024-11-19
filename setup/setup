@@ -235,7 +235,7 @@ if [ -z "$(docker images -q $DOCKER_IMAGE_NAME 2>/dev/null)" ]; then
     docker build -t "$DOCKER_IMAGE_NAME" "$SETUP_DIR"  > /dev/null 2>&1
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        echo "Error when building container: $DOCKER_BUILD_OUTPUT"
+        echo "Error when building container: $EXIT_CODE"
         exit 1
     fi
 fi
