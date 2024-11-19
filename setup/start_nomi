@@ -27,7 +27,8 @@ SET DOCKER_IMAGE_NAME=placeholder_docker_image_name
 SET CONFIG_FILE_NAME=%DOCKER_IMAGE_NAME%.conf
 SET "CONFIG_FILE=%SCRIPT_ROOT%%CONFIG_FILE_NAME%"
 
-SET "APP_DIR=%SCRIPT_ROOT%\..\run"
+SET "APP_DIR=app"
+SET "APP_PATH=%SCRIPT_ROOT%\..\%APP_DIR%%"
 
 :: Check if Docker is installed
 docker --version >NUL 2>&1
@@ -83,7 +84,7 @@ IF NOT ERRORLEVEL 1 (
 
 :: Build the Docker container
 ECHO Building a Docker container for %NOMI_NAME%
-docker build -t %DOCKER_IMAGE_NAME% "%APP_DIR%" >NUL 2>&1
+docker build -t %DOCKER_IMAGE_NAME% "%APP_PATH%" >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Error when building container.
     GOTO cleanup
@@ -168,7 +169,8 @@ echo "If you ever want to quit the script, simply press CTRL+C together"
 echo
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_DIR="$SCRIPT_ROOT/../run"
+APP_DIR="app"
+APP_PATH="$SCRIPT_ROOT/../$APP_DIR"
 
 NOMI_NAME="placeholder_nomi_name"
 DOCKER_IMAGE_NAME=placeholder_docker_image_name
@@ -232,7 +234,7 @@ fi
 echo "Building a Docker container for $NOMI_NAME"
 echo "The container will be called '$DOCKER_IMAGE_NAME'"
 
-DOCKER_BUILD_OUTPUT=$(docker build -t $DOCKER_IMAGE_NAME "$APP_DIR" 2>&1)
+DOCKER_BUILD_OUTPUT=$(docker build -t $DOCKER_IMAGE_NAME "$APP_PATH" 2>&1)
 if [ $? -ne 0 ]; then
     echo "Error when building container: $DOCKER_BUILD_OUTPUT"
     exit 1

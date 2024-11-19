@@ -11,7 +11,7 @@ services:
     name: nomi-discord-python
     region: oregon
     plan: free
-    rootDir: run
+    rootDir: app
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     envVars:
