@@ -153,8 +153,13 @@ def main() -> None:
 
     # Write the modified .conf file
     conf_output_path = Path(f"{output_dir}/{normalised_name}.conf")
-    with conf_output_path.open("w") as conf_output_file:
-        conf_output_file.write(modified_conf_content)
+    try:
+        with conf_output_path.open("w") as conf_output_file:
+            conf_output_file.write(modified_conf_content)
+    except:
+        print(f"Unable to write to output file: {conf_output_path}")
+        print("Please try running setup again")
+        exit(255)
 
     # Read start_nomi
     with start_nomi_path.open("r") as start_file:
@@ -170,10 +175,15 @@ def main() -> None:
 
     # Write the modified start_nomi file with the OS-specific extension
     start_output_path = Path(f"{output_dir}/start_{normalised_name}{extension}")
-    with start_output_path.open("w") as start_output_file:
-        if "Windows_NT" not in os_type:
-            start_output_file.write("#!/usr/bin/env bash\n")
-        start_output_file.write(modified_start_content)
+    try:
+        with start_output_path.open("w") as start_output_file:
+            if "Windows_NT" not in os_type:
+                start_output_file.write("#!/usr/bin/env bash\n")
+            start_output_file.write(modified_start_content)
+    except:
+        print(f"Unable to write to output file: {start_output_path}")
+        print("Please try running setup again")
+        exit(255)
 
     print(f"To invite {user_inputs["NOMI_NAME"]} to Discord you can copy and paste the invitation URL")
     print("into a browser:")
