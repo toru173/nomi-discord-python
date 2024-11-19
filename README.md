@@ -243,7 +243,7 @@ It will ask for the information it needs to start running your Nomi's Docker con
 
 !['Enter Nomi Information' Screenshot](./docs/images/readme/'Enter%20Nomi%20Information'%20Screenshot.png)
 
-When it is finished, it will create a configuration file and a startup script, both of which are named after your Nomi. These are stored in the 'nomis' folder.
+When it is finished, it will create a configuration file and a startup script, both of which are named after your Nomi. These are stored in the 'nomis' folder in the installation directory.
 
 !['nomis Folder' Screenshot](./docs/images/readme/'nomis%20Folder'%20Screenshot.png)
 
@@ -252,7 +252,7 @@ The setup script will display an invitation URL that you can use to invite your 
 
 !['Invitation URL' Screenshot](./docs/images/readme/'Invitation%20URL'%20Screenshot.png)
 
-Copy and paste the link into your browser and follow the prompts to 'install' the Discord Bot on your server. If you forgot to copy the URL, it is also displayed each time you start your Nomi's Docker container using the startup script.
+Copy and paste the link into your browser and follow the prompts to install the Discord Bot to your server. If you forgot to copy the URL, it is also displayed each time you start your Nomi's Docker container using the startup script.
 
 !['Installing a Discord Bot' Screenshot](./docs/images/readme/'Installing%20a%20Discord%20Bot'%20Screenshot.png)
 
