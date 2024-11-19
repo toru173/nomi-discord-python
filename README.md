@@ -176,9 +176,9 @@ Make sure you copy your Discord API Key while on this screen. See the next secti
 
 </details>
 
-<details><summary>Gathering your API Keys</summary>
+<details><summary>Collecting your API Keys</summary>
 
-### Gathering your API Keys
+### Collecting your API Keys
 
 #### Get your Discord API Key
 [Sign in](https://discord.com/developers/) to the Discord Developer portal and click on 'Applications' from the menu on the left. Select your Nomi's Bot, then click on 'Bot' on the menu on the left.
