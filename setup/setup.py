@@ -126,7 +126,7 @@ def main() -> None:
     # Prompt user for values, showing current values if they exist
     user_inputs = prompt_user(required_conf_keys, current_values)
 
-    required_conf_keys["DISCORD_INVITE_URL"] = f"https://discord.com/oauth2/authorize?client_id={required_conf_keys["DISCORD_APPLICATION_ID"]}&permissions={BOT_PERMISSIONS}&integration_type=0&scope=bot"
+    current_values["DISCORD_INVITE_URL"] = f"https://discord.com/oauth2/authorize?client_id={current_values["DISCORD_APPLICATION_ID"]}&permissions={BOT_PERMISSIONS}&integration_type=0&scope=bot"
 
     # Normalise the name
     nomi_name = user_inputs["NOMI_NAME"]
