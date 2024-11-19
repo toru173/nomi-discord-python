@@ -31,14 +31,14 @@ SET "APP_DIR=app"
 SET "APP_PATH=%SCRIPT_ROOT%\..\%APP_DIR%%"
 
 :: Check if Docker is installed
-docker --version 2>&1 >NUL
+docker --version >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Could not find Docker. Please re-run the installation script.
     GOTO cleanup
 )
 
 :: Check if Docker daemon is running
-docker info 2>&1 >NUL
+docker info >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Docker is installed but the Docker daemon is not running. Please start Docker before continuing.
     GOTO cleanup
@@ -72,10 +72,10 @@ IF "%MISSING_VARIABLE%"=="TRUE" (
 )
 
 :: Check if a Docker container already exists and remove it
-docker inspect %DOCKER_IMAGE_NAME% 2>&1 >NUL
+docker inspect %DOCKER_IMAGE_NAME% >NUL 2>&1
 IF NOT ERRORLEVEL 1 (
-    ECHO A Docker container for %NOMI_NAME% exists. Removing container...
-    docker container rm %DOCKER_IMAGE_NAME% -f 2>&1 >NUL
+    ECHO A Docker container named %NOMI_NAME% exists. Removing container...
+    docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
     IF ERRORLEVEL 1 (
         ECHO Error when removing container: %ERRORLEVEL%
         GOTO cleanup
@@ -84,7 +84,7 @@ IF NOT ERRORLEVEL 1 (
 
 :: Build the Docker container
 ECHO Building a Docker container for %NOMI_NAME%
-docker build -t %DOCKER_IMAGE_NAME% "%APP_PATH%" 2>&1 >NUL
+docker build -t %DOCKER_IMAGE_NAME% "%APP_PATH%" >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Error when building container: %ERRORLEVEL%
     GOTO cleanup
@@ -92,7 +92,7 @@ IF ERRORLEVEL 1 (
 
 :: Run the Docker container
 ECHO %NOMI_NAME%'s container built successfully. Running container...
-docker run -d --name %DOCKER_IMAGE_NAME% --env-file "%CONFIG_FILE%" %DOCKER_IMAGE_NAME% 2>&1 >NUL
+docker run -d --name %DOCKER_IMAGE_NAME% --env-file "%CONFIG_FILE%" %DOCKER_IMAGE_NAME% >NUL 2>&1
 IF ERRORLEVEL 1 (
     ECHO Error when running container: %ERRORLEVEL%
     GOTO cleanup
@@ -224,7 +224,7 @@ if [ MISSING_VARIABLE == true ]; then
 fi
 
 if docker inspect $DOCKER_IMAGE_NAME 2>&1 >/dev/null; then
-    echo "A Docker container for $NOMI_NAME exists. Removing container..."
+    echo "A Docker container named $NOMI_NAME exists. Removing container..."
     docker container rm -f $DOCKER_IMAGE_NAME 2>&1 >/dev/null
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then

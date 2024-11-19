@@ -54,7 +54,7 @@ SET DOCKER_INSTALLED=0
 SET TAR_INSTALLED=0
 
 :: Check if Docker is installed
-docker --version 2>&1 >NUL
+docker --version >NUL 2>&1
 IF ERRORLEVEL 1 (
     SET DOCKER_INSTALLED=0
 ) ELSE (
@@ -64,7 +64,7 @@ IF ERRORLEVEL 1 (
 :: Check if tar is installed. It SHOULD be because it shipped
 :: with Windows before cURL, and this script is most likely
 :: running using cURL.
-tar --version 2>&1 >NUL
+tar --version >NUL 2>&1
 IF ERRORLEVEL 1 (
     SET TAR_INSTALLED=0
 ) ELSE (
