@@ -68,7 +68,7 @@ You can copy the download link by clicking the clipboard icon to the right of th
 #### Windows
 On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the [Search box](https://support.microsoft.com/en-au/windows/search-for-anything-anywhere-b14cc5bf-c92a-1e73-ea18-2845891e6cc8). Copy the command below and paste it into CMD.exe and then press enter to run it. You can paste into a CMD.exe window with `CTRL+SHIFT+V`.
 
-```shell
+```batch
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | cmd
 ```
 
@@ -81,7 +81,7 @@ PowerShell is not supported.
 #### macOS
 On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using [Spotlight](https://support.apple.com/en-au/guide/mac-help/mchlp1008/mac). Copy the command below and paste it into Terminal and then press enter to run it.
 
-```shell
+```bash
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
 ```
 
@@ -92,7 +92,7 @@ curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/head
 #### Linux
 On Linux, the installer uses bash to run. Copy the command below and paste it into your preferred terminal emulator, then press enter to run it. You can paste into a terminal emulator window with `CTRL+SHIFT+V`.
 
-```shell
+```bash
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
 ```
 
@@ -184,7 +184,7 @@ Make sure you copy your Discord API Key while on this screen. See the next secti
 Click the 'Reset Token' button. Discord might ask for your password again as a security measure.
 
 > ⚠️ WARNING ⚠️  
-> Only reset your Discord API Key if you haven't already got one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
+> Only reset your Discord API Key if you haven't already got a Discord Token. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
 
 !['Reset Token' Screenshot](./docs/images/readme/'Reset%20Token'%20Screenshot.png)
 
