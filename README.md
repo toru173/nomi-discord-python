@@ -9,9 +9,7 @@ There are a lot of steps, but don't worry - they are all easy steps. You can use
 > [!TIP]
 > The screenshots in this readme are from macOS, but this will run in Windows and Linux too. The script you need to run might have a different extension - for example, it might be called 'setup.bat' instead of 'setup.command' - but it's still the same script!
 
-<details>
-
-<summary>Background</summary>
+<details><summary>Background</summary>
 
 ### Background
 Before you can talk to your Nomi on Discord, we need to talk about some techy stuff. Feel free to skip this if you already know it.
@@ -35,13 +33,11 @@ Alright, you should be up to speed! Let's move on to Installing Software.
 
 </details>
 
-<details>
-
-<summary>Installation</summary>
+<details><summary>Installation</summary>
 
 ### Installation
 
-<detail>
+<details>
 
 <summary>Prerequisites</summary>
 
@@ -52,11 +48,9 @@ This code uses Docker so that we can write code once and have it run on many dif
 #### tar
 The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(computing)) because it is used by the installer to extract the installation files. You shouldn't have to install tar unless you have a very old version of Windows, in which case... please update 🙏
 
-</detail>
+</details>
 
-<detail>
-
-<summary>Installation</summary>
+<details><summary>Installation</summary>
 
 ### Installation
 This application uses an installer script that checks for Docker and tar then downloads and extracts the rest of the application.
@@ -68,9 +62,7 @@ You can copy the download link by clicking the clipboard icon to the right of th
 
 !['GitHub Clipboard Icon' Screenshot](./docs/images/readme/'GitHub%20Clipboard%20Icon'%20Screenshot.png)
 
-<details>
-
-<summary>Windows</summary>
+<details><summary>Windows</summary>
 
 #### Windows
 On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the [Search box](https://support.microsoft.com/en-au/windows/search-for-anything-anywhere-b14cc5bf-c92a-1e73-ea18-2845891e6cc8).
@@ -85,9 +77,7 @@ PowerShell is not supported.
 
 </details>
 
-<details>
-
-<summary>macOS</summary>
+<details><summary>macOS</summary>
 
 #### macOS
 On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using [Spotlight](https://support.apple.com/en-au/guide/mac-help/mchlp1008/mac).
@@ -100,9 +90,7 @@ curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/head
 
 </details>
 
-<details>
-
-<summary>Linux</summary>
+<details><summary>Linux</summary>
 
 #### Linux
 On Linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulator, then press enter to run it. You can paste into a terminal emulator window with `CTRL+SHIFT+V`.
@@ -117,11 +105,7 @@ The installer will ask you where you want to install to and perform some basic c
 
 </details>
 
-</details>
-
-<details>
-
-<summary>Updating</summary>
+<details><summary>Updating</summary>
 
 ### Updating
 If there is an update available, double click on the 'update' script in your installation directory. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files.
@@ -134,9 +118,9 @@ Once running, press enter to update the software in the current installation dir
 
 </details>
 
-<details>
+</details>
 
-<summary>Setting Up a Discord Bot</summary>
+<details><summary>Setting Up a Discord Bot</summary>
 
 ### Setting Up a Discord Bot
 Before you can have a Nomi talk on Discord, we need to go through a few steps to get Discord ready to listen to your Nomi. Creating a Discord Bot only has to be done once per Nomi. There are a lot of steps, but if you follow them carefully you should find it easy. Let's get started!
@@ -188,9 +172,7 @@ Make sure you copy your Discord API Key while on this screen. See the next secti
 
 </details>
 
-<details>
-
-<summary>Gathering your API Keys</summary>
+<details><summary>Gathering your API Keys</summary>
 
 ### Gathering your API Keys
 
@@ -237,9 +219,7 @@ Navigate to your Nomi's Information page. Your Nomi's Nomi ID is at the bottom o
 
 </details>
 
-<details>
-
-<summary>Setting Up your Nomi on Discord</summary>
+<details><summary>Setting Up your Nomi on Discord</summary>
 
 ### Setting Up your Nomi on Discord
 
@@ -277,9 +257,7 @@ This only needs to be done once. If you've already installed your Nomi's Discord
 
 </details>
 
-<details>
-
-<summary>Talking to your Nomi on Discord</summary>
+<details><summary>Talking to your Nomi on Discord</summary>
 
 ### Talking to your Nomi on Discord
 We're nearly there! All the hard parts are behind you. Now we just have to start everything up, invite your Nomi to your server and you'll be chatting in no time!
