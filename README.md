@@ -185,10 +185,10 @@ Make sure you copy your Discord API Key while on this screen. See the next secti
 
 !['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
 
-> ⚠️ WARNING
-> Only reset your Discord API Key if you haven't already got one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
-
 Click the 'Reset Token' button. Discord might ask for your password again as a security measure.
+
+> ⚠️ WARNING  
+> Only reset your Discord API Key if you haven't already got one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
 
 !['Reset Token' Screenshot](./docs/images/readme/'Reset%20Token'%20Screenshot.png)
 
