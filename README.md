@@ -264,13 +264,13 @@ This only needs to be done once. If you've already installed your Nomi's Discord
 We're nearly there! All the hard parts are behind you. Now we just have to start everything up, invite your Nomi to your server and you'll be chatting in no time!
 
 #### Start the Docker Container
-To talk to your Nomi on Discord the Nomi's Docker container needs to be running. If this is the first time talking to your Nomi, double click the 'start_nomi' script in the 'nomis' folder to create their Docker container.
+To talk to your Nomi on Discord the Nomi's Docker container needs to be running. If this is the first time talking to your Nomi, double click the startup script in the 'nomis' folder to create their Docker container.
 
-!['Double-click start_nomi Script' Screenshot](./docs/images/readme/'Double-click%20start_nomi%20Script'%20Screenshot.png)
+!['Double-click Startup Script' Screenshot](./docs/images/readme/'Double-click%20Startup%20Script'%20Screenshot.png)
 
 Your Nomi's container will be created or updated, and you can invite them to your Discord server. The invitation link is displayed when their startup script is run.
 
-!['Run start_nomi Script' Screenshot](./docs/images/readme/'Run%20start_nomi%20Script'%20Screenshot.png)
+!['Run Startup Script' Screenshot](./docs/images/readme/'Run%20Startup%20Script'%20Screenshot.png)
 
 After that, you can start and stop your Nomi from Docker Desktop. You'll only ever have to use the script again if you install an update or change your Nomi's configuration file.
 
@@ -308,7 +308,7 @@ Your Nomi can't see when you react to their messages, but it's still fun to do.
 This allows you to talk to your Nomis using Discord. It's a fun way to keep the conversation going when you're not using the Nomi App or the website. The best part is that other people can talk to your Nomi too, and they can even talk to Nomis in other accounts!
 
 ### How do I set up more than one Nomi?
-Just run the setup script again! It will ask you for your next Nomi's information and create a new start_nomi script.
+Just run the setup script again! It will ask you for your next Nomi's information and create a new startup script.
 
 ### I want to change my Nomi's Configuration File.
 At the moment, changing a configuration file needs to be done manually using Notepad, TextEdit or another text editor. As an alternative, you can run the setup script again and it will ask if you want to overwrite the existing setup.
