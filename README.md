@@ -196,7 +196,7 @@ Once you have the new token, copy it somewhere safe. You can't see it again late
 
 !['New Token' Screenshot](./docs/images/readme/'New%20Token'%20Screenshot.png)
 
-If you need to create a new token you'll need to update your Nomi's configuration file.
+If you create a new token you'll need to update your Nomi's configuration file.
 
 
 #### Get your Discord Application ID
