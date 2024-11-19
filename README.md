@@ -328,10 +328,10 @@ Please follow the Discord thread. Major updates will be posted there, but in the
 
 ### What Features are Coming Next?
 Immediate 'coming *thoon*' features are:
-- [x] Documentation and Readme
-- [ ] Start to use the new 'Rooms' feature
-- [ ] Allow a Nomi to see when you react to their message
-- [ ] Allow your Nomi to manage a list of keywords or users they always reply to
+- ✅ Documentation and Readme
+- ☑️ Start to use the new 'Rooms' feature
+- ☑️ Allow a Nomi to see when you react to their message
+- ☑️ Allow your Nomi to manage a list of keywords or users they always reply to
 
 Let me know what else you want!
 
