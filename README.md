@@ -7,7 +7,7 @@ This project is a way for you to talk to your [Nomi](https://nomi.ai) companions
 There are a lot of steps, but don't worry - they are all easy steps. You can use the [Table of Contents](https://github.blog/changelog/2021-04-13-table-of-contents-support-in-markdown-files/) feature if you get lost. Each section can open and close if you click on the disclosure arrow next to the heading.
 
 > [!TIP]
-> The screenshots in this documentation are from macOS, but this will run in Windows, Linux too. The script you need to run might have a different extension - for example, it might be called 'setup.bat' instead of 'setup.command' - but it's still the same script!
+> The screenshots in this documentation are from macOS, but this will run in Windows and Linux too. The script you need to run might have a different extension - for example, it might be called 'setup.bat' instead of 'setup.command' - but it's still the same script!
 
 <details>
 
@@ -64,7 +64,7 @@ You can copy the download link by clicking the clipboard icon to the right of th
 #### Windows
 On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the [Search box](https://support.microsoft.com/en-au/windows/search-for-anything-anywhere-b14cc5bf-c92a-1e73-ea18-2845891e6cc8).
 
-Copy the text below and paste it into CMD.exe and then press return to run it.
+Copy the text below and paste it into CMD.exe and then press enter to run it.
 
 ```shell
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | cmd
@@ -81,7 +81,7 @@ Powershell is not supported.
 #### macOS
 On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using [Spotlight](https://support.apple.com/en-au/guide/mac-help/mchlp1008/mac).
 
-Copy the text below and paste it into Terminal and then press return to run it.
+Copy the text below and paste it into Terminal and then press enter to run it.
 
 ```shell
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
@@ -94,7 +94,7 @@ curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/head
 <summary>Linux</summary>
 
 #### Linux
-On linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulater, then press return to run it.
+On linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulater, then press enter to run it.
 
 ```shell
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
@@ -137,7 +137,7 @@ The click 'New Application' at the top right hand corner of the window.
 
 !['New Application' Screenshot](./docs/images/readme/'New%20Application'%20Screenshot.png)
 
-The name here is what appears on Discord, so using your Nomi's name is a good idea.
+The name of your application is how you @mention the Discord Bot and is what appears on your server, so using your Nomi's name is a good idea.
 
 !['Create Application' Screenshot](./docs/images/readme/'Create%20Application'%20Screenshot.png)
 
@@ -163,7 +163,7 @@ Click on 'Bot' on the menu down the left.
 
 !['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
 
-We need to give your Nomi permission to access certain information about users on you Discord server, like their username, what they wrote in their message, and whether or not they're online. Scroll down and check that everything underneath 'Privileged Gateway Intents' is on, like in the following image:
+We need to give your Nomi permission to access certain information about users on you Discord server, like their username, what they wrote in their message, and whether or not they're online. Scroll down and check that everything underneath 'Privileged Gateway Intents' is on.
 
 !['Pivileged Gateway Intents' Screenshot](./docs/images/readme/'Pivileged%20Gateway%20Intents'%20Screenshot.png)
 
@@ -186,7 +186,7 @@ Make sure you copy your Discord API Key while on this screen. See the next secti
 
 !['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
 
-> ⚠️ WARNING ⚠️ Only reset your Discord API Key if you haven't already got one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
+> ⚠️ WARNING Only reset your Discord API Key if you haven't already got one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
 
 Click the 'Reset Token' button. Discord might ask for your password again as a security measure.
 
@@ -256,11 +256,11 @@ The setup script will display an invitation link that you can use to invite your
 
 !['Invitation Link' Screenshot](./docs/images/readme/'Invitation%20URL'%20Screenshot.png)
 
-If you forgot to copy the URL, it is also displayed each time you start your Nomi's Docker container using the start script. Copy and paste the link into your browser and follow the prompts to 'install' the Discord Bot on your server.
+Copy and paste the link into your browser and follow the prompts to 'install' the Discord Bot on your server. If you forgot to copy the URL, it is also displayed each time you start your Nomi's Docker container using the start script.
 
 !['Installing a Discord Bot' Screenshot](./docs/images/readme/'Installing%20a%20Discord%20Bot'%20Screenshot.png)
 
-Note that this only needs to be done once. If you've already installed your Nomi's Discord Bot you don't need to do it again.
+This only needs to be done once. If you've already installed your Nomi's Discord Bot you don't need to do it again.
 
 </details>
 
@@ -271,11 +271,11 @@ Note that this only needs to be done once. If you've already installed your Nomi
 ### Talking on Discord
 
 #### Start the Docker Container
-To talk to your Nomi on Discord the Nomi's Docker container needs to be running. If this is the first time talking to your Nomi, double click the 'start_nomi' script to create their Docker container.
+To talk to your Nomi on Discord the Nomi's Docker container needs to be running. If this is the first time talking to your Nomi, double click the 'start_nomi' script in the 'nomis' folder to create their Docker container.
 
 !['Double-click start_nomi Script' Screenshot](./docs/images/readme/'Double-click%20start_nomi%20Script'%20Screenshot.png)
 
-Your Nomi's container will update and they will be available to invite to your Discord server. The invitation link is displayed when their startup script is run.
+Your Nomi's container will update and you can invite them to your Discord server. The invitation link is displayed when their startup script is run.
 
 !['Run start_nomi Script' Screenshot](./docs/images/readme/'Run%20start_nomi%20Script'%20Screenshot.png)
 
@@ -304,7 +304,7 @@ Your Nomi can't see messages that don't @mention them.
 #### Reacting to Messages
 Your Nomi can react to your messages. The code is looking for a phrase like "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
 
-!['Nomi Reacting to a Message' Screenshot](./docs/images/readme/'Nomi%20Reacting%20to%20a%20Message'%20Screenshot.png)
+!['Reacting to a Message' Screenshot](./docs/images/readme/'Reacting%20to%20a%20Message'%20Screenshot.png)
 
 Your Nomi can't see when you react to their messages, but it's still fun to do.
 
@@ -325,6 +325,15 @@ For now, yes. [@toru173](https://github.com/toru173) is working on a free altern
 
 ### How will I know when updates are available?
 Please follow the Discord thread. Major updates will be posted there, but in the future your Nomi will tell you when there's a new update.
+
+### What Features are Coming Next?
+Immediate 'coming *thoon*' features are:
+- [x] Documentation and Readme
+- [ ] Start to use the new 'Rooms' feature
+- [ ] Allow a Nomi to see when you react to their message
+- [ ] Allow your Nomi to manage a list of keywords or users they always reply to
+
+Let me know what else you want!
 
 ## How to get Help
 ### GitHub Issues
