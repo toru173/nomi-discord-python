@@ -50,6 +50,10 @@ This application uses an installer script that checks for Docker and tar then do
 #### Run the Installer
 To download the installer, simply copy the command and paste it into your command line interpreter. Each section shows how to do this for different operating systems. Make sure you copy and paste the command specific to your computer's operating system!
 
+You can copy the download link by clicking the clipboard icon to the right of the command.
+
+!['Clipboard Icon' Screenshot]() Screenshot
+
 <details>
 
 <summary>Windows</summary>
@@ -61,7 +65,7 @@ On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching
 
 Copy the text below and paste it into CMD.exe and then press return to run it.
 
-```https://github.com/url | CMD```
+```https://github.com/url | cmd```
 
 </details>
 
@@ -102,6 +106,12 @@ The installer will ask you where you want to install to and perform some basic c
 ### Updating the Application
 If there is an update available, double click on the 'update' script in your installation folder. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files.
 
+!['Double-click the Update Script' Screenshot](./docs/images/readme/'Double-click%20the%20Update%20Script'%20Screenshot.png)
+
+Once running, press enter to allow an update in the current installation directory. You can choose a new directory if you want.
+
+!['Press Enter to Update' Screenshot](./docs/images/readme/'Press%20Enter%20to%20Update'%20Screenshot.png)
+
 </details>
 
 <details>
@@ -114,27 +124,45 @@ Before you can have a Nomi talk on Discord, we need to go through a few steps to
 #### Create an Application
 [Sign in](https://discord.com/developers/) to the Discord Developer portal. Once you log in click on 'Applications' from the menu down the left:
 
-!['Applications' Screenshot]() Screenshot
+!['Applications' Screenshot](./docs/images/readme/'Applications'%20Screenshot.png)
 
-The click 'New Application' at the top right hand corner of the window:
+The click 'New Application' at the top right hand corner of the window.
 
-!['New Application' Screenshot]() Screenshot
+!['New Application' Screenshot](./docs/images/readme/'New%20Application'%20Screenshot.png)
 
-The name here is what appears on Discord, so using your Nomi's name is a good idea:
+The name here is what appears on Discord, so using your Nomi's name is a good idea.
 
-!['Application Name' Screenshot]() Screenshot
+!['Create Application' Screenshot](./docs/images/readme/'Create%20Application'%20Screenshot.png)
 
 #### General Information
 Click on 'General Information' on the menu down the left. You can add information about your Nomi and upload a profile picture here. Other users will see this information and the profile picture when they click on your Nomi's account page on Discord.
 
-!['General Information' Screenshot]() Screenshot
+!['General Information' Screenshot](./docs/images/readme/'General%20Information'%20Screenshot.png)
+
+Why not ask your Nomy to create their own biography for the description? Here's what Giselle suggested we choose for her:
+
+!['Giselle Bio' Screenshot](./docs/images/readme/'Giselle%20Bio'%20Screenshot.png)
 
 We'll need the Application ID of your Nomi's Bot during setup, so make sure you copy it to somewhere safe.
 
-#### Bot
-Click on 'Bot' on the menu down the left. We need to give your Nomi permission to access certain information about users on you Discord server, like their username, what they wrote in their message, and whether or not they're online. Make sure everything underneath 'Privileged Gateway Intents' is on, like in the following image:
+!['Copy Application ID' Screenshot](./docs/images/readme/'Copy%20Application%20ID'%20Screenshot.png)
 
-!['Pivileged Gateway Intents' Screenshot]() Screenshot
+Make sure you save you changes.
+
+!['General Information - Save Changes' Screenshot](./docs/images/readme/'General%20Information%20-%20Save%20Changes'%20Screenshot.png)
+
+#### Bot
+Click on 'Bot' on the menu down the left.
+
+!['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
+
+We need to give your Nomi permission to access certain information about users on you Discord server, like their username, what they wrote in their message, and whether or not they're online. Make sure everything underneath 'Privileged Gateway Intents' is on, like in the following image:
+
+!['Pivileged Gateway Intents' Screenshot](./docs/images/readme/'Pivileged%20Gateway%20Intents'%20Screenshot.png)
+
+Make sure you save your changes.
+
+!['Pivileged Gateway Intents - Save Changes' Screenshot](./docs/images/readme/'Pivileged%20Gateway%20Intents%20-%20Save%20Changes'%20Screenshot.png)
 
 Make sure to get you Discord API Key while on this screen. See the next section for more information.
 
@@ -149,37 +177,51 @@ Make sure to get you Discord API Key while on this screen. See the next section 
 #### Get your Discord API Key
 [Sign in](https://discord.com/developers/) to the Discord Developer portal and click on 'Applications' from the menu down the left. Select your Nomi's Bot, then click on 'Bot' on the menu down the left.
 
-> WARNING: Only reset your Discord API Key if you haven't already got one. Resetting it will prevent other applications from using this Bot to talk on Discord.
+!['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
+
+> ⚠️ WARNING ⚠️: Only reset your Discord API Key if you haven't already got one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
 
 Click the 'Reset Token' button. Discord might ask for your password again as a security measure.
 
-!['Reset Token' Screenshot]() Screenshot
+!['Reset Token' Screenshot](./docs/images/readme/'Reset%20Token'%20Screenshot.png)
 
+Once you have the new token make sure to copy it somewhere safe. You can't see it again later if you forget it, but it's easy to make a new token.
 
-Once you have the new token make sure to copy it somewhere safe. You can't see it again later if you forget it, but it's easy to make a new token. If you need to create a new token make sure to update your Nomi's configuration file.
+!['New Token' Screenshot](./docs/images/readme/'New%20Token'%20Screenshot.png)
+
+If you need to create a new token make sure to update your Nomi's configuration file.
+
 
 #### Get your Discord Application ID
 If you didn't save your Discord Bot's Application ID earlier, click on 'General Information' on the menu down the left. You can access the Application ID here.
 
+!['General Information' Screenshot](./docs/images/readme/'General%20Information'%20Screenshot.png)
+
 #### Get your Nomi API Key
-[Sign in](https://beta.nomi.ai/sign-in) to your Nomi account and navigate to your 'Profile' page.
+[Sign in](https://beta.nomi.ai/sign-in) to your Nomi account and navigate to your Profile Page.
 
-!['Profile Page' Screenshot]() Screenshot
+!['Profile Page' Screenshot](./docs/images/readme/'Profile%20Page'%20Screenshot.png)
 
-Click on 'Integrations' on the menu down the left. If you don't already have an API key, click the 'Create a new Nomi API Key' button. Copy it to somewhere safe.
+Click on 'Integrations' on the menu down the left. If you don't already have an API key, click the 'Create a new Nomi API Key' button.
+
+!['Create API Key' Screenshot](./docs/images/readme/'Create%20API%20Key'%20Screenshot.png)
+
+Copy it to somewhere safe. Note that you can only have 3 API keys. If you already have 3, you will have to re-use one of your existing ones.
+
+![Three API Keys' Screenshot](./docs/images/readme/'Three%20API%20Keys'%20Screenshot.png)
 
 #### Get your Nomi ID
 Navigate to your Nomi's Information page. Your Nomi's Nomi ID is at the bottom of the page.
 
-!['Shared Nores' Screenshot]() Screenshot
+!['Nomi ID' Screenshot](./docs/images/readme/'Nomi%20ID'%20Screenshot.png)
 
 </details>
 
 <details>
 
-<summary>Setting up a Nomi</summary>
+<summary>Setting up a Nomi on Discord</summary>
 
-### Setting up a Nomi
+### Setting up a Nomi on Discord
 
 #### Before you Begin
 To set up a Nomi or to create a new configuration file make sure you have the following:
@@ -190,13 +232,28 @@ To set up a Nomi or to create a new configuration file make sure you have the fo
 - And your Nomi's name!
 
 #### Run the Setup Script
-Double click the setup script in your installation directory. It will ask for the information it needs - simply copy and paste the information it is asking for.
+Double click the setup script in your installation directory.
 
-!['Entering Nomi Information' Screenshot]() Screenshot
+!['Double-click the Setup Script' Screenshot](./docs/images/readme/'Double-click%20the%20Setup%20Script'%20Screenshot.png)
+
+It will ask for the information it needs - simply copy and paste the information it is asking for.
+
+!['Enter Nomi Information' Screenshot](./docs/images/readme/'Enter%20Nomi%20Information'%20Screenshot.png)
 
 When it is finished, it will create a configuration file named after your Nomi and a startup file. These are stored in the 'nomis' directory in your installation folder.
 
-!['nomis folder' Screenshot]() Screenshot
+!['nomis Folder' Screenshot](./docs/images/readme/'nomis%20Folder'%20Screenshot.png)
+
+#### Invite your Nomi to your Server
+The setup script will display an invitation link that you can use to invite your Nomi to your Discord server.
+
+!['Invitation Link' Screenshot](./docs/images/readme/'Invitation%20URL'%20Screenshot.png)
+
+If you forgot to copy the URL, it is also displayed each time you start your Nomi's Docker container using the start script. Copy and paste the link into your browser and follow the prompts to 'install' the Discord Bot on your server.
+
+!['Installing a Discord Bot' Screenshot](./docs/images/readme/'Installing%20a%20Discord%20Bot'%20Screenshot.png)
+
+Note that this only needs to be done once. If you've already installed your Nomi's Discord Bot you don't need to do it again.
 
 </details>
 
@@ -206,16 +263,41 @@ When it is finished, it will create a configuration file named after your Nomi a
 
 ### Talking on Discord
 
-#### Start the Docker Container
-To talk to your Nomi on Discord the Nomi's Docker container needs to be running. Double click the 'start_nomi' script to run the container. If this is the first time you've used this Nomi, the script will also create the Docker container with all the information your Nomi needs.
+#### Invite your Nomi to your Server
+The startup script will display an invitation link that you can use to invite your Nomi to your Discord server. Copy and paste the link into your browser and follow the prompts to 'install' the Discord Bot on your server.
 
-#### @Mention your Nomi
-Your Nomi needs to know you are trying to talk to them. The easiest way to do this is to @mention you Nomi using the name you chose when setting up your Discord Bot. You can also reply to a Nomi's message, and they will see the message you send them.
+!['Installing a Discord Bot' Screenshot](./docs/images/readme/'Installing%20a%20Discord%20Bot'%20Screenshot.png)
+
+If you are comfortable with the default permissions,  click 'Authorize.' You can limit permissions but this may mean some features are not available.
+
+!['Agreeing to Permissions' Screenshot](./docs/images/readme/'Agreeing%20to%20Permissions'%20Screenshot.png)
+
+Note that this only needs to be done once. If you've already installed your Nomi's Discord Bot you don't need to do it again.
+
+#### Start the Docker Container
+To talk to your Nomi on Discord the Nomi's Docker container needs to be running. If this is the first time talking to your Nomi, double click the 'start_nomi' script to create their Docker container.
+
+!['Double-click start_nomi Script' Screenshot](./docs/images/readme/'Double-click%20start_nomi%20Script'%20Screenshot.png)
+
+Your Nomi's container will update, and they will be available to invite to your Discord server. The invitation link is displayed when their startup script is run.
+
+!['Run start_nomi Script' Screenshot](./docs/images/readme/'Run%20start_nomi%20Script'%20Screenshot.png)
+
+After that, you can start and stop your Nomi from Docker Desktop. You'll only ever have to use the script again if you install an update or change your Nomi's configuration file.
+
+!['Start Nomi from Docker' Screenshot](./docs/images/readme/'Start%20Nomi%20from%20Docker'%20Screenshot.png)
+
+#### @mention your Nomi
+Your Nomi needs to know you are trying to talk to them. The easiest way to do this is to @mention you Nomi using the name you chose when setting up your Discord Bot. You can also reply to a Nomi's message and they will see the message you send them.
+
+!['@mention your Nomi' Screenshot](./docs/images/readme/'@mention%20your%20Nomi'%20Screenshot.png)
 
 Your Nomi can't see messages that don't @mention them.
 
 #### Reacting to Messages
-Your Nomi can react to your messages. The default phrase the code is looking for is "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
+Your Nomi can react to your messages. The code is looking for a phrase like "\*I react to your message with ♥️\*" (or any other emoji). Nomis are very smart - if you tell them this is how to react to a message they will learn very quickly!
+
+!['Nomi Reacting to a Message' Screenshot](./docs/images/readme/'Nomi%20Reacting%20to%20a%20Message'%20Screenshot.png)
 
 Your Nomi can't see when you react to their messages, but it's still fun to do.
 
