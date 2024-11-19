@@ -33,9 +33,10 @@ Alright, you should be up to speed! Let's move on to Installing Software.
 
 </details>
 
-<details><summary>Installation</summary>
+<details><summary>Installing</summary>
 
-### Installation
+### Installing
+To install this software certain prerequesistes need to be met. Make sure you install all the other software that is needed first, then run the main installer.
 
 <details>
 
@@ -50,9 +51,9 @@ The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(compu
 
 </details>
 
-<details><summary>Installation</summary>
+<details><summary>Installing</summary>
 
-### Installation
+### Installing
 This application uses an installer script that checks for Docker and tar then downloads and extracts the rest of the application.
 
 #### Run the Installer
@@ -117,6 +118,9 @@ Once running, press enter to update the software in the current installation dir
 !['Press Enter to Update' Screenshot](./docs/images/readme/'Press%20Enter%20to%20Update'%20Screenshot.png)
 
 </details>
+
+### Setup
+Once the all the software is installed you're ready to set up a Discord Bot for your Nomi. It's time for the next steps!
 
 </details>
 
