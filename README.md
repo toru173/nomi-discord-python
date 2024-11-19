@@ -68,7 +68,7 @@ You can copy the download link by clicking the clipboard icon to the right of th
 #### Windows
 On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the [Search box](https://support.microsoft.com/en-au/windows/search-for-anything-anywhere-b14cc5bf-c92a-1e73-ea18-2845891e6cc8). Copy the command below and paste it into CMD.exe and then press enter to run it. You can paste into a CMD.exe window with `CTRL+SHIFT+V`.
 
-```batch
+```
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | cmd
 ```
 
@@ -81,7 +81,7 @@ PowerShell is not supported.
 #### macOS
 On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using [Spotlight](https://support.apple.com/en-au/guide/mac-help/mchlp1008/mac). Copy the command below and paste it into Terminal and then press enter to run it.
 
-```bash
+```
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
 ```
 
@@ -92,7 +92,7 @@ curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/head
 #### Linux
 On Linux, the installer uses bash to run. Copy the command below and paste it into your preferred terminal emulator, then press enter to run it. You can paste into a terminal emulator window with `CTRL+SHIFT+V`.
 
-```bash
+```
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
 ```
 
