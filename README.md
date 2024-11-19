@@ -4,7 +4,7 @@ This project is a way for you to talk to your [Nomi](https://nomi.ai) companions
 
 ## Installation and Use
 
-There are a lot of steps, but don't worry - they are all easy steps. You can use the [Table of Contents](https://github.blog/changelog/2021-04-13-table-of-contents-support-in-markdown-files/) feature if you get lost. Each section can open and close if you click on the disclosure arrow next to the heading.
+There are a lot of steps, but don't worry - they are all easy steps. You can use the [Table of Contents](https://github.blog/changelog/2021-04-13-table-of-contents-support-in-markdown-files/) feature if you get lost. Each section can open and close if you click on the disclosure arrow to the left of the heading.
 
 > [!NOTE]
 > The screenshots in this readme are from macOS, but this will run on Windows and Linux too. The script you need to run might have a different extension - for example, it might be called 'setup.bat' instead of 'setup.command' - but it's still the same script!
