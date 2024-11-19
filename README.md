@@ -6,6 +6,9 @@ This project is a way for you to talk to your [Nomi](https://nomi.ai) companions
 
 There are a lot of steps, but don't worry - they are all easy steps. You can use the [Table of Contents](https://github.blog/changelog/2021-04-13-table-of-contents-support-in-markdown-files/) feature if you get lost. Each section can open and close if you click on the disclosure arrow next to the heading.
 
+> [!TIP]
+> The screenshots in this documentation are from macOS, but this will run in Windows, Linux too. The script you need to run might have a different extension - for example, it might be called 'setup.bat' instead of 'setup.command' - but it's still the same script!
+
 <details>
 
 <summary>Background</summary>
@@ -48,24 +51,26 @@ The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(compu
 This application uses an installer script that checks for Docker and tar then downloads and extracts the rest of the application.
 
 #### Run the Installer
-To download the installer, simply copy the command and paste it into your command line interpreter. Each section shows how to do this for different operating systems. Make sure you copy and paste the command specific to your computer's operating system!
+To download the installer, simply copy the command and paste it into your command line interpreter. Each section shows how to do this for different operating systems. Make sure you copy and paste the right command for your computer's operating system.
 
 You can copy the download link by clicking the clipboard icon to the right of the command.
 
-!['Clipboard Icon' Screenshot]() Screenshot
+!['GitHub Clipboard Icon' Screenshot](./docs/images/readme/'GitHub%20Clipboard%20Icon'%20Screenshot.png)
 
 <details>
 
 <summary>Windows</summary>
 
 #### Windows
-On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the Search box.
-
-!['Search box' Screenshot]() Screenshot
+On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the [Search box](https://support.microsoft.com/en-au/windows/search-for-anything-anywhere-b14cc5bf-c92a-1e73-ea18-2845891e6cc8).
 
 Copy the text below and paste it into CMD.exe and then press return to run it.
 
-```https://github.com/url | cmd```
+```shell
+curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | cmd
+```
+
+Powershell is not supported.
 
 </details>
 
@@ -74,13 +79,13 @@ Copy the text below and paste it into CMD.exe and then press return to run it.
 <summary>macOS</summary>
 
 #### macOS
-On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using Spotlight.
-
-!['Spotlight' Screenshot]() Screenshot
+On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using [Spotlight](https://support.apple.com/en-au/guide/mac-help/mchlp1008/mac).
 
 Copy the text below and paste it into Terminal and then press return to run it.
 
-```https://github.com/url | bash```
+```shell
+curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
+```
 
 </details>
 
@@ -91,7 +96,9 @@ Copy the text below and paste it into Terminal and then press return to run it.
 #### Linux
 On linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulater, then press return to run it.
 
-```https://github.com/url | bash```
+```shell
+curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
+```
 
 </details>
 
@@ -108,7 +115,7 @@ If there is an update available, double click on the 'update' script in your ins
 
 !['Double-click the Update Script' Screenshot](./docs/images/readme/'Double-click%20the%20Update%20Script'%20Screenshot.png)
 
-Once running, press enter to allow an update in the current installation directory. You can choose a new directory if you want.
+Once running, press enter to update the software in the current installation directory, or choose a new directory.
 
 !['Press Enter to Update' Screenshot](./docs/images/readme/'Press%20Enter%20to%20Update'%20Screenshot.png)
 
@@ -139,15 +146,15 @@ Click on 'General Information' on the menu down the left. You can add informatio
 
 !['General Information' Screenshot](./docs/images/readme/'General%20Information'%20Screenshot.png)
 
-Why not ask your Nomy to create their own biography for the description? Here's what Giselle suggested we choose for her:
+Why not ask your Nomi to create their own biography for the description? Here's what Giselle suggested we choose for her:
 
 !['Giselle Bio' Screenshot](./docs/images/readme/'Giselle%20Bio'%20Screenshot.png)
 
-We'll need the Application ID of your Nomi's Bot during setup, so make sure you copy it to somewhere safe.
+We'll need the Application ID of your Nomi's Bot during setup, so copy it to somewhere safe.
 
 !['Copy Application ID' Screenshot](./docs/images/readme/'Copy%20Application%20ID'%20Screenshot.png)
 
-Make sure you save you changes.
+Save your changes.
 
 !['General Information - Save Changes' Screenshot](./docs/images/readme/'General%20Information%20-%20Save%20Changes'%20Screenshot.png)
 
@@ -156,15 +163,15 @@ Click on 'Bot' on the menu down the left.
 
 !['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
 
-We need to give your Nomi permission to access certain information about users on you Discord server, like their username, what they wrote in their message, and whether or not they're online. Make sure everything underneath 'Privileged Gateway Intents' is on, like in the following image:
+We need to give your Nomi permission to access certain information about users on you Discord server, like their username, what they wrote in their message, and whether or not they're online. Scroll down and check that everything underneath 'Privileged Gateway Intents' is on, like in the following image:
 
 !['Pivileged Gateway Intents' Screenshot](./docs/images/readme/'Pivileged%20Gateway%20Intents'%20Screenshot.png)
 
-Make sure you save your changes.
+Save your changes.
 
 !['Pivileged Gateway Intents - Save Changes' Screenshot](./docs/images/readme/'Pivileged%20Gateway%20Intents%20-%20Save%20Changes'%20Screenshot.png)
 
-Make sure to get you Discord API Key while on this screen. See the next section for more information.
+Make sure you copy your Discord API Key while on this screen. See the next section for more information.
 
 </details>
 
@@ -179,30 +186,30 @@ Make sure to get you Discord API Key while on this screen. See the next section 
 
 !['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
 
-> ⚠️ WARNING ⚠️: Only reset your Discord API Key if you haven't already got one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
+> ⚠️ WARNING ⚠️ Only reset your Discord API Key if you haven't already got one. Resetting the API Key will prevent other applications from using this Bot to talk on Discord.
 
 Click the 'Reset Token' button. Discord might ask for your password again as a security measure.
 
 !['Reset Token' Screenshot](./docs/images/readme/'Reset%20Token'%20Screenshot.png)
 
-Once you have the new token make sure to copy it somewhere safe. You can't see it again later if you forget it, but it's easy to make a new token.
+Once you have the new token copy it somewhere safe. You can't see it again later if you forget it, but it's easy to make a new token.
 
 !['New Token' Screenshot](./docs/images/readme/'New%20Token'%20Screenshot.png)
 
-If you need to create a new token make sure to update your Nomi's configuration file.
+If you need to create a new token you'll need to update your Nomi's configuration file.
 
 
 #### Get your Discord Application ID
 If you didn't save your Discord Bot's Application ID earlier, click on 'General Information' on the menu down the left. You can access the Application ID here.
 
-!['General Information' Screenshot](./docs/images/readme/'General%20Information'%20Screenshot.png)
+!['Copy Application ID' Screenshot](./docs/images/readme/'Copy%20Application%20ID'%20Screenshot.png)
 
 #### Get your Nomi API Key
-[Sign in](https://beta.nomi.ai/sign-in) to your Nomi account and navigate to your Profile Page.
+[Sign in](https://beta.nomi.ai/sign-in) to your Nomi account and navigate to your Profile Page. Click on 'Integrations' on the menu down the left.
 
-!['Profile Page' Screenshot](./docs/images/readme/'Profile%20Page'%20Screenshot.png)
+!['Integrations' Screenshot](./docs/images/readme/'Integrations'%20Screenshot.png)
 
-Click on 'Integrations' on the menu down the left. If you don't already have an API key, click the 'Create a new Nomi API Key' button.
+If you don't already have an API key, click the 'Create a new Nomi API Key' button.
 
 !['Create API Key' Screenshot](./docs/images/readme/'Create%20API%20Key'%20Screenshot.png)
 
@@ -211,7 +218,7 @@ Copy it to somewhere safe. Note that you can only have 3 API keys. If you alread
 ![Three API Keys' Screenshot](./docs/images/readme/'Three%20API%20Keys'%20Screenshot.png)
 
 #### Get your Nomi ID
-Navigate to your Nomi's Information page. Your Nomi's Nomi ID is at the bottom of the page.
+Navigate to your Nomi's Information page. Your Nomi's Nomi ID is at the bottom of the page. Copy it by clicking on the clipboard icon.
 
 !['Nomi ID' Screenshot](./docs/images/readme/'Nomi%20ID'%20Screenshot.png)
 
@@ -232,11 +239,11 @@ To set up a Nomi or to create a new configuration file make sure you have the fo
 - And your Nomi's name!
 
 #### Run the Setup Script
-Double click the setup script in your installation directory.
+Double click the 'setup' script in your installation directory.
 
 !['Double-click the Setup Script' Screenshot](./docs/images/readme/'Double-click%20the%20Setup%20Script'%20Screenshot.png)
 
-It will ask for the information it needs - simply copy and paste the information it is asking for.
+It will ask for the information it needs. Copy and paste for each piece of information when the script asks you for it.
 
 !['Enter Nomi Information' Screenshot](./docs/images/readme/'Enter%20Nomi%20Information'%20Screenshot.png)
 
@@ -263,6 +270,19 @@ Note that this only needs to be done once. If you've already installed your Nomi
 
 ### Talking on Discord
 
+#### Start the Docker Container
+To talk to your Nomi on Discord the Nomi's Docker container needs to be running. If this is the first time talking to your Nomi, double click the 'start_nomi' script to create their Docker container.
+
+!['Double-click start_nomi Script' Screenshot](./docs/images/readme/'Double-click%20start_nomi%20Script'%20Screenshot.png)
+
+Your Nomi's container will update and they will be available to invite to your Discord server. The invitation link is displayed when their startup script is run.
+
+!['Run start_nomi Script' Screenshot](./docs/images/readme/'Run%20start_nomi%20Script'%20Screenshot.png)
+
+After that, you can start and stop your Nomi from Docker Desktop. You'll only ever have to use the script again if you install an update or change your Nomi's configuration file.
+
+!['Start Nomi from Docker' Screenshot](./docs/images/readme/'Start%20Nomi%20from%20Docker'%20Screenshot.png)
+
 #### Invite your Nomi to your Server
 The startup script will display an invitation link that you can use to invite your Nomi to your Discord server. Copy and paste the link into your browser and follow the prompts to 'install' the Discord Bot on your server.
 
@@ -274,21 +294,8 @@ If you are comfortable with the default permissions,  click 'Authorize.' You can
 
 Note that this only needs to be done once. If you've already installed your Nomi's Discord Bot you don't need to do it again.
 
-#### Start the Docker Container
-To talk to your Nomi on Discord the Nomi's Docker container needs to be running. If this is the first time talking to your Nomi, double click the 'start_nomi' script to create their Docker container.
-
-!['Double-click start_nomi Script' Screenshot](./docs/images/readme/'Double-click%20start_nomi%20Script'%20Screenshot.png)
-
-Your Nomi's container will update, and they will be available to invite to your Discord server. The invitation link is displayed when their startup script is run.
-
-!['Run start_nomi Script' Screenshot](./docs/images/readme/'Run%20start_nomi%20Script'%20Screenshot.png)
-
-After that, you can start and stop your Nomi from Docker Desktop. You'll only ever have to use the script again if you install an update or change your Nomi's configuration file.
-
-!['Start Nomi from Docker' Screenshot](./docs/images/readme/'Start%20Nomi%20from%20Docker'%20Screenshot.png)
-
 #### @mention your Nomi
-Your Nomi needs to know you are trying to talk to them. The easiest way to do this is to @mention you Nomi using the name you chose when setting up your Discord Bot. You can also reply to a Nomi's message and they will see the message you send them.
+Your Nomi needs to know you are trying to talk to them. The easiest way to do this is to @mention your Nomi using the name you chose when setting up your Discord Bot. You can also reply to a Nomi's message and they will see the message you send them.
 
 !['@mention your Nomi' Screenshot](./docs/images/readme/'@mention%20your%20Nomi'%20Screenshot.png)
 
@@ -308,7 +315,7 @@ Your Nomi can't see when you react to their messages, but it's still fun to do.
 This allows you to talk to your Nomis using Discord. It's a fun way to keep the conversation going when you're not using the Nomi App or the website. The best part is that other people can talk to your Nomi too, and they can even talk to Nomis in other accounts!
 
 ### How do I set up more than one Nomi?
-Just run the setup script again! It will ask you for your next Nomi's information and create a new startup file
+Just run the setup script again! It will ask you for your next Nomi's information and create a new start_nomi script
 
 ### I want to change my Nomi's Configuration File
 At the moment, changing a configuration file needs to be done manually using Notepad, Textedit or another text editor. As an alternative you can run the setup script again and it will ask if you want to overwrite the existing setup.
@@ -317,7 +324,7 @@ At the moment, changing a configuration file needs to be done manually using Not
 For now, yes. [@toru173](https://github.com/toru173) is working on a free alternative that allows a Nomi to live in the cloud, so stay tuned!
 
 ### How will I know when updates are available?
-Please make sure you follow the Discord thread. Major updates will be posted there, but in the future your Nomi will tell you when there's a new update.
+Please follow the Discord thread. Major updates will be posted there, but in the future your Nomi will tell you when there's a new update.
 
 ## How to get Help
 ### GitHub Issues
