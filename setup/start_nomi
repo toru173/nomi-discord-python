@@ -47,11 +47,31 @@ IF ERRORLEVEL 1 (
 :: Check for a configuration file
 IF EXIST "%CONFIG_FILE%" (
     ECHO Found %NOMI_NAME%'s configuration file. Reading contents...
-    CALL "%CONFIG_FILE%"
 ) ELSE (
     ECHO A configuration file for %NOMI_NAME% was not found. Please re-run
     ECHO the setup script to set up %NOMI_NAME%.
     GOTO cleanup
+)
+
+:: Read the config file
+FOR /F "usebackq tokens=* delims=" %%A IN ("%CONFIG_FILE%") DO (
+    SET "LINE=%%A"
+    :: Skip empty lines
+    IF NOT "!LINE!"=="" (
+        :: Skip comment lines starting with #
+        IF NOT "!LINE:~0,1!"=="#" (
+            :: Parse the KEY and VALUE
+            FOR /F "tokens=1* delims==" %%K IN ("!LINE!") DO (
+                SET "KEY=%%K"
+                SET "VALUE=%%L"
+                :: Trim spaces from KEY and VALUE
+                FOR /F "tokens=* delims= " %%a IN ("!KEY!") DO SET "KEY=%%a"
+                FOR /F "tokens=* delims= " %%a IN ("!VALUE!") DO SET "VALUE=%%a"
+                :: Set the variable
+                SET "!KEY!=!VALUE!"
+            )
+        )
+    )
 )
 
 :: Check required variables are in the configuration file
