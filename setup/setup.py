@@ -36,7 +36,7 @@ from typing import List, Dict
 def normalise_name(name: str) -> str:
     # Normalise to ASCII, lowercase, replace spaces with underscores
     normalised = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode('ascii')
-    normalised = normalised.lower().replace(" ", "_")
+    normalised = re.sub(r'[^a-z0-9_]', '', normalised.lower().replace(" ", "_"))
     return normalised
 
 def safe_input(prompt: str) -> str:
@@ -173,6 +173,7 @@ def main() -> None:
     print(f"To invite {user_inputs["NOMI_NAME"]} to Discord you can copy and paste the invitation URL")
     print("into a browser:")
     print(f"{user_inputs["DISCORD_INVITE_URL"]}")
+    print()
 
 if __name__ == "__main__":
     main()

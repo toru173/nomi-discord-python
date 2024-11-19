@@ -76,7 +76,7 @@ ECHO:
 docker run -it --name %DOCKER_IMAGE_NAME% -v "%SETUP_DIR%\output:/app/output" -e HOST=%OS% %DOCKER_IMAGE_NAME%
 IF %ERRORLEVEL% (
     IF %ERRORLEVEL% EQ 255 (
-        ECHO Operation cancelled.
+        ECHO Setup cancelled.
         GOTO CLEANUP
     ) ELSE (
     ECHO Error when running container: %ERRORLEVEL%
@@ -261,7 +261,7 @@ docker run -it --name $DOCKER_IMAGE_NAME -v "$SETUP_DIR/output:/app/output" -e H
 EXIT_CODE=$?
 if [[ $EXIT_CODE -ne 0 ]]; then
     if [[ $EXIT_CODE -eq 255 ]]; then
-        echo "Operation cancelled."
+        echo "Setup cancelled."
         exit 1
     else
     echo "Error when running container: $EXIT_CODE"
