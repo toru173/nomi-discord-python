@@ -50,6 +50,8 @@ def safe_input(prompt: str) -> str:
             while True:
                 try:
                     response = input("\nSetup is not complete. Do you really want to quit? [y/N]: ").strip().lower()
+                    if not response:
+                        break
                     if response in ('y', 'yes'):
                         exit(255)
                     elif response in ('n', 'no', ''):
@@ -175,6 +177,7 @@ def main() -> None:
 
     print(f"To invite {user_inputs["NOMI_NAME"]} to Discord you can copy and paste the invitation URL")
     print("into a browser:")
+    print()
     print(f"{user_inputs["DISCORD_INVITE_URL"]}")
     print()
 
