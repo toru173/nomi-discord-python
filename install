@@ -54,7 +54,7 @@ SET DOCKER_INSTALLED=0
 SET TAR_INSTALLED=0
 
 :: Check if Docker is installed
-docker --version >NUL 2>&1
+docker --version 2>&1 >NUL
 IF ERRORLEVEL 1 (
     SET DOCKER_INSTALLED=0
 ) ELSE (
@@ -64,7 +64,7 @@ IF ERRORLEVEL 1 (
 :: Check if tar is installed. It SHOULD be because it shipped
 :: with Windows before cURL, and this script is most likely
 :: running using cURL.
-tar --version >NUL 2>&1
+tar --version 2>&1 >NUL
 IF ERRORLEVEL 1 (
     SET TAR_INSTALLED=0
 ) ELSE (
@@ -296,7 +296,7 @@ readonly INSTALL_FOLDER=nomi-discord-python
 # Perform some basic sanity checks, then continue execution
 if [ -z "${BASH_VERSION:-}" ]; then
     # Attempt to find Bash
-    if command -v bash >/dev/null 2>&1; then
+    if command -v bash 2>&1 >/dev/null; then
         # Re-execute the script with Bash by reading it from stdin if necessary
         if [ -t 0 ]; then
             # If the script is not being piped, re-execute the file with bash
@@ -346,14 +346,14 @@ function check_dependancies() {
     TAR_INSTALLED=0
 
     # Check if Docker is installed
-    if command -v docker >/dev/null 2>&1; then
+    if command -v docker 2>&1 >/dev/null; then
         DOCKER_INSTALLED=1
     else
         DOCKER_INSTALLED=0
     fi
 
     # Check if tar is installed
-    if command -v tar >/dev/null 2>&1; then
+    if command -v tar 2>&1 >/dev/null; then
         TAR_INSTALLED=1
     else
         TAR_INSTALLED=0
@@ -387,9 +387,9 @@ function check_dependancies() {
                 echo "Docker is required but not installed."
                 if prompt_confirm "Would you like to open the Docker download page now?"; then
                     # Attempt to open the browser with xdg-open (Linux) or open (macOS)
-                    if command -v xdg-open >/dev/null 2>&1; then
+                    if command -v xdg-open 2>&1 >/dev/null; then
                         xdg-open "https://www.docker.com/products/docker-desktop/"
-                    elif command -v open >/dev/null 2>&1; then
+                    elif command -v open 2>&1 >/dev/null; then
                         open "https://www.docker.com/products/docker-desktop/"
                     else
                         echo "Please manually open the following URL: https://www.docker.com/products/docker-desktop/"
@@ -406,19 +406,19 @@ function check_dependancies() {
                 echo
 
                 # Provide examples of how to install tar depending on the system
-                if command -v apt >/dev/null 2>&1; then
+                if command -v apt 2>&1 >/dev/null; then
                     echo "For Ubuntu or Debian-based systems, you can install tar by running:"
                     echo "    sudo apt update && sudo apt install tar"
-                elif command -v yum >/dev/null 2>&1; then
+                elif command -v yum 2>&1 >/dev/null; then
                     echo "For Red Hat, CentOS, or Fedora systems, you can install tar by running:"
                     echo "    sudo yum install tar"
-                elif command -v dnf >/dev/null 2>&1; then
+                elif command -v dnf 2>&1 >/dev/null; then
                     echo "For newer Fedora systems (or RHEL 8+), you can install tar by running:"
                     echo "    sudo dnf install tar"
-                elif command -v zypper >/dev/null 2>&1; then
+                elif command -v zypper 2>&1 >/dev/null; then
                     echo "For SUSE or openSUSE systems, you can install tar by running:"
                     echo "    sudo zypper install tar"
-                elif command -v brew >/dev/null 2>&1; then
+                elif command -v brew 2>&1 >/dev/null; then
                     echo "For macOS users, you can install GNU tar by running:"
                     echo "    brew install gnu-tar"
                 else
@@ -643,12 +643,12 @@ echo "You can set up a Nomi's Docker container by running the setup script."
 
 echo
 if prompt_confirm "Would you like to open the installation folder in a file browser?"; then
-    if command -v xdg-open >/dev/null 2>&1; then
+    if command -v xdg-open 2>&1 >/dev/null; then
         # Linux (xdg-open is available)
-        xdg-open "$INSTALL_DIR" 2> /dev/null
-    elif command -v open >/dev/null 2>&1; then
+        xdg-open "$INSTALL_DIR" 2>/dev/null
+    elif command -v open 2>&1 >/dev/null; then
         # macOS (open is available)
-        open "$INSTALL_DIR" 2> /dev/null
+        open "$INSTALL_DIR" 2>/dev/null
     fi
     if [[ $? -ne 0 ]]; then
         echo "Error: unable to open installation folder."

@@ -31,14 +31,14 @@ SET "APP_DIR=app"
 SET "APP_PATH=%SCRIPT_ROOT%\..\%APP_DIR%%"
 
 :: Check if Docker is installed
-docker --version >NUL 2>&1
+docker --version 2>&1 >NUL
 IF ERRORLEVEL 1 (
     ECHO Could not find Docker. Please re-run the installation script.
     GOTO cleanup
 )
 
 :: Check if Docker daemon is running
-docker info >NUL 2>&1
+docker info 2>&1 >NUL
 IF ERRORLEVEL 1 (
     ECHO Docker is installed but the Docker daemon is not running. Please start Docker before continuing.
     GOTO cleanup
@@ -72,10 +72,10 @@ IF "%MISSING_VARIABLE%"=="TRUE" (
 )
 
 :: Check if a Docker container already exists and remove it
-docker inspect %DOCKER_IMAGE_NAME% >NUL 2>&1
+docker inspect %DOCKER_IMAGE_NAME% 2>&1 >NUL
 IF NOT ERRORLEVEL 1 (
     ECHO A Docker container for %NOMI_NAME% exists. Removing container...
-    docker container rm %DOCKER_IMAGE_NAME% -f >NUL 2>&1
+    docker container rm %DOCKER_IMAGE_NAME% -f 2>&1 >NUL
     IF ERRORLEVEL 1 (
         ECHO Error when removing container: %ERRORLEVEL%
         GOTO cleanup
@@ -84,7 +84,7 @@ IF NOT ERRORLEVEL 1 (
 
 :: Build the Docker container
 ECHO Building a Docker container for %NOMI_NAME%
-docker build -t %DOCKER_IMAGE_NAME% "%APP_PATH%" >NUL 2>&1
+docker build -t %DOCKER_IMAGE_NAME% "%APP_PATH%" 2>&1 >NUL
 IF ERRORLEVEL 1 (
     ECHO Error when building container: %ERRORLEVEL%
     GOTO cleanup
@@ -92,7 +92,7 @@ IF ERRORLEVEL 1 (
 
 :: Run the Docker container
 ECHO %NOMI_NAME%'s container built successfully. Running container...
-docker run -d --name %DOCKER_IMAGE_NAME% --env-file "%CONFIG_FILE%" %DOCKER_IMAGE_NAME% >NUL 2>&1
+docker run -d --name %DOCKER_IMAGE_NAME% --env-file "%CONFIG_FILE%" %DOCKER_IMAGE_NAME% 2>&1 >NUL
 IF ERRORLEVEL 1 (
     ECHO Error when running container: %ERRORLEVEL%
     GOTO cleanup
@@ -121,7 +121,7 @@ END_WIN
 # Perform some basic sanity checks, then continue execution
 if [ -z "${BASH_VERSION:-}" ]; then
     # Attempt to find Bash
-    if command -v bash >/dev/null 2>&1; then
+    if command -v bash 2>&1 >/dev/null; then
         # Re-execute the script with Bash by reading it from stdin if necessary
         if [ -t 0 ]; then
             # If the script is not being piped, re-execute the file with bash
@@ -180,13 +180,13 @@ CONFIG_FILE_NAME=$DOCKER_IMAGE_NAME.conf
 CONFIG_FILE="$SCRIPT_ROOT/$CONFIG_FILE_NAME"
 
 # Check if Docker is installed
-if ! command -v docker >/dev/null 2>&1; then
+if ! command -v docker 2>&1 >/dev/null; then
     echo "Could not find Docker. Please re-run the installation script"
     exit 1
 fi
 
 # Check if the Docker daemon is running
-if ! docker info > /dev/null 2>&1; then
+if ! docker info 2>&1 >/dev/null; then
     echo "Docker is installed but the Docker daemon is not running. Please start Docker before continuing."
     exit 1
 fi
@@ -223,9 +223,9 @@ if [ MISSING_VARIABLE == true ]; then
     exit 1
 fi
 
-if docker inspect $DOCKER_IMAGE_NAME > /dev/null 2>&1; then
+if docker inspect $DOCKER_IMAGE_NAME 2>&1 >/dev/null; then
     echo "A Docker container for $NOMI_NAME exists. Removing container..."
-    docker container rm -f $DOCKER_IMAGE_NAME > /dev/null 2>&1
+    docker container rm -f $DOCKER_IMAGE_NAME 2>&1 >/dev/null
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
         echo "Error when removing container: $EXIT_CODE"
