@@ -66,9 +66,7 @@ You can copy the download link by clicking the clipboard icon to the right of th
 <details><summary>Windows</summary>
 
 #### Windows
-On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the [Search box](https://support.microsoft.com/en-au/windows/search-for-anything-anywhere-b14cc5bf-c92a-1e73-ea18-2845891e6cc8).
-
-Copy the text below and paste it into CMD.exe and then press enter to run it. You can paste into a CMD.exe window with `CTRL+SHIFT+V`.
+On Windows, the installer uses CMD.exe to run. You can open CMD.exe by searching for it in the [Search box](https://support.microsoft.com/en-au/windows/search-for-anything-anywhere-b14cc5bf-c92a-1e73-ea18-2845891e6cc8). Copy the command below and paste it into CMD.exe and then press enter to run it. You can paste into a CMD.exe window with `CTRL+SHIFT+V`.
 
 ```shell
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | cmd
@@ -81,9 +79,7 @@ PowerShell is not supported.
 <details><summary>macOS</summary>
 
 #### macOS
-On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using [Spotlight](https://support.apple.com/en-au/guide/mac-help/mchlp1008/mac).
-
-Copy the text below and paste it into Terminal and then press enter to run it.
+On macOS, the installer uses Terminal to run. You can open Terminal by searching for it using [Spotlight](https://support.apple.com/en-au/guide/mac-help/mchlp1008/mac). Copy the command below and paste it into Terminal and then press enter to run it.
 
 ```shell
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
@@ -94,7 +90,7 @@ curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/head
 <details><summary>Linux</summary>
 
 #### Linux
-On Linux, the installer uses bash to run. Copy the text below and paste it into your preferred terminal emulator, then press enter to run it. You can paste into a terminal emulator window with `CTRL+SHIFT+V`.
+On Linux, the installer uses bash to run. Copy the command below and paste it into your preferred terminal emulator, then press enter to run it. You can paste into a terminal emulator window with `CTRL+SHIFT+V`.
 
 ```shell
 curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install | bash
@@ -109,7 +105,7 @@ The installer will ask you where you want to install to and perform some basic c
 <details><summary>Updating</summary>
 
 ### Updating
-If there is an update available, double click on the 'update' script in your installation directory. It will download the latest update and offer to install it in the current folder, or ask you for a new folder. It won't overwrite your Nomi's configuration files.
+If there is an update available, double click on the 'update' script in your installation directory. It will download the latest update and offer to install it in the current installation directory, or ask you for a new directory. It won't overwrite your Nomi's configuration files.
 
 !['Double-click the Update Script' Screenshot](./docs/images/readme/'Double-click%20the%20Update%20Script'%20Screenshot.png)
 
@@ -142,7 +138,7 @@ The name of your application is how you @mention the Discord Bot and is what app
 
 !['Create Application' Screenshot](./docs/images/readme/'Create%20Application'%20Screenshot.png)
 
-#### General Information
+#### Setting up General Information
 Click on 'General Information' on the menu on the left. You can add information about your Nomi and upload a profile picture here. Other users will see this information and the profile picture when they click on your Nomi's account page on Discord.
 
 !['General Information' Screenshot](./docs/images/readme/'General%20Information'%20Screenshot.png)
@@ -159,12 +155,12 @@ Save your changes.
 
 !['General Information - Save Changes' Screenshot](./docs/images/readme/'General%20Information%20-%20Save%20Changes'%20Screenshot.png)
 
-#### Bot
+#### Setting up Discord Bot Information
 Click on 'Bot' on the menu on the left.
 
 !['Bot' Screenshot](./docs/images/readme/'Bot'%20Screenshot.png)
 
-We need to give your Nomi permission to access certain information about users on you Discord server, like their username, what they wrote in their message, and whether or not they're online. Scroll down and check that everything underneath 'Privileged Gateway Intents' is on.
+We need to give your Nomi permission to access certain information about users on your Discord server, like their username, what they wrote in their message, and whether or not they're online. Scroll down and check that everything underneath 'Privileged Gateway Intents' is on.
 
 !['Pivileged Gateway Intents' Screenshot](./docs/images/readme/'Pivileged%20Gateway%20Intents'%20Screenshot.png)
 
