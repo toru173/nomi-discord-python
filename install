@@ -313,41 +313,18 @@ if [ -z "${BASH_VERSION:-}" ]; then
     fi
 fi
 
-# If we're not running in an interactive terminal
-# (for example, if we were double-clicked), try to
-# re-launch in an interactive terminal
-function rerun_in_terminal() {
-    # Determine the operating system
-    OS="$(uname)"
-    script_path="$(realpath "$0")"
-
-    if [ "$OS" == "Darwin" ]; then
-        # macOS
-        osascript <<END
-tell application "Terminal"
-    do script "bash '$script_path'"
-    activate
-end tell
-END
-    elif [ "$OS" == "Linux" ]; then
-        # Linux
-        if command -v gnome-terminal >/dev/null 2>&1; then
-            gnome-terminal -- bash "$script_path"
-        elif command -v x-terminal-emulator >/dev/null 2>&1; then
-            x-terminal-emulator -e bash "$script_path"
-        elif command -v xterm >/dev/null 2>&1; then
-            xterm -e bash "$script_path"
-        else
-            echo "No terminal emulator found. Please run this script from a terminal."
-            exit 1
-        fi
-    else
-        echo "Unsupported operating system."
-        exit 1
-    fi
-    exit 0
+# Prompt for and confirm user input
+function prompt_confirm() {
+    read -r -p "$1 [y/N] " RESPONSE </dev/tty
+    case "$RESPONSE" in
+        [yY][eE][sS]|[yY])
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
 }
-
 
 # Trap to function when we exit
 trap "cleanup" EXIT INT
@@ -359,25 +336,6 @@ function cleanup() {
         rm -rf "$INSTALL_DIR/.downloads/"
     fi
     exit $EXIT_CODE
-}
-
-# Prompt for and confirm user input
-function prompt_confirm() {
-    if [ ! -t 0 ]; then
-        echo "No TTY detected."
-        # Logic to re-run the script with a TTY goes here
-        rerun_in_terminal
-    else
-        read -r -p "$1 [y/N] " RESPONSE </dev/tty
-        case "$RESPONSE" in
-            [yY][eE][sS]|[yY])
-                true
-                ;;
-            *)
-                false
-                ;;
-        esac
-    fi
 }
 
 function check_dependancies() {
