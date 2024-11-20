@@ -36,8 +36,8 @@ jobs:
             echo "Latest tag: $LATEST_TAG"
             echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_OUTPUT
 
-      # Increment 'minor' version
-      - name: Increment Minor
+      # Increment 'incremental' version
+      - name: Increment Incremental
         id: increment_version
         run: |
             VERSION=${{ steps.get_latest_release.outputs.LATEST_TAG }}
@@ -63,7 +63,7 @@ jobs:
         id: package_installer
         run: |
             mkdir -p release_assets
-            zip -r release_assets/install.zip install
+            zip -r release_assets/install.zip *
 
       # Create a release
       - name: Create Release
