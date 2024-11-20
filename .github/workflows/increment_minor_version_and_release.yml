@@ -68,11 +68,10 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Release ${{ steps.increment_version.outputs.NEW_VERSION }}"
+          name: "${{ steps.increment_version.outputs.NEW_VERSION }}"
           tag_name: ${{ steps.increment_version.outputs.NEW_VERSION }}
           make_latest: true
-          body_path: release_notes.md
-          body: "Latest Release"
+          body: "Download the latest version"
           files: |
             LICENSE
             install
