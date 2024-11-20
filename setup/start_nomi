@@ -212,7 +212,7 @@ if ! docker info  > /dev/null 2>&1; then
 fi
 
 # Check for a configuration file
-if [ -f "$CONFIG_FILE" ]; then
+if [[ -f "$CONFIG_FILE" ]]; then
     # Inform user we've found the config file
     echo "Found $NOMI_NAME's configuration file. Reading contents..."
     source "$CONFIG_FILE"
@@ -229,13 +229,13 @@ REQUIRED_VARIABLES=("DISCORD_API_KEY" "NOMI_API_KEY" "NOMI_NAME" "NOMI_ID")
 MISSING_VARIABLE=false
 for var in "${REQUIRED_VARIABLES[@]}"; do
     # Check if the variable is unset or empty
-    if [ -z "${!var}" ]; then
+    if [[ -z "${!var}" ]]; then
         echo "$var not found in the configuration file"
         MISSING_VARIABLE=true
     fi
 done
 
-if [ MISSING_VARIABLE == true ]; then
+if [[ MISSING_VARIABLE == true ]]; then
     echo "There was an error reading the configuration file for $NOMI_NAME."
     echo "Please re-run the create_nomi script to set up $NOMI_NAME, or"
     echo "open the configuration file in a text editor to inspect the"

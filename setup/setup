@@ -193,7 +193,7 @@ function get_script() {
     local DESTINATION_FILE="$2"
 
     # Check if the source file exists
-    if [ ! -f "$SOURCE_FILE" ]; then
+    if [[ ! -f "$SOURCE_FILE" ]]; then
         echo "Error: Source file '$SOURCE_FILE' not found!"
         return 1
     fi
@@ -201,9 +201,9 @@ function get_script() {
     local BASE_FILENAME="$(basename $SOURCE_FILE)"
 
     # Determine the destination file based on the OS
-    if [ "$(uname -s)" == "Darwin" ]; then
+    if [[ "$(uname -s)" == "Darwin" ]]; then
         DESTINATION_FILE="${DESTINATION_FILE}/${BASE_FILENAME}.command"
-    elif [ "$(uname -s)" == "Linux" ]; then
+    elif [[ "$(uname -s)" == "Linux" ]]; then
         DESTINATION_FILE="${DESTINATION_FILE}/${BASE_FILENAME}.sh"
     else
         echo "Error: Unsupported operating system '$(uname -s)'."
@@ -243,7 +243,7 @@ if ! docker info  > /dev/null 2>&1; then
 fi
 
 # Check if the Docker image exists
-if [ -z "$(docker images -q $DOCKER_IMAGE_NAME 2>/dev/null)" ]; then
+if [[ -z "$(docker images -q $DOCKER_IMAGE_NAME 2>/dev/null)" ]]; then
     echo "Setup Docker image ($DOCKER_IMAGE_NAME) not found. Building Docker image..."
     docker build -t "$DOCKER_IMAGE_NAME" "$SETUP_DIR"  > /dev/null 2>&1
     EXIT_CODE=$?
@@ -263,7 +263,7 @@ fi
 
 
 # Create the output folder if it doesn't exist.
-if [ ! -d "$SETUP_DIR/output" ]; then
+if [[ ! -d "$SETUP_DIR/output" ]]; then
     mkdir -p "$SETUP_DIR/output"
 fi
 
@@ -303,7 +303,7 @@ if [[ $EXIT_CODE -ne 0 ]]; then
 fi
 
 # Create the nomis folder if it doesn't exist.
-if [ ! -d "$SCRIPT_ROOT/nomis" ]; then
+if [[ ! -d "$SCRIPT_ROOT/nomis" ]]; then
     mkdir -p "$SCRIPT_ROOT/nomis"
 fi
 
@@ -314,7 +314,7 @@ for FILE in "$SETUP_DIR/output/"*; do
     FILENAME=$(basename "$FILE")
     DESTINATION="$SCRIPT_ROOT/nomis/$FILENAME"
 
-    if [ -e "$DESTINATION" ]; then
+    if [[ -e "$DESTINATION" ]]; then
         if ! prompt_confirm "File $FILENAME already exists. Overwrite?"; then
             echo "Skipping $FILENAME"
             continue
