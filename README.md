@@ -355,6 +355,6 @@ If you have a feature request, a suggested improvement or just want to tell me s
 ## Thanks
 This project started as a re-implementation of [@d3tourrr's](https://github.com/d3tourrr) [NomiKin-Discord bridge](https://github.com/d3tourrr/NomiKin-Discord), written in Python. It has since grown far beyond the original scope 😅
 
-Thank you @yattering for proof reading my README.md and putting up all my hackerman questions and rambling.
+Thank you @yattering for proof reading @toru173's README.md and putting up with all of our hackerman questions and ramblings.
 
 Thank you, Cardine and the team at Nomi.AI for this amazing product 🙏
