@@ -30,7 +30,6 @@ import os
 import re
 import unicodedata
 from pathlib import Path
-from time import sleep
 
 from typing import List, Dict
 
@@ -107,8 +106,6 @@ def replace_placeholders(file_content: str, replacements: Dict[str, str]) -> str
 def main() -> None:
 
     BOT_PERMISSIONS = "274878122048"
-    MAX_ATTEMPTS = 5
-    ATTEMPT_DELAY = 0.5
 
     input_dir = "./"
     output_dir = f"{input_dir}output"
@@ -154,26 +151,23 @@ def main() -> None:
 
     modified_conf_content = replace_placeholders(conf_content, user_inputs)
 
+
     conf_output_path = Path(f"{output_dir}/{normalised_name}.conf")
-    print("Writing output to output file...")
 
     # Write the modified .conf file. There's some weirdness going on
     # here that I think is a race condition, so we just try a couple
     # of times. Debugging will occur in the future, I promise 😅
-    attempts = 0
-    while attempts < MAX_ATTEMPTS:
-        try:
-            with conf_output_path.open("w") as conf_output_file:
-                conf_output_file.write(modified_conf_content)
-        except:
-            sleep(ATTEMPT_DELAY)
-            continue
-    else:
+    try:
+        with conf_output_path.open("w") as conf_output_file:
+            conf_output_file.write(modified_conf_content)
+    except Exception as e:
         print(f"Unable to write to output file: {conf_output_path}")
         print("Please try running setup again")
         print()
+        print("@toru173 still hasn't figured out this error. Please post"
+        print("a screentshot of the error to help:")
+        print(f"{e}")
         exit(255)
-
 
     # Read start_nomi
     with start_nomi_path.open("r") as start_file:
@@ -189,21 +183,18 @@ def main() -> None:
 
     # Write the modified start_nomi file with the OS-specific extension
     start_output_path = Path(f"{output_dir}/start_{normalised_name}{extension}")
-    print("Writing output to output file...")
-
-    attempts = 0
-    while attempts < MAX_ATTEMPTS:
-        try:
-            with start_output_path.open("w") as start_output_file:
-                if "Windows_NT" not in os_type:
-                    start_output_file.write("#!/usr/bin/env bash\n")
-                start_output_file.write(modified_start_content)
-        except:
-            sleep(ATTEMPT_DELAY)
-            continue
-    else:
+    try:
+        with start_output_path.open("w") as start_output_file:
+            if "Windows_NT" not in os_type:
+                start_output_file.write("#!/usr/bin/env bash\n")
+            start_output_file.write(modified_start_content)
+    except Exception as e:
         print(f"Unable to write to output file: {start_output_path}")
         print("Please try running setup again")
+        print()
+        print("@toru173 still hasn't figured out this error. Please post"
+        print("a screentshot of the error to help:")
+        print(f"{e}")
         print()
         exit(255)
 
