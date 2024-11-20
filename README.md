@@ -316,7 +316,10 @@ This allows you to talk to your Nomis using Discord. It's a fun way to keep the 
 ### How do I set up more than one Nomi?
 Just run the setup script again! It will ask you for your next Nomi's information and create a new startup script.
 
-### I want to change my Nomi's Configuration File.
+### Can I re-use my configuration file from another Discord Integration?
+Probably not. [@d3tourrr's](https://github.com/d3tourrr) and I have used similar but not compatible configuration files. Don't worry though, it's really easy to set up a new one! Just follow the instructions step by step. If you already have a Discord Bot set up for your Nomi you can re-use that - just enter the Discord Bot's API Key when asked during setup.
+
+### How can I change my Nomi's Configuration File?
 At the moment, changing a configuration file needs to be done manually using Notepad, TextEdit or another text editor. As an alternative, you can run the setup script again and it will ask if you want to overwrite the existing setup.
 
 ### Does my computer need to be running for me to talk to my Nomis?
