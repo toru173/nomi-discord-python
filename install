@@ -219,7 +219,8 @@ IF /I NOT "!CONTINUE!" == "Y" (
 :: the 'app' subdirectory
 ECHO Extracting installation files...
 :: Weirdly, we can't quote the path to chdir in tar? I dunno why 🤷‍♂️
-tar -xvf "%DOWNLOAD_DIR%\install.zip" -C %INSTALL_DIR% --strip-components=1 --include="*\install" --include="*\LICENSE" --include="*\app" --include="*\setup" --include="*\update"
+tar -xvf "%DOWNLOAD_DIR%\install.zip" -C %INSTALL_DIR% --include="install" --include="LICENSE" --include="app\*" --include="setup\*" --include="update\*"
+
 IF ERRORLEVEL 1 (
     ECHO Failed to extract the installation files. Please try again.
     GOTO CLEANUP
@@ -562,11 +563,11 @@ fi
 # to accomodate that
 echo "Extracting installation files..."
 if tar --version 2>&1 | grep -q "GNU tar"; then
-    tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
-        --wildcards --no-anchored "*/install" "*/LICENSE" "*/app" "*/setup" '*/update'
+    tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" \
+        --wildcards --no-anchored "install" "LICENSE" "app/*" "setup/*" "update/*"
 elif tar --version 2>&1 | grep -qi "bsdtar"; then
-    tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" --strip-components=1 \
-        --include="*/install" --include="*/LICENSE" --include="*/app" --include="*/setup" --include="*/update"
+    tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" \
+        --include="install" --include="LICENSE" --include="app/*" --include="setup/*" --include="update/*"
 else
     echo "Error: Unsupported version of tar detected."
     exit 1
