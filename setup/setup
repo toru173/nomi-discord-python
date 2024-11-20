@@ -24,7 +24,7 @@ ECHO:
 FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=!SCRIPT_ROOT:~0,-1!"
 SET "SETUP_DIR=!SCRIPT_ROOT!\setup"
 
-SET "DOCKER_IMAGE_NAME=nomi-config-setup"
+SET "DOCKER_IMAGE_NAME=nomi-discord-setup"
 
 :: Check if Docker is installed
 docker --version >NUL 2>&1
@@ -44,13 +44,21 @@ IF ERRORLEVEL 1 (
 :: Check if the Docker image exists
 FOR /F "DELIMS=" %%I IN ('docker images -q %DOCKER_IMAGE_NAME% 2^>NUL') DO SET IMAGE_ID=%%I
 IF NOT DEFINED IMAGE_ID (
-    ECHO Setup Docker image ^(%DOCKER_IMAGE_NAME%^) not found. Building the image...
+    ECHO Setup Docker image ^(%DOCKER_IMAGE_NAME%^) not found. Building Docker image...
     docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" >NUL 2>&1
     IF ERRORLEVEL 1 (
-        ECHO Error when building container: %ERRORLEVEL%
+        ECHO Error when building image: %ERRORLEVEL%
+        GOTO CLEANUP
+    )
+) ELSE (
+    ECHO An existing image for %DOCKER_IMAGE_NAME% exists. Updating Docker image...
+    docker build -t %DOCKER_IMAGE_NAME% "%SETUP_DIR%" >NUL 2>&1
+    IF ERRORLEVEL 1 (
+        ECHO Error when updating image: %ERRORLEVEL%
         GOTO CLEANUP
     )
 )
+
 
 :: Create the output folder if it doesn't exist
 IF NOT EXIST "%SETUP_DIR%\output" (
@@ -123,6 +131,8 @@ ECHO:
 :CLEANUP
 :: Clean up the output folder
 DEL /F /Q "%SETUP_DIR%\output\*" 2>NUL
+:: Force delete the container (if it exists)
+docker container rm -f %DOCKER_IMAGE_NAME% >NUL 2>&1
 ENDLOCAL
 PAUSE
 ECHO You may now close this window
@@ -173,6 +183,8 @@ function cleanup() {
     EXIT_CODE=$?
     # Clean up the output folder
     rm -f "$SETUP_DIR/output/"*
+    # Force delete the container (if it exists)
+    docker rm -f $DOCKER_IMAGE_NAME  > /dev/null 2>&1
     exit $EXIT_CODE
 }
 
@@ -215,7 +227,7 @@ echo
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SETUP_DIR="$SCRIPT_ROOT/setup"
-DOCKER_IMAGE_NAME="nomi-config-setup"
+DOCKER_IMAGE_NAME="nomi-discord-setup"
 
 # Check if Docker is installed
 if ! command -v docker  > /dev/null 2>&1; then
@@ -232,14 +244,23 @@ fi
 
 # Check if the Docker image exists
 if [ -z "$(docker images -q $DOCKER_IMAGE_NAME 2>/dev/null)" ]; then
-    echo "Setup Docker image ($DOCKER_IMAGE_NAME) not found. Building the image..."
+    echo "Setup Docker image ($DOCKER_IMAGE_NAME) not found. Building Docker image..."
     docker build -t "$DOCKER_IMAGE_NAME" "$SETUP_DIR"  > /dev/null 2>&1
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        echo "Error when building container: $EXIT_CODE"
+        echo "Error when building image: $EXIT_CODE"
+        exit 1
+    fi
+else
+    echo "An existing image for $DOCKER_IMAGE_NAME exists. Updating Docker image..."
+    docker build -t "$DOCKER_IMAGE_NAME" "$SETUP_DIR"  > /dev/null 2>&1
+    EXIT_CODE=$?
+    if [[ $EXIT_CODE -ne 0 ]]; then
+        echo "Error when updating image: $EXIT_CODE"
         exit 1
     fi
 fi
+
 
 # Create the output folder if it doesn't exist.
 if [ ! -d "$SETUP_DIR/output" ]; then
