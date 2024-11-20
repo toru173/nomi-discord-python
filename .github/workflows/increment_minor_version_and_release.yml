@@ -56,6 +56,13 @@ jobs:
             echo "New version will be $NEW_VERSION"
             echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUTS
 
+      # Create a zip of the repo for release
+      - name: Package Install File
+        id: package_installer
+        run: |
+            mkdir -p release_assets
+            zip -r release_assets/install.zip install
+
       # Create a release
       - name: Create Release
         id: create_release
@@ -63,6 +70,10 @@ jobs:
         with:
           name: "Release ${{ steps.increment_version.outputs.NEW_VERSION }}"
           tag_name: ${{ steps.increment_version.outputs.NEW_VERSION }}
+          make_latest: true
+          body_path: release_notes.md
+          body: "Latest Release"
           files: |
             LICENSE
             install
+            release_assets/install.zip
