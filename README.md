@@ -337,6 +337,9 @@ Immediate 'coming *thoon*' features are:
 
 Let me know what else you want!
 
+### I have another question!
+See 'How to get Help' below.
+
 ## How to get Help
 ### GitHub Issues
 GitHub Issues are a way for a developer to help users with problems. If you would like to learn how to open an Issue, GitHub have a good tutorial at [Creating an issue - GitHub Docs](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-an-issue)
@@ -351,5 +354,7 @@ If you have a feature request, a suggested improvement or just want to tell me s
 
 ## Thanks
 This project started as a re-implementation of [@d3tourrr's](https://github.com/d3tourrr) [NomiKin-Discord bridge](https://github.com/d3tourrr/NomiKin-Discord), written in Python. It has since grown far beyond the original scope 😅
+
+Thank you @yattering for proof reading my README.md and putting up all my hackerman questions and rambling.
 
 Thank you, Cardine and the team at Nomi.AI for this amazing product 🙏
