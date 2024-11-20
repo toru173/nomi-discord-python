@@ -9,34 +9,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Verify 'install' File Exists
+      - name: Verify 'install' File Exists
+        run: |
+            if [ ! -f ./install ]; then
+                echo "'install' file not found!"
+                exit 1
+            fi
+
       # Fetch the latest release
       - name: Get Latest Release Tag
         id: get_latest_release
         run: |
-          LATEST_TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            LATEST_TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
-          if [ "$LATEST_TAG" == "null" ]; then
-            # Default to v1.0.0 if no releases exist
-            LATEST_TAG="v1.0.0"
-          fi
-          echo "Latest tag: $LATEST_TAG"
-          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_OUTPUT
+            if [ "$LATEST_TAG" == "null" ]; then
+                # Default to v1.0.0 if no releases exist
+                LATEST_TAG="v1.0.0"
+            fi
+            echo "Latest tag: $LATEST_TAG"
+            echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       # Increment 'major' version
       - name: Increment Major
         id: increment_version
         run: |
-          VERSION=${{ steps.get_latest_release.outputs.LATEST_TAG }}
+            VERSION=${{ steps.get_latest_release.outputs.LATEST_TAG }}
 
-          # Extract current version
-          MAJOR=$(echo $VERSION | cut -d. -f1 | sed 's/v//')
+            # Extract current version
+            MAJOR=$(echo $VERSION | cut -d. -f1 | sed 's/v//')
 
-          # Increment major part and reset minor and incremental parts
-          NEW_MAJOR=$((major + 1))
-          NEW_VERSION="v${new_major}.0.0"
+            # Increment major part and reset minor and incremental parts
+            NEW_MAJOR=$((major + 1))
+            NEW_VERSION="v${new_major}.0.0"
 
-          echo "New version will be $NEW_VERSION"
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUTS
+            echo "New version will be $NEW_VERSION"
+            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUTS
 
       # Create a release
       - name: Create Release
@@ -49,6 +61,7 @@ jobs:
           release_name: "Release ${{ steps.increment_version.outputs.NEW_VERSION }}"
           draft: false
           prerelease: false
+
 
       # Upload the 'install' file to the release
       - name: Upload 'install' File
