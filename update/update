@@ -25,7 +25,7 @@ FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=!SCRIPT_ROOT:
 
 SET "LATEST_INSTALLER=!SCRIPT_ROOT!\latest_installer.bat"
 
-curl -sL https://raw.githubusercontent.com/toru173/nomi-discord-python/refs/heads/main/install -o "%LATEST_INSTALLER%"
+curl -sL https://github.com/toru173/nomi-discord-python/releases/latest/download/install -o "%LATEST_INSTALLER%"
 ATTRIB +H "%LATEST_INSTALLER%"
 CALL "%LATEST_INSTALLER%" --skip-checks
 
