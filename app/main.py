@@ -198,8 +198,9 @@ def main() -> None:
     nomi = Nomi.from_uuid(session = nomi_session, uuid = env["nomi_id"])
 
     intents = discord.Intents.default()
-    intents.messages = True
     intents.members = True
+    intents.messages = True
+    intents.message_content = True
 
     nomi = NomiBot(nomi = nomi,
                    max_message_length = env["max_message_length"],
