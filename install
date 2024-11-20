@@ -477,6 +477,7 @@ if [[ "$1" != "--skip-checks" ]]; then
     echo
 
     check_dependancies
+    echo
 
 fi
 
