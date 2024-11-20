@@ -30,6 +30,7 @@ import os
 import re
 import unicodedata
 from pathlib import Path
+from time import sleep
 
 from typing import List, Dict
 
@@ -105,7 +106,9 @@ def replace_placeholders(file_content: str, replacements: Dict[str, str]) -> str
 
 def main() -> None:
 
-    BOT_PERMISSIONS="274878122048"
+    BOT_PERMISSIONS = "274878122048"
+    MAX_ATTEMPTS = 5
+    ATTEMPT_DELAY = 0.5
 
     input_dir = "./"
     output_dir = f"{input_dir}output"
@@ -151,15 +154,26 @@ def main() -> None:
 
     modified_conf_content = replace_placeholders(conf_content, user_inputs)
 
-    # Write the modified .conf file
     conf_output_path = Path(f"{output_dir}/{normalised_name}.conf")
-    try:
-        with conf_output_path.open("w") as conf_output_file:
-            conf_output_file.write(modified_conf_content)
-    except:
+    print("Writing output to output file...")
+
+    # Write the modified .conf file. There's some weirdness going on
+    # here that I think is a race condition, so we just try a couple
+    # of times. Debugging will occur in the future, I promise 😅
+    attempts = 0
+    while attempts < MAX_ATTEMPTS:
+        try:
+            with conf_output_path.open("w") as conf_output_file:
+                conf_output_file.write(modified_conf_content)
+        except:
+            sleep(ATTEMPT_DELAY)
+            continue
+    else:
         print(f"Unable to write to output file: {conf_output_path}")
         print("Please try running setup again")
+        print()
         exit(255)
+
 
     # Read start_nomi
     with start_nomi_path.open("r") as start_file:
@@ -175,14 +189,22 @@ def main() -> None:
 
     # Write the modified start_nomi file with the OS-specific extension
     start_output_path = Path(f"{output_dir}/start_{normalised_name}{extension}")
-    try:
-        with start_output_path.open("w") as start_output_file:
-            if "Windows_NT" not in os_type:
-                start_output_file.write("#!/usr/bin/env bash\n")
-            start_output_file.write(modified_start_content)
-    except:
+    print("Writing output to output file...")
+
+    attempts = 0
+    while attempts < MAX_ATTEMPTS:
+        try:
+            with start_output_path.open("w") as start_output_file:
+                if "Windows_NT" not in os_type:
+                    start_output_file.write("#!/usr/bin/env bash\n")
+                start_output_file.write(modified_start_content)
+        except:
+            sleep(ATTEMPT_DELAY)
+            continue
+    else:
         print(f"Unable to write to output file: {start_output_path}")
         print("Please try running setup again")
+        print()
         exit(255)
 
     print(f"To invite {user_inputs["NOMI_NAME"]} to Discord you can copy and paste the invitation URL")
