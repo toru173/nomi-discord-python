@@ -61,7 +61,7 @@ jobs:
         id: package_installer
         run: |
             mkdir -p release_assets
-            zip -r release_assets/install.zip *
+            zip -r release_assets/install.zip * -x "docs/*"
 
       # Create a release
       - name: Create Release
