@@ -39,19 +39,20 @@ jobs:
           NEW_INCREMENTAL=$((INCREMENTAL + 1))
           NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_INCREMENTAL}"
 
+          echo "New version will be $NEW_VERSION"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       # Create a release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.increment_version.outputs.NEW_VERSION }}
           release_name: "Release ${{ steps.increment_version.outputs.NEW_VERSION }}"
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Upload the 'install' file to the release
       - name: Upload 'install' File
