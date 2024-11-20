@@ -164,9 +164,11 @@ def main() -> None:
         print(f"Unable to write to output file: {conf_output_path}")
         print("Please try running setup again")
         print()
-        print("@toru173 still hasn't figured out this error. Please post"
-        print("a screentshot of the error to help:")
+        print("@toru173 still hasn't figured out this error. Please post a screentshot")
+        print("of the error to help troubleshoot, along with a brief description of")
+        print("what happened.")
         print(f"{e}")
+        print()
         exit(255)
 
     # Read start_nomi
@@ -192,8 +194,9 @@ def main() -> None:
         print(f"Unable to write to output file: {start_output_path}")
         print("Please try running setup again")
         print()
-        print("@toru173 still hasn't figured out this error. Please post"
-        print("a screentshot of the error to help:")
+        print("@toru173 still hasn't figured out this error. Please post a screentshot")
+        print("of the error to help troubleshoot, along with a brief description of")
+        print("what happened.")
         print(f"{e}")
         print()
         exit(255)
