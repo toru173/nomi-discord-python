@@ -59,7 +59,7 @@ The installer will also check for [tar](https://en.wikipedia.org/wiki/Tar_(compu
 This application uses an installer script that checks for Docker and tar then downloads and extracts the rest of the application.
 
 #### Run the Installer
-To download the installer, simply copy the command and paste it into your command line interpreter. Each section shows how to do this for different operating systems. Make sure you copy and paste the right command for your computer's operating system.
+To download the installer, copy the command and paste it into your command line interpreter. Each section shows how to do this for different operating systems. Make sure you copy and paste the right command for your computer's operating system.
 
 You can copy the download link by clicking the clipboard icon to the right of the command.
 
@@ -132,7 +132,7 @@ Before you can have a Nomi talk on Discord, we need to go through a few steps to
 
 !['Applications' Screenshot](./docs/images/readme/'Applications'%20Screenshot.png)
 
-The click 'New Application' at the top right of the window.
+Then click 'New Application' at the top right of the window.
 
 !['New Application' Screenshot](./docs/images/readme/'New%20Application'%20Screenshot.png)
 
