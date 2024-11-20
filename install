@@ -42,7 +42,7 @@ ECHO ===========================================================================
 ECHO:
 ECHO Welcome to the easy installer for nomi-discord-python. We're going to check
 ECHO that your system has a few things installed already, then install the latest
-ECHO version of nomi-python-discord.
+ECHO version of nomi-discord-python.
 ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together
 ECHO:
@@ -471,7 +471,7 @@ if [[ "$1" != "--skip-checks" ]]; then
     echo
     echo "Welcome to the easy installer for nomi-discord-python. We're going to check"
     echo "that your system has a few things installed already, then install the latest"
-    echo "version of nomi-python-discord."
+    echo "version of nomi-discord-python."
     echo
     echo "If you ever want to quit the script, simply press CTRL+C together"
     echo
