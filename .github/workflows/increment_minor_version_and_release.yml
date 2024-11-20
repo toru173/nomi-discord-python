@@ -3,6 +3,9 @@ name: Increment Major Version and Create Release
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   increment_major:
     name: Increment Minor Version
@@ -38,18 +41,23 @@ jobs:
       - name: Increment Minor
         id: increment_version
         run: |
-          VERSION=${{ steps.get_latest_release.outputs.LATEST_TAG }}
+            VERSION=${{ steps.get_latest_release.outputs.LATEST_TAG }}
 
-          # Extract current version
-          MAJOR=$(echo $VERSION | cut -d. -f1 | sed 's/v//')
-          MINOR=$(echo $VERSION | cut -d. -f2)
+            if [[ "$VERSION" == "v1.0.0" ]]; then
+                NEW_VERSION="$VERSION"
+            else
+                # Extract major, minor, and incremental parts
+                MAJOR=$(echo $VERSION | cut -d. -f1 | sed 's/v//')
+                MINOR=$(echo $VERSION | cut -d. -f2)
+                INCREMENTAL=$(echo $VERSION | cut -d. -f3)
 
-          # Increment minor part and reset incremental part
-          NEW_MINOR=$((MINOR + 1))
-          NEW_VERSION="v${MAJOR}.${NEW_MINOR}.0"
+                # Increment the minor part
+                NEW_MINOR=$((MINOR + 1))
+                NEW_VERSION="v${MAJOR}.${NEW_MINOR}.0"
+            fi
 
-          echo "New version will be $NEW_VERSION"
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUTS
+            echo "New version will be $NEW_VERSION"
+            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUTS
 
       # Create a release
       - name: Create Release

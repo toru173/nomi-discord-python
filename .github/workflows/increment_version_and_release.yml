@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   versioning:
     name: Increment Version and Create Release
@@ -40,19 +43,23 @@ jobs:
       - name: Increment Version
         id: increment_version
         run: |
-          VERSION=${{ steps.get_latest_release.outputs.LATEST_TAG }}
+            VERSION=${{ steps.get_latest_release.outputs.LATEST_TAG }}
 
-          # Extract major, minor, and incremental parts
-          MAJOR=$(echo $VERSION | cut -d. -f1 | sed 's/v//')
-          MINOR=$(echo $VERSION | cut -d. -f2)
-          INCREMENTAL=$(echo $VERSION | cut -d. -f3)
+            if [[ "$VERSION" == "v1.0.0" ]]; then
+                NEW_VERSION="$VERSION"
+            else
+                # Extract major, minor, and incremental parts
+                MAJOR=$(echo $VERSION | cut -d. -f1 | sed 's/v//')
+                MINOR=$(echo $VERSION | cut -d. -f2)
+                INCREMENTAL=$(echo $VERSION | cut -d. -f3)
 
-          # Increment the incremental part
-          NEW_INCREMENTAL=$((INCREMENTAL + 1))
-          NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_INCREMENTAL}"
+                # Increment the incremental part
+                NEW_INCREMENTAL=$((INCREMENTAL + 1))
+                NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_INCREMENTAL}"
+            fi
 
-          echo "New version will be $NEW_VERSION"
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "New version will be $NEW_VERSION"
+            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       # Create a release
       - name: Create Release
