@@ -112,6 +112,8 @@ class NomiBot(commands.Bot):
         if discord_message.author.id == self.user.id:
             return
 
+        logging.info(f"Received message from Discord: {discord_message}")
+
         # Check if the Nomi is mentioned in the message, or if we're in DMs
         if self.user in discord_message.mentions or discord_message.guild is None:
             # The Nomi was mentioned (or we're DMing). Now check to see if any other
@@ -171,8 +173,7 @@ class NomiBot(commands.Bot):
                 except RuntimeError as e:
                     # If there's an error, use that as the reply so we can let
                     # the user know what went wrong
-                    nomi_reply  = f"❌ ERROR ❌\n"
-                    nomi_reply += f"\n{str(e)}"
+                    nomi_reply  = f"{self.nomi.name} encountered an error when trying to reply: {str(e)}"
 
             # Re-set the typing indicator. The Nomi is 'typing' the whole time
             # we are communicating with them, which includes sending the message
@@ -213,7 +214,7 @@ class NomiBot(commands.Bot):
                             # Replace @username or @role with the proper mention
                             nomi_reply = nomi_reply.replace(f"@{match}", mention)
 
-                logging.error(nomi_reply)
+                logging.info(f"Sending message to Discord from {self.nomi.name}: {nomi_reply}")
 
                 # If the nomi has reacted to the message using the react
                 # key phrase, attempt to get that from the Nomi's message
