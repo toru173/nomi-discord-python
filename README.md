@@ -100,7 +100,11 @@ curl -sL https://github.com/toru173/nomi-discord-python/releases/latest/download
 
 </details>
 
-The installer will ask you where you want to install to and perform some basic checks. Once everything is installed you can set up a Nomi using the setup script.
+The installer will ask you where you want to install nomi-discord-python to, and perform some basic checks.
+
+!['Installer Script Checks' Screenshot](./docs/images/readme/'Installer%20Script%20Checks'%20Screenshot.png)
+
+Once everything is installed you can set up a Nomi using the setup script, but make sure you have set up a Discord Bot first.
 
 </details>
 
@@ -250,7 +254,7 @@ When it is finished, it will create a configuration file and a startup script, b
 #### Invite your Nomi to your Server
 The setup script will display an invitation URL that you can use to invite your Nomi to your Discord server.
 
-!['Invitation URL' Screenshot](./docs/images/readme/'Invitation%20URL'%20Screenshot.png)
+!['Setup Script Invitation URL' Screenshot](./docs/images/readme/'Setup%20Script%20Invitation%20URL'%20Screenshot.png)
 
 Copy and paste the link into your browser and follow the prompts to install the Discord Bot to your server. If you forgot to copy the URL, it is also displayed each time you start your Nomi's Docker container using the startup script.
 
