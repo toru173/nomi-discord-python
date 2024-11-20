@@ -145,7 +145,7 @@ ECHO:
 ECHO Where would you like to install nomi-discord-python?
 
 :CONFIRM_INSTALL_DIR
-ECHO Install Location: %INSTALL_DIR%
+ECHO Install Directory: %INSTALL_DIR%
 SET /P "USER_INPUT=Press Enter to accept, or choose a new location: "
 
 IF NOT "%USER_INPUT%" == "" SET "INSTALL_DIR=%USER_INPUT%"
@@ -497,13 +497,13 @@ fi
 while true; do
     # Prompt the user to confirm the installation directory
     echo
-    echo "Install Location: $INSTALL_DIR"
+    echo "Install Directory: $INSTALL_DIR"
     read -p "Press Enter to accept, or choose a new location: " INSTALL_DIR </dev/tty
     INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
 
     # Display the chosen directory and ask for confirmation
     echo
-    echo "Install Location: $INSTALL_DIR"
+    echo "Install Directory: $INSTALL_DIR"
     if prompt_confirm "Are you sure?"; then
         break
     fi

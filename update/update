@@ -14,8 +14,8 @@ ECHO ============================= Easy Updater ================================
 ECHO ===========================================================================
 ECHO:
 ECHO This will download the latest version of nomi-discord-python and install it
-ECHO to the current install location. You will have the opportunity to install
-ECHO to a different location if you wish.
+ECHO to the current install directory. You will have the opportunity to install
+ECHO to a different directory if you wish.
 ECHO:
 ECHO If you ever want to quit the script, simply press CTRL+C together.
 ECHO:
@@ -88,8 +88,8 @@ echo "============================= Easy Updater ===============================
 echo "==========================================================================="
 echo
 echo "This will download the latest version of nomi-discord-python and install it"
-echo "to the current install location. You will have the opportunity to install"
-echo "to a different location if you want to."
+echo "to the current install directory. You will have the opportunity to install"
+echo "to a different directory if you want to."
 echo
 echo "If you ever want to quit the script, simply press CTRL+C together."
 echo
