@@ -78,6 +78,8 @@ jobs:
                 echo "⚠️ WARNING ⚠️ All files will be pushed to Production"
             fi
 
+            find prod/ -mindepth 1
+
       # Commit and Push Changes to Production Repo
       - name: Commit and Push Changes
         run: |
