@@ -40,16 +40,15 @@ jobs:
 
       # Clone the Production Repository
       - name: Clone Production Repository
-        run: git clone git@github.com:myakirimiya/nomi-discord-python.git prod
+        run: git clone git@github.com:myakirimiya/nomi-discord-python.git prod/
 
       # Copy the Development repository to the Production repository.
       # Here we basically nuke everything in prod except .git, and
       # replace it with the contents of dev
       - name: Clean Production Repository
         run: |
-            find prod -mindepth 1 ! -type d -name 'prod/.git/*' -exec rm -rf {} +
-            rsync -ah --exclude='.git' --exclude='prod' . prod/
-            find prod -mindepth 1
+            find prod/ -mindepth 1 ! -type d -name 'prod/.git/*' -exec rm -rf {} +
+            rsync -ah --exclude='.git' --exclude='prod' ./ prod/
 
       # Prepare the Production Repository for Release
       - name: Prepare for Release
@@ -71,7 +70,7 @@ jobs:
             if [[ -f "$RELEASE_IGNORE" ]]; then
                 while IFS= read -r PATTERN; do
                     if [ -n "$PATTERN" ]; then
-                        rm -rf "prod/$PATTERN"
+                        find prod/ -path "prod/$PATTERN" -exec echo "Removing {}" \;
                     fi
                 done < "$RELEASE_IGNORE"
             else
