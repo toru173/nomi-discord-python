@@ -72,7 +72,8 @@ jobs:
                     fi
                 done < "$RELEASE_IGNORE"
             else
-                echo "$RELEASE_IGNORE file not found. Skipping..."
+                echo "$RELEASE_IGNORE file not found."
+                echo "⚠️ WARNING ⚠️ All files will be synchronised to Production"
             fi
 
       # Commit and Push Changes to Production Repo
