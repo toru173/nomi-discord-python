@@ -46,7 +46,9 @@ jobs:
       # Here we basically nuke everything in prod except .git, and
       # replace it with the contents of dev
       - name: Clean Production Repository
-        run: rsync -avh --delete-before --ignore-errors --exclude='.git' . prod/
+        run:
+            find prod/ -mindepth 1 ! -path 'prod/.git/*' -exec rm -rf {} +
+            rsync -avh --exclude='.git' --exclude='prod' . prod/
 
       # Prepare the Production Repository for Release
       - name: Prepare for Release
@@ -77,12 +79,6 @@ jobs:
                 echo "$RELEASE_IGNORE file not found."
                 echo "⚠️ WARNING ⚠️ All files will be synchronised to the production repository."
             fi
-
-      # Sanity Check
-      - name: Sanity Check
-        run: |
-            cat prod/README.md
-            find prod/
 
       # Commit and Push Changes to Production Repo
       - name: Commit and Push Changes
