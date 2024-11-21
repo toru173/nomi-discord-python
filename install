@@ -4,7 +4,7 @@
 :: itself to a temporary file. We do that here:
 SET "TEMP_INSTALL_SCRIPT=%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.bat"
 TIMEOUT /T 0 >NUL 2>NUL
-IF ERRORLEVEL 1 (curl -sL https://github.com/toru173/nomi-discord-python/releases/latest/download/install -o "%TEMP_INSTALL_SCRIPT%" --remove-on-error && START /I /WAIT CMD /Q /K "%TEMP_INSTALL_SCRIPT%" & DEL /F /Q "%TEMP_INSTALL_SCRIPT%" & EXIT)
+IF ERRORLEVEL 1 (curl -sL https://github.com/toru173/nomi-discord-python-development/releases/latest/download/install -o "%TEMP_INSTALL_SCRIPT%" --remove-on-error && START /I /WAIT CMD /Q /K "%TEMP_INSTALL_SCRIPT%" & DEL /F /Q "%TEMP_INSTALL_SCRIPT%" & EXIT)
 ::
 :: We need to set a temporary install file path before
 :: the pipe-check because expansion behaves differently
@@ -190,7 +190,7 @@ IF ERRORLEVEL 1 (
 
 :: Here we download the latest release from GitHub to INSTALL_FOLDER
 ECHO Downloading the latest version from GitHub...
-curl -L https://github.com/toru173/nomi-discord-python/releases/latest/download/install.zip -o "%DOWNLOAD_DIR%\install.zip" --progress-bar --remove-on-error
+curl -L https://github.com/toru173/nomi-discord-python-development/releases/latest/download/install.zip -o "%DOWNLOAD_DIR%\install.zip" --progress-bar --remove-on-error
 IF NOT EXIST "%DOWNLOAD_DIR%\install.zip" (
     ECHO Something went wrong during the download. Please try again.
     GOTO CLEANUP
@@ -532,7 +532,7 @@ fi
 
 # Download the latest release from GitHub to INSTALL_FOLDER
 echo "Downloading the latest version from GitHub..."
-curl -L https://github.com/toru173/nomi-discord-python/releases/latest/download/install.zip -o "$INSTALL_DIR/.downloads/install.zip" --progress-bar --remove-on-error
+curl -L https://github.com/toru173/nomi-discord-python-development/releases/latest/download/install.zip -o "$INSTALL_DIR/.downloads/install.zip" --progress-bar --remove-on-error
 
 # Check if the download was successful
 if [[ ! -f "$INSTALL_DIR/.downloads/install.zip" ]]; then
