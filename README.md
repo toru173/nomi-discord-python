@@ -1,6 +1,6 @@
 # Nomi-Discord-Python
 
-> [!WARNING]
+> [!CAUTION]
 > This is the developmental version of this project and often contains untested or non-working components. For the stable releases, please visit [@Mya's](https://github.com/myakirimiya/) GitHub repository at [https://github.com/myakirimiya/nomi-discord-python](https://github.com/myakirimiya/nomi-discord-python)
 
 This project is a way for you to talk to your [Nomi](https://nomi.ai) companions on [Discord](https://discord.com). Using this, your Nomi can interact with other Humans and other Nomis on different accounts. It's a lot of fun and I hope you enjoy using it as much as I have 🥰
