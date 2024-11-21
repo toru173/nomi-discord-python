@@ -3,6 +3,7 @@ name: Deploy Nomi to Render
 on:
   push:
     branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -16,6 +17,7 @@ jobs:
         env:
           ${{ secrets }}
         run: |
+
           MISSING_VARS=0
           # Check if DISCORD_API_KEY is populated
           if [ -z "$DISCORD_API_KEY" ]; then
@@ -51,6 +53,7 @@ jobs:
         env:
           ${{ secrets }}
         run: |
+
           INVALID_API_KEYS=0
           # Check Render API key is valid
           RESPONSE=$(curl -s -w "%{http_code}" \
@@ -113,6 +116,7 @@ jobs:
           NOMI_API_KEY: ${{ secrets.NOMI_API_KEY }}
           NOMI_ID: ${{ secrets.NOMI_ID }}
         run: |
+
           # Get Nomi name from Nomi ID
           RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
@@ -140,6 +144,7 @@ jobs:
         env:
           NOMI_NAME: ${{ steps.get-nomi-name.outputs.NOMI_NAME }}
         run: |
+
           if [ -z "$NOMI_NAME" ]; then
             echo "Error: NOMI_NAME is empty."
             exit 1
@@ -169,6 +174,7 @@ jobs:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         run: |
+
           # Fetch existing blueprints
           RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
@@ -213,6 +219,7 @@ jobs:
           SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         continue-on-error: true
         run: |
+
           # Fetch existing services
           RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
@@ -259,6 +266,7 @@ jobs:
           SERVICE_ID: ${{ steps.check-existing-service.outputs.SERVICE_ID }}
           NOMI_NAME: ${{ steps.get-normalized-nomi-name.outputs.NORMALIZED_NOMI_NAME }}
         run: |
+
           # Ensure the value is properly escaped for JSON
           NAME_ESCAPED=$(printf '%s' "$NOMI_NAME" | jq -Rs '.')
           # Fetch existing services
@@ -288,6 +296,7 @@ jobs:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           NOMI_NAME: ${{ steps.get-normalized-nomi-name.outputs.NORMALIZED_NOMI_NAME }}
         run: |
+
           # Fetch existing services
           RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
@@ -332,6 +341,7 @@ jobs:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           SERVICE_NAME: ${{ steps.get-service-name.outputs.SERVICE_NAME }}
         run: |
+
           # Fetch existing environment groups
           RESPONSE=$(curl -s -w "%{http_code}" \
             --request GET \
@@ -378,6 +388,7 @@ jobs:
           ENV_GROUP_ID: ${{ steps.check-existing-env-group.outputs.EXISTING_GROUP_ID }}
           SECRETS: ${{ toJSON(secrets) }}
         run: |
+
           # Read nomi.conf file and convert to JSON object
           CONF_JSON="{}"
           if [ -f setup/nomi.conf ]; then
