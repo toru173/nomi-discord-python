@@ -49,9 +49,9 @@ jobs:
         run: |
 
             # Delete everything in prod that isn't prod's .git folder
-            find prod/ -mindepth 1 ! -path 'prod/.git*' -exec rm -rf {} +
+            find prod -mindepth 1 ! -path 'prod/.git*' -exec rm -rf {} +
             # Copy over everything from dev that isn't dev's .git folder
-            rsync -ah --exclude='.git' ./ prod/
+            rsync -ah --exclude='.git' . prod
 
       # Prepare the Production Repository for Release
       - name: Prepare for Release
@@ -72,8 +72,10 @@ jobs:
 
             if [[ -f "$RELEASE_IGNORE" ]]; then
                 while IFS= read -r PATTERN; do
+                    echo "$PATERN"
                     if [ -n "$PATTERN" ]; then
-                        rm -rf $PATTERN
+                        echo "Removing $PATTERN from Release Update"
+                        rm -rf "$PATTERN"
                     fi
                 done < "$RELEASE_IGNORE"
             else
