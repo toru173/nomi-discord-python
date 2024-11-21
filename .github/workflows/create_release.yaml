@@ -47,8 +47,8 @@ jobs:
       # replace it with the contents of dev
       - name: Clean Production Repository
         run: |
-            find prod/ -mindepth 1 ! -path 'prod/.git/*' -exec rm -rf {} +
-            rsync -avh --exclude='.git' --exclude='prod' . prod/
+            find prod/ -mindepth 1 ! -path '.git/*' -exec rm -rf {} +
+            rsync -ah --exclude='.git' --exclude='prod' . prod/
 
       # Prepare the Production Repository for Release
       - name: Prepare for Release
@@ -69,10 +69,8 @@ jobs:
 
             if [[ -f "$RELEASE_IGNORE" ]]; then
                 while IFS= read -r PATTERN; do
-                    echo "$PATERN"
                     if [ -n "$PATTERN" ]; then
-                        echo "Removing $PATTERN from Release Update"
-                        rm -rf "$PATTERN"
+                        rm -rf $PATTERN
                     fi
                 done < "$RELEASE_IGNORE"
             else
