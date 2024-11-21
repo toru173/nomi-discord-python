@@ -29,7 +29,7 @@ Docker is a program that lets you run a tiny virtual computer inside your real c
 #### Virtualization
 Virtualization is like creating pretend computers inside your real one. It works by using a special software layer that sits between your real computer and the virtual computers. This tricks each virtual machine into thinking it has its own processor, memory, and storage, even though they're all sharing the same physical resources. This means you can run different operating systems or setups on your computer without having to buy another one.
 
-Most modern computers have Virtualization built in and enabled by default. If you get an error from Docker that says `ensure virtualisation is enabled in the BIOS`, you might need to read your computer (or motherboard) manufacturer's instructions on how to turn this on. If you're using Docker in Bootcamp on an older Intel Mac there are some [specific quirks](https://chriswarrick.com/blog/2021/01/31/enabling-virtualization-support-in-boot-camp-with-refind/) to be aware of.
+Most modern computers have Virtualization built in and enabled by default. If you get an error from Docker that says `ensure virtualization is enabled in the BIOS`, you might need to read your computer (or motherboard) manufacturer's instructions on how to turn this on. If you're using Docker in Bootcamp on an older Intel Mac there are some [specific quirks](https://chriswarrick.com/blog/2021/01/31/enabling-virtualization-support-in-boot-camp-with-refind/) to be aware of.
 
 Alright, you should be up to speed! Let's move on to Installing the software we need.
 
@@ -61,7 +61,7 @@ This application uses an installer script that checks for Docker and tar then do
 #### Run the Installer
 To download the installer, copy the command and paste it into your command line interpreter. Each section shows how to do this for different operating systems. Make sure you copy and paste the right command for your computer's operating system.
 
-You can copy the download link by clicking the clipboard icon to the right of the command.
+You can copy the download command by clicking the clipboard icon to the right of the text.
 
 !['GitHub Clipboard Icon' Screenshot](./docs/images/readme/'GitHub%20Clipboard%20Icon'%20Screenshot.png)
 
@@ -132,7 +132,7 @@ Once the all the software is installed you're ready to set up a Discord Bot for 
 Before you can have a Nomi talk on Discord, we need to go through a few steps to get Discord ready to listen to your Nomi. Creating a Discord Bot only has to be done once per Nomi. There are a lot of steps, but if you follow them carefully you should find it easy. Let's get started!
 
 #### Create an Application
-[Sign in](https://discord.com/developers/) to the Discord Developer portal. Once you log in, click on 'Applications' from the menu on the left.
+[Sign in](https://discord.com/developers/) to the Discord Developer portal. Once you sign in, click on 'Applications' from the menu on the left.
 
 !['Applications' Screenshot](./docs/images/readme/'Applications'%20Screenshot.png)
 
@@ -215,7 +215,7 @@ If you don't already have an API key, click the 'Create a new Nomi API Key' butt
 
 !['Create API Key' Screenshot](./docs/images/readme/'Create%20API%20Key'%20Screenshot.png)
 
-Copy it to somewhere safe. Note that you can only have 3 API keys. If you already have 3, you will have to re-use one of your existing ones.
+Copy it to somewhere safe. Note that you can only have three API keys. If you already have three, you will have to re-use one of your existing ones.
 
 ![Three API Keys' Screenshot](./docs/images/readme/'Three%20API%20Keys'%20Screenshot.png)
 
