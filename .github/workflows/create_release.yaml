@@ -46,7 +46,7 @@ jobs:
       # Here we basically nuke everything in prod except .git, and
       # replace it with the contents of dev
       - name: Clean Production Repository
-        run: rsync -a --delete --exclude='.git' /dev/null prod/
+        run: rsync -ah --delete --exclude='.git' . prod/
 
       # Prepare the Production Repository for Release
       - name: Prepare for Release
