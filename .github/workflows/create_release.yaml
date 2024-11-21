@@ -70,7 +70,7 @@ jobs:
             if [[ -f "$RELEASE_IGNORE" ]]; then
                 while IFS= read -r PATTERN; do
                     if [ -n "$PATTERN" ]; then
-                        find prod/ -path "prod/$PATTERN" -exec echo "Removing {}" \;
+                        find prod/ -path "prod/$PATTERN" -exec rm -rf {} +
                     fi
                 done < "$RELEASE_IGNORE"
             else
