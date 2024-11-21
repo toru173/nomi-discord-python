@@ -46,7 +46,7 @@ jobs:
       # Here we basically nuke everything in prod except .git, and
       # replace it with the contents of dev
       - name: Clean Production Repository
-        run:
+        run: |
             find prod/ -mindepth 1 ! -path 'prod/.git/*' -exec rm -rf {} +
             rsync -avh --exclude='.git' --exclude='prod' . prod/
 
