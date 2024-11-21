@@ -19,49 +19,57 @@ jobs:
       # Verify 'install' File Exists
       - name: Verify 'install' File Exists
         run: |
-            if [ ! -f ./install ]; then
-                echo "'install' file not found!"
-                exit 1
-            fi
+
+          # Check for installer file
+          if [ ! -f ./install ]; then
+              echo "'install' file not found!"
+              exit 1
+          fi
 
       # Fetch the latest release
       - name: Get Latest Release Tag
         id: get_latest_release
         run: |
-            LATEST_TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
 
-            echo "Latest tag: $LATEST_TAG"
-            echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_OUTPUT
+          # Query the repo for the latest version
+          LATEST_TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+
+          echo "Latest tag: $LATEST_TAG"
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       # Increment 'minor' version
       - name: Increment Minor
         id: increment_version
         run: |
-            VERSION=${{ steps.get_latest_release.outputs.LATEST_TAG }}
 
-            if [[ "$VERSION" == "null" ]]; then
-                NEW_VERSION="v1.0.0"
-            else
-                # Extract major, minor, and incremental parts
-                MAJOR=$(echo $VERSION | cut -d. -f1 | sed 's/v//')
-                MINOR=$(echo $VERSION | cut -d. -f2)
-                INCREMENTAL=$(echo $VERSION | cut -d. -f3)
+          # Get the current version
+          VERSION=${{ steps.get_latest_release.outputs.LATEST_TAG }}
 
-                # Increment the minor part
-                NEW_MINOR=$((MINOR + 1))
-                NEW_VERSION="v${MAJOR}.${NEW_MINOR}.0"
-            fi
+          if [[ "$VERSION" == "null" ]]; then
+              NEW_VERSION="v1.0.0"
+          else
+              # Extract major, minor, and incremental parts
+              MAJOR=$(echo $VERSION | cut -d. -f1 | sed 's/v//')
+              MINOR=$(echo $VERSION | cut -d. -f2)
+              INCREMENTAL=$(echo $VERSION | cut -d. -f3)
 
-            echo "New version will be $NEW_VERSION"
-            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUTS
+              # Increment the minor part
+              NEW_MINOR=$((MINOR + 1))
+              NEW_VERSION="v${MAJOR}.${NEW_MINOR}.0"
+          fi
+
+          echo "New version will be $NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUTS
 
       # Create a zip of the repo for release
       - name: Package Install File
         id: package_installer
         run: |
-            mkdir -p release_assets
-            zip -r release_assets/install.zip * -x "docs/*"
+
+          # Compress installer assets
+          mkdir -p release_assets
+          zip -r release_assets/install.zip * -x "docs/*"
 
       # Create a release
       - name: Create Release
