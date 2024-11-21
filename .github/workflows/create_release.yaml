@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
         README: "README.md"
-        RELEASE_IGNORE_FILE: ".releaseignore"
+        RELEASE_IGNORE: "./.releaseignore"
 
     steps:
       # Checkout the development repo
@@ -65,12 +65,12 @@ jobs:
             # Replace URLs from dev repo with URLs from prod repo
             sed -i 's|https://github.com/toru173/nomi-discord-python-development|https://github.com/myakirimiya/nomi-discord-python|g' "./prod/$README"
 
-            if [[ -f "$RELEASE_IGNORE_FILE" ]]; then
+            if [[ -f "$RELEASE_IGNORE" ]]; then
                 while IFS= read -r PATTERN; do
                     if [ -n "$PATTERN" ]; then
                         rm -rf $PATTERN
                     fi
-                done < "$RELEASE_IGNORE_FILE"
+                done < "$RELEASE_IGNORE"
             fi
 
       # Commit and Push Changes to Production Repo
@@ -83,5 +83,5 @@ jobs:
           git config --global user.email "mya.kirimiya@gmail.com"
           git config --global commit.gpgsign true
           git add .
-          git commit -m "Getting the latest updates from toru173..."
-          git push
+          git commit -m "Getting the latest updates from toru173..." --dry-run
+          git push --dry-run
