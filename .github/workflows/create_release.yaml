@@ -47,7 +47,10 @@ jobs:
       # replace it with the contents of dev
       - name: Clean Production Repository
         run: |
-            find prod/ -mindepth 1 ! -type d -name 'prod/.git/*' -exec rm -rf {} +
+
+            find prod/ -mindepth 1 -not -path "./.git" -not -path "./.git/*" -exec rm -rf {} +
+            # find prod/ -mindepth 1 ! -path 'prod/.git/*' -exec sh -c 'echo "Removing: $1" && rm -rf "$1"' _ {} \;
+            find prod/ -mindepth 1
             rsync -ah --exclude='.git' --exclude='prod' ./ prod/
 
       # Prepare the Production Repository for Release
