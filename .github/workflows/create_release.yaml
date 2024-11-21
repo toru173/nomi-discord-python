@@ -75,7 +75,7 @@ jobs:
                 done < "$RELEASE_IGNORE"
             else
                 echo "$RELEASE_IGNORE file not found."
-                echo "⚠️ WARNING ⚠️ All files will be synchronised to Production"
+                echo "⚠️ WARNING ⚠️ All files will be pushed to Production"
             fi
 
       # Commit and Push Changes to Production Repo
@@ -88,5 +88,5 @@ jobs:
           git config --global user.email "mya.kirimiya@gmail.com"
           git config --global commit.gpgsign true
           git add .
-          git commit -m "Getting the latest updates from toru173..." --dry-run
-          git push --dry-run
+          git commit -m "Getting the latest updates from toru173..."
+          git push
