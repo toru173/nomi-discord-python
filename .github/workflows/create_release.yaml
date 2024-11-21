@@ -76,9 +76,6 @@ jobs:
                 echo "⚠️ WARNING ⚠️ All files will be synchronised to the production repository."
             fi
 
-            cat "prod/$README"
-            find prod/ -type f
-
       # Commit and Push Changes to Production Repo
       - name: Commit and Push Changes
         run: |
