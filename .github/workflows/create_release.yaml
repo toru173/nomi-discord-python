@@ -81,6 +81,13 @@ jobs:
                 echo "⚠️ WARNING ⚠️ All files will be synchronised to the production repository."
             fi
 
+      # Sanity Check
+      - name: Sanity Check
+        run: |
+            cat README.md
+            find prod/
+            exit 1
+
       # Commit and Push Changes to Production Repo
       - name: Commit and Push Changes
         run: |
