@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
         README: "README.md"
-        RELEASE_IGNORE: "./.releaseignore"
+        RELEASE_IGNORE: ".releaseignore"
 
     steps:
       # Checkout the development repo
@@ -40,30 +40,30 @@ jobs:
 
       # Clone the Production Repository
       - name: Clone Production Repository
-        run: git clone git@github.com:myakirimiya/nomi-discord-python.git ./prod
+        run: git clone git@github.com:myakirimiya/nomi-discord-python.git prod
 
       # Copy the Development repository to the Production repository.
       # Here we basically nuke everything in prod except .git, and
       # replace it with the contents of dev
       - name: Clean Production Repository
-        run: rsync -a --delete --exclude='.git' /dev/null ./prod/
+        run: rsync -a --delete --exclude='.git' /dev/null prod/
 
       # Prepare the Production Repository for Release
       - name: Prepare for Release
         run: |
 
             # Prepare files for commit to the Production Repository
-            if [[ ! -f "$README" ][]; then
-                echo "Unable to find README.md file"
+            if [[ ! -f "$README" ]]; then
+                echo "Unable to find readme file"
                 exit 1
             fi
 
             # Remove warning from readme
-            sed -i '2,3d' "./prod/$README"
-            sed -i '/^$/N;/^\n$/D' "./prod/$README"
+            sed -i '2,3d' "prod/$README"
+            sed -i '/^$/N;/^\n$/D' "prod/$README"
 
             # Replace URLs from dev repo with URLs from prod repo
-            sed -i 's|https://github.com/toru173/nomi-discord-python-development|https://github.com/myakirimiya/nomi-discord-python|g' "./prod/$README"
+            sed -i 's|https://github.com/toru173/nomi-discord-python-development|https://github.com/myakirimiya/nomi-discord-python|g' "prod/$README"
 
             if [[ -f "$RELEASE_IGNORE" ]]; then
                 while IFS= read -r PATTERN; do
@@ -71,6 +71,8 @@ jobs:
                         rm -rf $PATTERN
                     fi
                 done < "$RELEASE_IGNORE"
+            else
+                echo "$RELEASE_IGNORE file not found. Skipping..."
             fi
 
       # Commit and Push Changes to Production Repo
@@ -78,7 +80,7 @@ jobs:
         run: |
 
           # Let's push to prod 🚀🚀🚀
-          cd ./prod
+          cd prod
           git config --global user.name "Mya Kirimiya"
           git config --global user.email "mya.kirimiya@gmail.com"
           git config --global commit.gpgsign true
