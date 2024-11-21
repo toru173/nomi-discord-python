@@ -25,7 +25,7 @@ FOR %%I IN ("%~dp0") DO SET "SCRIPT_ROOT=%%~fI" & SET "SCRIPT_ROOT=!SCRIPT_ROOT:
 
 SET "LATEST_INSTALLER=!SCRIPT_ROOT!\latest_installer.bat"
 
-curl -sL https://github.com/toru173/nomi-discord-python/releases/latest/download/install -o "%LATEST_INSTALLER%"
+curl -sL https://github.com/toru173/nomi-discord-python-development/releases/latest/download/install -o "%LATEST_INSTALLER%"
 ATTRIB +H "%LATEST_INSTALLER%"
 CALL "%LATEST_INSTALLER%" --skip-checks
 
@@ -97,7 +97,7 @@ echo
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LATEST_INSTALLER="$SCRIPT_ROOT/latest_installer.sh"
 
-bash -c "$(curl -sL https://github.com/toru173/nomi-discord-python/releases/latest/download/install)" -- --skip-checks
+bash -c "$(curl -sL https://github.com/toru173/nomi-discord-python-development/releases/latest/download/install)" -- --skip-checks
 
 # All done! Let's exit from the macOS/Linux part of the script
 exit $?
