@@ -10,6 +10,9 @@ jobs:
     env:
         README: "README.md"
         RELEASE_IGNORE: ".releaseignore"
+        INSTALL: "install"
+        UPDATE: "update/update"
+
 
     steps:
       # Checkout the development repo
@@ -24,19 +27,19 @@ jobs:
       - name: Get SSH Key for Authentication
         run: |
 
-            # Get authentication SSH Key from secrets
-            echo "${{ secrets.MYA_AUTHENTICATION_SSH_KEY }}" > ~/.ssh/id_ed25519
-            chmod 600 ~/.ssh/id_ed25519
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
+          # Get authentication SSH Key from secrets
+          echo "${{ secrets.MYA_AUTHENTICATION_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Get SSH Key for Signing
         run: |
 
-            # Get signing SSH Key from secrets
-            echo "${{ secrets.MYA_SIGNING_SSH_KEY }}" > ~/.ssh/id_ed25519_signing
-            chmod 600 ~/.ssh/id_ed25519_signing
-            git config --global gpg.format ssh
-            git config --global user.signingkey "~/.ssh/id_ed25519_signing"
+          # Get signing SSH Key from secrets
+          echo "${{ secrets.MYA_SIGNING_SSH_KEY }}" > ~/.ssh/id_ed25519_signing
+          chmod 600 ~/.ssh/id_ed25519_signing
+          git config --global gpg.format ssh
+          git config --global user.signingkey "~/.ssh/id_ed25519_signing"
 
       # Clone the Production Repository
       - name: Clone Production Repository
@@ -48,37 +51,41 @@ jobs:
       - name: Clean Production Repository
         run: |
 
-            find prod/ -mindepth 1 -not -path "prod/.git" -not -path "prod/.git/*" -exec rm -rf {} +
-            # find prod/ -mindepth 1 ! -path 'prod/.git/*' -exec sh -c 'echo "Removing: $1" && rm -rf "$1"' _ {} \;
-            rsync -ah --exclude='.git' --exclude='prod' ./ prod/
+          find prod/ -mindepth 1 -not -path "prod/.git" -not -path "prod/.git/*" -exec rm -rf {} +
+          # find prod/ -mindepth 1 ! -path 'prod/.git/*' -exec sh -c 'echo "Removing: $1" && rm -rf "$1"' _ {} \;
+          rsync -ah --exclude='.git' --exclude='prod' ./ prod/
 
       # Prepare the Production Repository for Release
       - name: Prepare for Release
         run: |
 
-            # Prepare files for commit to the Production Repository
-            if [[ ! -f "$README" ]]; then
-                echo "Unable to find readme file"
-                exit 1
-            fi
+          # Prepare files for commit to the Production Repository
+          if [[ ! -f "$README" ]]; then
+              echo "Unable to find readme file"
+              exit 1
+          fi
 
-            # Remove warning from readme
-            sed -i '3,4d' "prod/$README"
-            sed -i '/^$/N;/^\n$/D' "prod/$README"
+          FILES=("$README" "$INSTALL" "$UPDATE")
 
-            # Replace URLs from dev repo with URLs from prod repo
-            sed -i 's|https://github.com/toru173/nomi-discord-python-development|https://github.com/myakirimiya/nomi-discord-python|g' "prod/$README"
+          # Remove warning from readme
+          sed -i '3,4d' "prod/$README"
+          sed -i '/^$/N;/^\n$/D' "prod/$README"
 
-            if [[ -f "$RELEASE_IGNORE" ]]; then
-                while IFS= read -r PATTERN; do
-                    if [ -n "$PATTERN" ]; then
-                        find prod/ -path "prod/$PATTERN" -exec rm -rf {} +
-                    fi
-                done < "$RELEASE_IGNORE"
-            else
-                echo "$RELEASE_IGNORE file not found."
-                echo "⚠️ WARNING ⚠️ All files will be pushed to Production"
-            fi
+          # Replace URLs from dev repo with URLs from prod repo
+          for FILE in "${FILES[@]}"; do
+              sed -i 's|https://github.com/toru173/nomi-discord-python-development|https://github.com/myakirimiya/nomi-discord-python|g' "prod/$FILE"
+          done
+
+          if [[ -f "$RELEASE_IGNORE" ]]; then
+              while IFS= read -r PATTERN; do
+                  if [ -n "$PATTERN" ]; then
+                      find prod/ -path "prod/$PATTERN" -exec rm -rf {} +
+                  fi
+              done < "$RELEASE_IGNORE"
+          else
+              echo "$RELEASE_IGNORE file not found."
+              echo "⚠️ WARNING ⚠️ All files will be pushed to Production"
+          fi
 
       # Commit and Push Changes to Production Repo
       - name: Commit and Push Changes
