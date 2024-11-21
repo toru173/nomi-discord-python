@@ -30,6 +30,8 @@ jobs:
       - name: Get Latest Release Tag
         id: get_latest_release
         run: |
+
+          # Query the repo for the latest version
           LATEST_TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
 
@@ -65,7 +67,7 @@ jobs:
         id: package_installer
         run: |
 
-          # Zip up installer assets
+          # Compress installer assets
           mkdir -p release_assets
           zip -r release_assets/install.zip * -x "docs/*"
 
