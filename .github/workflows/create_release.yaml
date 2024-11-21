@@ -71,12 +71,12 @@ jobs:
             if [[ -f "$RELEASE_IGNORE" ]]; then
                 while IFS= read -r PATTERN; do
                     if [ -n "$PATTERN" ]; then
-                        rm -rf $PATTERN
+                        rm -rf "prod/$PATTERN"
                     fi
                 done < "$RELEASE_IGNORE"
             else
                 echo "$RELEASE_IGNORE file not found."
-                echo "⚠️ WARNING ⚠️ All files will be synchronised to the production repository."
+                echo "⚠️ WARNING ⚠️ All files will be synchronised to Production"
             fi
 
       # Commit and Push Changes to Production Repo
