@@ -49,9 +49,9 @@ jobs:
         run: |
 
             # Delete everything in prod that isn't prod's .git folder
-            find prod -mindepth 1 ! -name '.git' -exec rm -rf {} +
+            find prod/ -mindepth 1 ! -name '.git' -exec rm -rf {} +
             # Copy over everything from dev that isn't dev's .git folder
-            rsync -ah --exclude='.git' . prod/
+            rsync -ah --exclude='.git' ./ prod/
 
       # Prepare the Production Repository for Release
       - name: Prepare for Release
