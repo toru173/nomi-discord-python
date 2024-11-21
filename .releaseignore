@@ -1,4 +1,4 @@
+.releaseignore
 .github/**/deploy_to_render.*
 .github/**/create_release.*
-.releaseignore
 render.*
