@@ -203,7 +203,6 @@ Once you have the new token, copy it somewhere safe. You can't see it again late
 
 If you create a new token you'll need to update your Nomi's configuration file.
 
-
 #### Get your Discord Application ID
 If you didn't save your Discord Bot's Application ID earlier, click on 'General Information' on the menu on the left. You can access the Application ID here.
 
