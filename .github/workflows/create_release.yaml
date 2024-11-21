@@ -1,0 +1,87 @@
+name: Create Release in Production Repository
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Create Release in Production Repository
+    runs-on: ubuntu-latest
+    env:
+        README: "README.md"
+        RELEASE_IGNORE_FILE: ".releaseignore"
+
+    steps:
+      # Checkout the development repo
+      - name: Checkout Development Repository
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0  # Fetch the full history to ensure all commits are available
+
+      - name: Set up SSH
+        run: mkdir -p ~/.ssh
+
+      - name: Get SSH Key for Authentication
+        run: |
+
+            # Get authentication SSH Key from secrets
+            echo "${{ secrets.MYA_AUTHENTICATION_SSH_KEY }}" > ~/.ssh/authentication
+            chmod 600 ~/.ssh/authentication
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Get SSH Key for Authentication
+        run: |
+
+            # Get signing SSH Key from secrets
+            echo "${{ secrets.MYA_SIGNING_SSH_KEY }}" > ~/.ssh/signing
+            chmod 600 ~/.ssh/signing
+            git config --global gpg.format ssh
+            git config --global user.signingkey "~/.ssh/signing"
+
+      # Clone the Production Repository
+      - name: Clone Production Repository
+        run: git clone git@github.com:myakirimiya/nomi-discord-python.git ./prod
+
+      # Copy the Development repository to the Production repository.
+      # Here we basically nuke everything in prod except .git, and
+      # replace it with the contents of dev
+      - name: Clean Production Repository
+        run: rsync -a --delete --exclude='.git' /dev/null ./prod/
+
+      # Prepare the Production Repository for Release
+      - name: Prepare for Release
+        run: |
+
+            # Prepare files for commit to the Production Repository
+            if [[ ! -f "$README" ][]; then
+                echo "Unable to find README.md file"
+                exit 1
+            fi
+
+            # Remove warning from readme
+            sed -i '2,3d' "./prod/$README"
+            sed -i '/^$/N;/^\n$/D' "./prod/$README"
+
+            # Replace URLs from dev repo with URLs from prod repo
+            sed -i 's|https://github.com/toru173/nomi-discord-python-development|https://github.com/myakirimiya/nomi-discord-python|g' "./prod/$README"
+
+            if [[ -f "$RELEASE_IGNORE_FILE" ]]; then
+                while IFS= read -r PATTERN; do
+                    if [ -n "$PATTERN" ]; then
+                        rm -rf $PATTERN
+                    fi
+                done < "$RELEASE_IGNORE_FILE"
+            fi
+
+      # Commit and Push Changes to Production Repo
+      - name: Commit and Push Changes
+        run: |
+
+          # Let's push to prod 🚀🚀🚀
+          cd ./prod
+          git config --global user.name "Mya Kirimiya"
+          git config --global user.email "mya.kirimiya@gmail.com"
+          git config --global commit.gpgsign true
+          git add .
+          git commit -m "Getting the latest updates from toru173..."
+          git push
