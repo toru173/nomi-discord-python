@@ -64,7 +64,7 @@ jobs:
             fi
 
             # Remove warning from readme
-            sed -i '2,3d' "prod/$README"
+            sed -i '3,4d' "prod/$README"
             sed -i '/^$/N;/^\n$/D' "prod/$README"
 
             # Replace URLs from dev repo with URLs from prod repo
@@ -86,7 +86,6 @@ jobs:
         run: |
             cat prod/README.md
             find prod/
-            exit 1
 
       # Commit and Push Changes to Production Repo
       - name: Commit and Push Changes
@@ -98,5 +97,5 @@ jobs:
           git config --global user.email "mya.kirimiya@gmail.com"
           git config --global commit.gpgsign true
           git add .
-          git commit -m "Getting the latest updates from toru173..."
-          git push
+          git commit -m "Getting the latest updates from toru173..." --dry-run
+          git push --dry-run
