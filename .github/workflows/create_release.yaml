@@ -25,18 +25,18 @@ jobs:
         run: |
 
             # Get authentication SSH Key from secrets
-            echo "${{ secrets.MYA_AUTHENTICATION_SSH_KEY }}" > ~/.ssh/authentication
-            chmod 600 ~/.ssh/authentication
+            echo "${{ secrets.MYA_AUTHENTICATION_SSH_KEY }}" > ~/.ssh/id_ed25519
+            chmod 600 ~/.ssh/id_ed25519
             ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-      - name: Get SSH Key for Authentication
+      - name: Get SSH Key for Signing
         run: |
 
             # Get signing SSH Key from secrets
-            echo "${{ secrets.MYA_SIGNING_SSH_KEY }}" > ~/.ssh/signing
-            chmod 600 ~/.ssh/signing
+            echo "${{ secrets.MYA_SIGNING_SSH_KEY }}" > ~/.ssh/id_ed25519_signing
+            chmod 600 ~/.ssh/id_ed25519_signing
             git config --global gpg.format ssh
-            git config --global user.signingkey "~/.ssh/signing"
+            git config --global user.signingkey "~/.ssh/id_ed25519_signing"
 
       # Clone the Production Repository
       - name: Clone Production Repository
