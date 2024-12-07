@@ -361,6 +361,13 @@ function check_dependancies() {
         TAR_INSTALLED=0
     fi
 
+    # Check if unzip is installed
+    if command -v unzip  > /dev/null 2>&1; then
+        UNZIP_INSTALLED=1
+    else
+        UNZIP_INSTALLED=0
+    fi
+
     # Display installation statuses
     if [[ "$DOCKER_INSTALLED" -eq 1 ]]; then
         echo "[x] Docker is installed"
@@ -374,8 +381,15 @@ function check_dependancies() {
         echo "[ ] tar is not installed"
     fi
 
+    if [[ "$UNZIP_INSTALLED" -eq 1 ]]; then
+        echo "[x] unzip is installed"
+    else
+        echo "[ ] unzip is not installed"
+    fi
+
+
     # If both are installed, continue
-    if [[ "$DOCKER_INSTALLED" -eq 1 ]] && [[ "$TAR_INSTALLED" -eq 1 ]]; then
+    if [[ "$DOCKER_INSTALLED" -eq 1 ]] && [[ "$TAR_INSTALLED" -eq 1 || "$UNZIP_INSTALLED" -eq 1 ]]; then
         echo
         echo "All required software is installed."
     else
@@ -420,15 +434,41 @@ function check_dependancies() {
                 elif command -v zypper  > /dev/null 2>&1; then
                     echo "For SUSE or openSUSE systems, you can install tar by running:"
                     echo "    sudo zypper install tar"
-                elif command -v brew  > /dev/null 2>&1; then
-                    echo "For macOS users, you can install GNU tar by running:"
-                    echo "    brew install gnu-tar"
                 else
                     echo "Your system does not have a recognized package manager."
                     echo "Please refer to your system documentation on how to install tar."
                 fi
             fi
+
+            # Check if unzip is installed. Prompt the user to download it if not
+            # by attempting to guess what package manager they are using (if any)
+            if [[ "$UNZIP_INSTALLED" -eq 0 ]]; then
+                echo
+                echo "unzip is required but not installed."
+                echo "You may need to install it using a package manager."
+                echo
+
+                # Provide examples of how to install unzip depending on the system
+                if command -v apt  > /dev/null 2>&1; then
+                    echo "For Ubuntu or Debian-based systems, you can install unzip by running:"
+                    echo "    sudo apt update && sudo apt install unzip"
+                elif command -v yum  > /dev/null 2>&1; then
+                    echo "For Red Hat, CentOS, or Fedora systems, you can install unzip by running:"
+                    echo "    sudo yum install unzip"
+                elif command -v dnf  > /dev/null 2>&1; then
+                    echo "For newer Fedora systems (or RHEL 8+), you can install unzip by running:"
+                    echo "    sudo dnf install unzip"
+                elif command -v zypper  > /dev/null 2>&1; then
+                    echo "For SUSE or openSUSE systems, you can install unzip by running:"
+                    echo "    sudo zypper install unzip"
+                else
+                    echo "Your system does not have a recognized package manager."
+                    echo "Please refer to your system documentation on how to install unzip."
+                fi
+            fi
+
         fi
+        echo
         echo "Some required software is missing. Please install the missing software"
         echo "and re-run the installer."
         exit 1
@@ -565,9 +605,11 @@ fi
 # to accomodate that
 echo "Extracting installation files..."
 if tar --version 2>&1 | grep -q "GNU tar"; then
+    # If we have GNU tar, we need to use unzip instead.
     tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" \
         --wildcards --no-anchored 'install' 'LICENSE' 'app/*' 'setup/*' 'update/*'
 elif tar --version 2>&1 | grep -qi "bsdtar"; then
+    # bsdtar can do what we need
     tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" \
         --include="install" --include="LICENSE" --include="app/*" --include="setup/*" --include="update/*"
 else
