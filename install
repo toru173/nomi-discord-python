@@ -566,7 +566,7 @@ fi
 echo "Extracting installation files..."
 if tar --version 2>&1 | grep -q "GNU tar"; then
     tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" \
-        --wildcards --no-anchored "install" "LICENSE" "app/*" "setup/*" "update/*"
+        --wildcards --no-anchored 'install' 'LICENSE' 'app/*' 'setup/*' 'update/*'
 elif tar --version 2>&1 | grep -qi "bsdtar"; then
     tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" \
         --include="install" --include="LICENSE" --include="app/*" --include="setup/*" --include="update/*"
