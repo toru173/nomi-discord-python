@@ -13,7 +13,6 @@ jobs:
         INSTALL: "install"
         UPDATE: "update/update"
 
-
     steps:
       # Checkout the development repo
       - name: Checkout Development Repository
