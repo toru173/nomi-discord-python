@@ -198,7 +198,7 @@ IF NOT EXIST "%DOWNLOAD_DIR%\install.zip" (
 
 :: Warn the user that existing files will be overwritten. No going back now!
 ECHO:
-ECHO WARNING: This step will overwrite existing installation files in the directory:
+ECHO WARNING: This step will overwrite the existing installation in the directory:
 ECHO %INSTALL_DIR%
 ECHO:
 ECHO Any configuration files or startup scripts should be safe; however, if
@@ -582,7 +582,7 @@ fi
 
 # Warn the user that existing files will be overwritten. No going back now!
 echo
-echo "WARNING: This step will overwrite existing installation files in the directory:"
+echo "WARNING: This step will overwrite the existing installation in the directory:"
 echo "$INSTALL_DIR"
 echo
 echo "Any configuration files or startup scripts should be safe; however, if"
@@ -602,12 +602,12 @@ fi
 # into that before before we can filter by the things we want to download.
 # After that, get the install script, the license and everything inside
 # the 'app' subdirectory. GNU tar and bsdtar behave differently so we need
-# to accomodate that
+# to accomodate for that
 echo "Extracting installation files..."
-if tar --version 2>&1 | grep -q "GNU tar"; then
+if tar --version 2>&1 | grep -qi "gnu tar"; then
     # If we have GNU tar, we need to use unzip instead.
-    tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" \
-        --wildcards --no-anchored 'install' 'LICENSE' 'app/*' 'setup/*' 'update/*'
+    unzip "$INSTALL_DIR/.downloads/install.zip" -d "$INSTALL_DIR" \
+        "install" "LICENSE" "app/*" "setup/*" "update/*"
 elif tar --version 2>&1 | grep -qi "bsdtar"; then
     # bsdtar can do what we need
     tar -xvf "$INSTALL_DIR/.downloads/install.zip" -C "$INSTALL_DIR" \
