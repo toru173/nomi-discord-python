@@ -82,6 +82,7 @@ jobs:
           tag_name: ${{ steps.increment_version.outputs.NEW_VERSION }}
           make_latest: true
           body: "Download the latest version here 🥰"
+          body_path: "CHANGELOG.md"
           files: |
             LICENSE
             install
